@@ -1,4 +1,4 @@
-import DummyClass from "../src/resourcery"
+import DummyClass from "../src/resorcery"
 
 /**
  * Dummy test

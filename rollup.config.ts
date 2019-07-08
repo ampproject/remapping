@@ -5,7 +5,7 @@ import typescript from 'rollup-plugin-typescript2'
 
 const pkg = require('./package.json')
 
-const libraryName = 'resourcery'
+const libraryName = 'resorcery'
 
 export default {
   input: `src/${libraryName}.ts`,
