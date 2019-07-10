@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": ["helloworld.mjs"],
+  "names": [],
+  "mappings": ";;AAAA,IAAI,CAAC,UAAL,GAAkB,EAAlB;;AAEA,IAAM,KAAK,GAAG,SAAR,KAAQ;AAAA,SAAM,KAAK,SAAX;AAAA,CAAd;;AAEA,KAAK",
+  "file": "helloworld.js",
+  "sourcesContent": ["self.AMP_CONFIG = {};\n\nconst greet = () => alert(`hello`);\n\ngreet();"]
+}
