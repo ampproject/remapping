@@ -3,17 +3,14 @@ import FastStringArray from './fast-string-array';
 import OriginalSource from './original-source';
 import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
 
-type PickedMap = Pick<DecodedSourceMap, 'mappings' | 'names'>;
 type Graph = OriginalSource | GraphNode;
 
 export default class GraphNode {
-  mappings: SourceMapSegment[][];
-  names: string[];
+  map: DecodedSourceMap;
   sources: Graph[];
 
-  constructor(map: PickedMap, sources: Graph[]) {
-    this.mappings = map.mappings;
-    this.names = map.names;
+  constructor(map: DecodedSourceMap, sources: Graph[]) {
+    this.map = map;
     this.sources = sources;
   }
 
@@ -23,8 +20,9 @@ export default class GraphNode {
     const sources = new FastStringArray();
     const sourcesContent: (string | null)[] = [];
 
-    for (let i = 0; i < this.mappings.length; i++) {
-      const line = this.mappings[i];
+    const { mappings: mapMappings, names: mapNames } = this.map;
+    for (let i = 0; i < mapMappings.length; i++) {
+      const line = mapMappings[i];
       const tracedLine: SourceMapSegment[] = [];
 
       for (let i = 0; i < line.length; i++) {
@@ -37,7 +35,7 @@ export default class GraphNode {
           segment[2],
           segment[3],
           // TODO: Is this necessary?
-          segment.length === 5 ? this.names[segment[4]] : ''
+          segment.length === 5 ? mapNames[segment[4]] : ''
         );
 
         if (!traced) continue;
@@ -58,7 +56,12 @@ export default class GraphNode {
       mappings.push(tracedLine);
     }
 
-    return { mappings, names: names.array, sources: sources.array, sourcesContent, version: 3 };
+    return Object.assign({}, this.map, {
+      mappings,
+      names: names.array,
+      sources: sources.array,
+      sourcesContent,
+    });
   }
 
   traceSegment(
@@ -66,7 +69,7 @@ export default class GraphNode {
     column: number,
     name: string
   ): SourceMapSegmentObject<OriginalSource> | null {
-    const segments = this.mappings[line];
+    const segments = this.map.mappings[line];
     if (!segments) return null;
 
     const index = binarySearch(segments, column, (segment, column) => {
@@ -83,7 +86,7 @@ export default class GraphNode {
     return source.traceSegment(
       segment[2],
       segment[3],
-      segment.length === 5 ? this.names[segment[4]] : name
+      segment.length === 5 ? this.map.names[segment[4]] : name
     );
   }
 }
