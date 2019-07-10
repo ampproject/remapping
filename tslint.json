@@ -4,6 +4,8 @@
     "tslint-config-prettier"
   ],
   "rules": {
-    "no-any": true
+    "no-any": true,
+    "ordered-imports": true,
+    "object-literal-sort-keys": true
   }
 }

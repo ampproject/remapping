@@ -10,6 +10,6 @@ export default class OriginalSource {
   }
 
   traceSegment(line: number, column: number, name: string): SourceMapSegmentObject<OriginalSource> {
-    return { line, column, name, source: this };
+    return { column, line, name, source: this };
   }
 }

@@ -19,12 +19,15 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "lint:ts": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "lint:prettier": "prettier --write 'src/**/*.ts'",
+    "lint": "npm run lint:ts && npm run lint:prettier",
     "prebuild": "rm -rf dist",
     "build": "tsc --module commonjs && rollup -c rollup.config.ts",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
-    "test:prod": "npm run lint && npm run test -- --no-cache"
+    "test:lint": "npm run lint:ts && prettier --check 'src/**/*.ts'",
+    "test:prod": "npm run test:lint && npm run test -- --no-cache"
   },
   "jest": {
     "transform": {

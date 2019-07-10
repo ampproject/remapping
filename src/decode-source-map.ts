@@ -1,17 +1,23 @@
-import { SourceMapInput, DecodedSourceMap, RawSourceMap, SourceMapInputMap, DecodedSourceMapMap } from './types';
 import { decode } from 'sourcemap-codec';
+import {
+  DecodedSourceMap,
+  DecodedSourceMapMap,
+  RawSourceMap,
+  SourceMapInput,
+  SourceMapInputMap,
+} from './types';
 
 export function decodeSourceMap(map: SourceMapInput): DecodedSourceMap {
   if (typeof map === 'string') {
     map = JSON.parse(map) as DecodedSourceMap | RawSourceMap;
   }
 
-  let {mappings} = map;
+  let { mappings } = map;
   if (typeof mappings === 'string') {
     mappings = decode(mappings);
   }
 
-  return Object.assign({}, map, {mappings});
+  return Object.assign({}, map, { mappings });
 }
 
 export function decodeSourceMapMap(modules: SourceMapInputMap): DecodedSourceMapMap {

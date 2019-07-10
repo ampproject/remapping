@@ -1,5 +1,5 @@
 export default class FastStringArray {
-  private map: { [key:string]: number };
+  private map: { [key: string]: number };
   array: string[];
 
   constructor() {
@@ -8,7 +8,7 @@ export default class FastStringArray {
   }
 
   put(key: string): number {
-    const {array, map} = this;
+    const { array, map } = this;
     // The key may or may not be present. If it is present, it's a number.
     let index = map[key] as number | undefined;
 
@@ -17,7 +17,7 @@ export default class FastStringArray {
       map[key] = index;
       array.push(key);
     }
-    
+
     return index;
   }
 }

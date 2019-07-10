@@ -1,7 +1,7 @@
-import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
-import OriginalSource from './original-source';
 import binarySearch from 'binary-search';
 import FastStringArray from './fast-string-array';
+import OriginalSource from './original-source';
+import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
 
 type PickedMap = Pick<DecodedSourceMap, 'mappings' | 'names'>;
 type Graph = OriginalSource | GraphNode;
@@ -21,7 +21,7 @@ export default class GraphNode {
     const mappings: SourceMapSegment[][] = [];
     const names = new FastStringArray();
     const sources = new FastStringArray();
-    const sourcesContent: (string | null)[] = []
+    const sourcesContent: (string | null)[] = [];
 
     for (let i = 0; i < this.mappings.length; i++) {
       const line = this.mappings[i];
@@ -42,27 +42,16 @@ export default class GraphNode {
 
         if (!traced) continue;
 
-        const {name} = traced;
-        const {filename, content} = traced.source;
+        const { name } = traced;
+        const { filename, content } = traced.source;
 
         const sourceIndex = sources.put(filename);
         sourcesContent[sourceIndex] = content;
 
         if (name) {
-          tracedLine.push([
-            segment[0],
-            sourceIndex,
-            traced.line,
-            traced.column,
-            names.put(name),
-          ]);
+          tracedLine.push([segment[0], sourceIndex, traced.line, traced.column, names.put(name)]);
         } else {
-          tracedLine.push([
-            segment[0],
-            sourceIndex,
-            traced.line,
-            traced.column,
-          ]);
+          tracedLine.push([segment[0], sourceIndex, traced.line, traced.column]);
         }
       }
 
@@ -72,7 +61,11 @@ export default class GraphNode {
     return { mappings, names: names.array, sources: sources.array, sourcesContent, version: 3 };
   }
 
-  traceSegment(line: number, column: number, name: string): SourceMapSegmentObject<OriginalSource> | null {
+  traceSegment(
+    line: number,
+    column: number,
+    name: string
+  ): SourceMapSegmentObject<OriginalSource> | null {
     const segments = this.mappings[line];
     if (!segments) return null;
 
