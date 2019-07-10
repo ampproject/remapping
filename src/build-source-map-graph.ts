@@ -3,20 +3,17 @@ import GraphNode from './graph-node';
 import OriginalSource from './original-source';
 import { DecodedSourceMap, DecodedSourceMapMap, SourceMapInput, SourceMapInputMap } from './types';
 
-function buildNode(
-  map: DecodedSourceMap,
-  modules: DecodedSourceMapMap,
-  sourceContent: string | null
-): GraphNode {
+function buildNode(map: DecodedSourceMap, modules: DecodedSourceMapMap): GraphNode {
   const { sourcesContent } = map;
   const sources = map.sources.map((sourceFile, i) => {
     const sourceMap = modules[sourceFile] as DecodedSourceMap | undefined;
+    const sourceContent = sourcesContent ? sourcesContent[i] : null;
+
     if (sourceMap === undefined) {
       return new OriginalSource(sourceFile, sourceContent);
     }
 
-    const sc = sourcesContent ? sourcesContent[i] : null;
-    return buildNode(sourceMap, modules, sc);
+    return buildNode(sourceMap, modules);
   });
 
   return new GraphNode(map, sources);
@@ -26,5 +23,5 @@ export default function buildSourceMapGraph(
   map: SourceMapInput,
   modules: SourceMapInputMap
 ): GraphNode {
-  return buildNode(decodeSourceMap(map), decodeSourceMapMap(modules), null);
+  return buildNode(decodeSourceMap(map), decodeSourceMapMap(modules));
 }
