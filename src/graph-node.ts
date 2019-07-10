@@ -1,4 +1,4 @@
-import binarySearch from 'binary-search';
+import binarySearch from './binary-search';
 import FastStringArray from './fast-string-array';
 import OriginalSource from './original-source';
 import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
