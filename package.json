@@ -19,14 +19,15 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "lint:ts": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "lint:ts": "tslint  --project tsconfig.json -t codeFrame '{src,test}/**/*.ts'",
     "lint:prettier": "prettier --write 'src/**/*.ts'",
     "lint": "npm run lint:ts && npm run lint:prettier",
     "prebuild": "rm -rf dist",
     "build": "tsc --module commonjs && rollup -c rollup.config.ts",
     "test": "jest --coverage",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:watch": "jest --coverage --watch",
-    "test:lint": "npm run lint:ts && prettier --check 'src/**/*.ts'",
+    "test:lint": "npm run lint:ts && prettier --check '{src,test}/**/*.ts'",
     "test:prod": "npm run test:lint && npm run test -- --no-cache"
   },
   "devDependencies": {
