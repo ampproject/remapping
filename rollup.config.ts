@@ -1,11 +1,11 @@
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
-import sourceMaps from 'rollup-plugin-sourcemaps'
-import typescript from 'rollup-plugin-typescript2'
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+import sourceMaps from 'rollup-plugin-sourcemaps';
+import typescript from 'rollup-plugin-typescript2';
 
-const pkg = require('./package.json')
+const pkg = require('./package.json');
 
-const libraryName = 'resorcery'
+const libraryName = 'resorcery';
 
 export default {
   input: `src/${libraryName}.ts`,
@@ -31,4 +31,4 @@ export default {
     // Resolve source maps to the original source
     sourceMaps(),
   ],
-}
+};
