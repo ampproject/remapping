@@ -20,7 +20,7 @@
   },
   "scripts": {
     "lint:ts": "npm run test:lint:ts -- --fix",
-    "lint:prettier": "npm run test:lint:prettier --write",
+    "lint:prettier": "npm run test:lint:prettier -- --write",
     "lint": "run-s -n lint:*",
     "prebuild": "rm -rf dist",
     "build:ts": "tsc --module commonjs",

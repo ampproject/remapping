@@ -6,6 +6,7 @@ import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './ty
 
 type Graph = OriginalSource | GraphNode;
 
+// TODO: Rename to SourceMapTree
 export default class GraphNode {
   map: DecodedSourceMap;
   sources: Graph[];
