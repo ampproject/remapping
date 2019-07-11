@@ -1,12 +1,12 @@
 import resorcery from '../../src/resorcery';
-import {RawSourceMap} from '../../src/types';
+import { RawSourceMap } from '../../src/types';
 
 describe('resorcery', () => {
   const rawMap: RawSourceMap = {
     file: 'transpiled.min.js',
     // 0th column of 1st line of output file translates into the 1st source
     // file, line 2, column 1, using 1st name.
-    mappings: 'AACCA', 
+    mappings: 'AACCA',
     names: ['add'],
     sourceRoot: '',
     sources: ['transpiled.js'],
@@ -76,11 +76,15 @@ describe('resorcery', () => {
   });
 
   test('excludes sourcesContent if `excludeContent` is set', () => {
-    const map = resorcery(rawMap, (name: string) => {
-      if (name === 'transpiled.js') {
-        return transpiledMap;
-      }
-    }, true);
+    const map = resorcery(
+      rawMap,
+      (name: string) => {
+        if (name === 'transpiled.js') {
+          return transpiledMap;
+        }
+      },
+      true
+    );
 
     expect(map).not.toHaveProperty('sourcesContent');
   });

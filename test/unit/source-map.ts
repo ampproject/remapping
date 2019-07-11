@@ -1,5 +1,5 @@
 import SourceMap from '../../src/source-map';
-import {DecodedSourceMap} from '../../src/types';
+import { DecodedSourceMap } from '../../src/types';
 
 describe('SourceMap', () => {
   const decoded: DecodedSourceMap = {
@@ -53,5 +53,5 @@ describe('SourceMap', () => {
       const map = new SourceMap(decoded, false);
       expect(JSON.parse(map.toString())).toEqual(map);
     });
-  })
+  });
 });

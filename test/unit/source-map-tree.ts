@@ -1,4 +1,4 @@
-describe('GraphNode', () => {
+describe('SourceMapTree', () => {
   describe('traceMappings()', () => {
     test.todo('');
   });

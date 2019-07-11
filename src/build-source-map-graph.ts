@@ -1,24 +1,24 @@
 import decodeSourceMap from './decode-source-map';
-import GraphNode from './graph-node';
 import OriginalSource from './original-source';
 import resolve from './resolve';
+import SourceMapTree from './source-map-tree';
 import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
 
 /**
  * Recursively builds a tree structure out of sourcemap files, with each node
- * being either an `OriginalSource` "leaf" or a `GraphNode` composed of
- * `OriginalSource`s and `GraphNode`s.
+ * being either an `OriginalSource` "leaf" or a `SourceMapTree` composed of
+ * `OriginalSource`s and `SourceMapTree`s.
  *
  * Every sourcemap is composed of a collection of source files and mappings
- * into locations of those source files. When we generate a `GraphNode` for the
- * sourcemap, we attempt to load each source file's own sourcemap. If it does
- * not have an associated sourcemap, it is considered an original, unmodified
- * source file.
+ * into locations of those source files. When we generate a `SourceMapTree` for
+ * the sourcemap, we attempt to load each source file's own sourcemap. If it
+ * does not have an associated sourcemap, it is considered an original,
+ * unmodified source file.
  */
 export default function buildSourceMapGraph(
   map: SourceMapInput,
   loader: SourceMapLoader
-): GraphNode {
+): SourceMapTree {
   map = decodeSourceMap(map);
   const { sourceRoot, sources, sourcesContent } = map;
 
@@ -44,5 +44,5 @@ export default function buildSourceMapGraph(
     return buildSourceMapGraph(decodeSourceMap(sourceMap), loader);
   });
 
-  return new GraphNode(map, children);
+  return new SourceMapTree(map, children);
 }

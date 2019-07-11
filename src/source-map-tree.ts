@@ -4,10 +4,9 @@ import FastStringArray from './fast-string-array';
 import OriginalSource from './original-source';
 import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
 
-type Graph = OriginalSource | GraphNode;
+type Graph = OriginalSource | SourceMapTree;
 
-// TODO: Rename to SourceMapTree
-export default class GraphNode {
+export default class SourceMapTree {
   map: DecodedSourceMap;
   sources: Graph[];
 
