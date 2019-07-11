@@ -1,9 +1,7 @@
-type GlobalURL = import('url').URL;
-interface Url extends GlobalURL {
-  // tslint:disable-next-line no-misused-new
-  new (input: string, base?: string): Url;
+type WhatWgUrl = import('url').URL;
+interface Url extends WhatWgUrl {
+  new (input: string, base?: string): WhatWgUrl;
 }
 
-// tslint:disable-next-line: no-any
-declare var URL: any;
+declare var URL: unknown;
 export default (typeof URL !== 'undefined' ? URL : require('url').URL) as Url;
