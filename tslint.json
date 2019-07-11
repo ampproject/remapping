@@ -6,6 +6,15 @@
   "rules": {
     "no-any": true,
     "ordered-imports": true,
-    "object-literal-sort-keys": true
+    "object-literal-sort-keys": true,
+    "typedef": [
+      true,
+      "call-signature",
+      "arrow-call-signature",
+      "parameter",
+      "arrow-parameter",
+      "property-declaration",
+      "member-variable-declaration"
+    ]
   }
 }

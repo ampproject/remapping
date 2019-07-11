@@ -6,7 +6,7 @@ import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
 
 function buildNode(map: DecodedSourceMap, loader: SourceMapLoader): GraphNode {
   const { sourceRoot, sourcesContent } = map;
-  const sources = map.sources.map((sourceFile, i) => {
+  const sources = map.sources.map((sourceFile: string, i: number) => {
     const sourceMap = loader(resolve(sourceFile, sourceRoot));
     const sourceContent = sourcesContent ? sourcesContent[i] : null;
 
