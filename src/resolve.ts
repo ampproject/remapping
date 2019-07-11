@@ -31,20 +31,21 @@ function resolveRelative(relative: string): string {
   return href.slice('https://foo/'.length);
 }
 
-function makeRelative(relative: string, root: string): string {
-  if (!root.startsWith('.')) return relative;
+function makeRelative(relative: string, base: string): string {
+  if (!base.startsWith('.')) return relative;
   if (relative.startsWith('.')) return relative;
   return './' + relative;
 }
 
-export default function resolve(root: string | undefined, file: string): string {
-  root = root || '';
-  if (root && !root.endsWith('/')) root += '/';
+export default function resolve(base: string | undefined, file: string): string {
+  base = base || '';
+  if (base && !base.endsWith('/')) base += '/';
 
-  const joined = root + file;
-  if (isAbsolute(joined)) return new URL(joined).href;
+  if (base && isAbsolute(base)) return new URL(file, base).href;
+  if (isAbsolute(file)) return new URL(file).href;
 
-  if (!parentRegex.exec(joined)) return makeRelative(resolveRelative(joined), root);
+  const joined = base + file;
+  if (!parentRegex.exec(joined)) return makeRelative(resolveRelative(joined), base);
 
   let prefix = '';
   const uniq = uniqInStr(joined);
@@ -63,5 +64,5 @@ export default function resolve(root: string | undefined, file: string): string 
     return '../'.repeat(total - leftover);
   });
 
-  return makeRelative(relative, root);
+  return makeRelative(relative, base);
 }

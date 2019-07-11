@@ -1,7 +1,7 @@
 type GlobalURL = import('url').URL;
 interface Url extends GlobalURL {
   // tslint:disable-next-line no-misused-new
-  new (input: string): Url;
+  new (input: string, base?: string): Url;
 }
 
 // tslint:disable-next-line: no-any
