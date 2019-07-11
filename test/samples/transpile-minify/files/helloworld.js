@@ -7,5 +7,4 @@ var greet = function greet() {
 };
 
 greet();
-
 //# sourceMappingURL=helloworld.js.map

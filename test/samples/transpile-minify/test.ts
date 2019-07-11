@@ -3,10 +3,10 @@ import { RawSourceMap, SourceMapConsumer } from 'source-map';
 import resorcery from '../../../src/resorcery';
 
 function read(filename: string): string {
-  return readFileSync(`${__dirname}/${filename}`, 'utf8');
+  return readFileSync(`${__dirname}/files/${filename}`, 'utf8');
 }
 
-describe('sample 1', () => {
+describe('transpile then minify', () => {
   test('single source map does not change', () => {
     const map = read('helloworld.js.map');
     const remapped = resorcery(map, {});
@@ -14,11 +14,10 @@ describe('sample 1', () => {
     expect(remapped).toEqual(JSON.parse(map));
   });
 
-  test('minify a transpiled source map', async () => {
-    const minified = read('helloworld.min.js.map');
-    const transpiled = read('helloworld.js.map');
-    const remapped = resorcery(minified, {
-      'helloworld.js': transpiled,
+  test('minify a transpiled source map', () => {
+    const map = read('helloworld.min.js.map');
+    const remapped = resorcery(map, {
+      'helloworld.js': read('helloworld.js.map'),
     });
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
@@ -34,11 +33,10 @@ describe('sample 1', () => {
     });
   });
 
-  test('inherits sourcesContent of original source', async () => {
-    const minified = read('helloworld.min.js.map');
-    const transpiled = read('helloworld.js.map');
-    const remapped = resorcery(minified, {
-      'helloworld.js': transpiled,
+  test('inherits sourcesContent of original source', () => {
+    const map = read('helloworld.min.js.map');
+    const remapped = resorcery(map, {
+      'helloworld.js': read('helloworld.js.map'),
     });
 
     expect(remapped.sourcesContent).toEqual([read('helloworld.mjs')]);
