@@ -1,5 +1,3 @@
-type Dictionary<T> = { [key: string]: T };
-
 interface SourceMapV3 {
   file?: string;
   names: string[];
@@ -31,6 +29,4 @@ export interface SourceMapSegmentObject<T> {
 
 export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;
 
-export type SourceMapInputMap = Dictionary<SourceMapInput>;
-
-export type DecodedSourceMapMap = Dictionary<DecodedSourceMap>;
+export type SourceMapLoader = (file: string) => SourceMapInput | null | undefined;

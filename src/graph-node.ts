@@ -37,7 +37,6 @@ export default class GraphNode {
           // TODO: Is this necessary?
           segment.length === 5 ? mapNames[segment[4]] : ''
         );
-
         if (!traced) continue;
 
         const { name } = traced;
@@ -46,6 +45,10 @@ export default class GraphNode {
         const sourceIndex = sources.put(filename);
         sourcesContent[sourceIndex] = content;
 
+        // This looks like unnecessary duplication, but it noticably increases
+        // preformance. If we were to push the nameIndex onto length-4 array, v8
+        // would internally allocate 22 slots! That's 68 wasted bytes! Array
+        // literals have the same capacity as their length, saving memory.
         if (name) {
           tracedLine.push([segment[0], sourceIndex, traced.line, traced.column, names.put(name)]);
         } else {
@@ -72,9 +75,7 @@ export default class GraphNode {
     const segments = this.map.mappings[line];
     if (!segments) return null;
 
-    const index = binarySearch(segments, column, (segment, column) => {
-      return segment[0] - column;
-    });
+    const index = binarySearch(segments, column, segmentComparator);
     if (index < 0) {
       return null;
     }
@@ -89,4 +90,8 @@ export default class GraphNode {
       segment.length === 5 ? this.map.names[segment[4]] : name
     );
   }
+}
+
+function segmentComparator(segment: SourceMapSegment, column: number): number {
+  return segment[0] - column;
 }

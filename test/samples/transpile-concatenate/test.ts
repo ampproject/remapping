@@ -9,9 +9,8 @@ function read(filename: string): string {
 describe('transpile then concatenate', () => {
   test('concated sections point to source files', () => {
     const map = read('bundle.js.map');
-    const remapped = resorcery(map, {
-      'a.js': read('a.js.map'),
-      'b.js': read('b.js.map'),
+    const remapped = resorcery(map, (file) => {
+      return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
@@ -37,11 +36,10 @@ describe('transpile then concatenate', () => {
     });
   });
 
-  test('inherits sourcesContent of original source', () => {
+  test('inherits sourcesContent of original sources', () => {
     const map = read('bundle.js.map');
-    const remapped = resorcery(map, {
-      'a.js': read('a.js.map'),
-      'b.js': read('b.js.map'),
+    const remapped = resorcery(map, (file) => {
+      return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
     expect(remapped.sourcesContent).toEqual([

@@ -7,17 +7,10 @@ function read(filename: string): string {
 }
 
 describe('transpile then minify', () => {
-  test('single source map does not change', () => {
-    const map = read('helloworld.js.map');
-    const remapped = resorcery(map, {});
-
-    expect(remapped).toEqual(JSON.parse(map));
-  });
-
   test('minify a transpiled source map', () => {
     const map = read('helloworld.min.js.map');
-    const remapped = resorcery(map, {
-      'helloworld.js': read('helloworld.js.map'),
+    const remapped = resorcery(map, (file) => {
+      return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
@@ -35,8 +28,8 @@ describe('transpile then minify', () => {
 
   test('inherits sourcesContent of original source', () => {
     const map = read('helloworld.min.js.map');
-    const remapped = resorcery(map, {
-      'helloworld.js': read('helloworld.js.map'),
+    const remapped = resorcery(map, (file) => {
+      return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
     expect(remapped.sourcesContent).toEqual([read('helloworld.mjs')]);
