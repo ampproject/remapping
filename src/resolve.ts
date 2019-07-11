@@ -8,11 +8,11 @@ function isAbsolute(url: string): boolean {
   }
 }
 
-export default function resolve(base: string | undefined, file: string): string {
-  if (isAbsolute(file)) return new URL(file).href;
+export default function resolve(input: string, base: string | undefined): string {
+  if (isAbsolute(input)) return new URL(input).href;
   if (base) {
-    if (isAbsolute(base)) return new URL(file, base).href;
+    if (isAbsolute(base)) return new URL(input, base).href;
     throw new Error(`cannot handle relative base "${base}"`);
   }
-  return file;
+  return input;
 }
