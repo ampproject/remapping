@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": ["a.mjs"],
+  "names": [],
+  "mappings": "AAAA,gBAAe;AAAA,SAAM,GAAN;AAAA,CAAf",
+  "sourcesContent": ["export default () => 'a';"],
+  "file": "a.js"
+}

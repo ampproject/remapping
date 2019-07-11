@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": ["index.mjs"],
+  "names": ["default", "a", "b"],
+  "mappings": "AAAA,SAAQA,OAAO,IAAIC,CAAnB,QAA2B,QAA3B;AACA,SAAQD,OAAO,IAAIE,CAAnB,QAA2B,QAA3B",
+  "sourcesContent": ["export {default as a} from './a.js';\nexport {default as b} from './b.js';"],
+  "file": "index.js"
+}
