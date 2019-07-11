@@ -9,7 +9,7 @@ function read(filename: string): string {
 describe('transpile then minify', () => {
   test('minify a transpiled source map', () => {
     const map = read('helloworld.min.js.map');
-    const remapped = resorcery(map, (file) => {
+    const remapped = resorcery(map, file => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
@@ -28,7 +28,7 @@ describe('transpile then minify', () => {
 
   test('inherits sourcesContent of original source', () => {
     const map = read('helloworld.min.js.map');
-    const remapped = resorcery(map, (file) => {
+    const remapped = resorcery(map, file => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
