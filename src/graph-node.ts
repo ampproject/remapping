@@ -1,4 +1,5 @@
 import binarySearch from './binary-search';
+import defaults from './defaults';
 import FastStringArray from './fast-string-array';
 import OriginalSource from './original-source';
 import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
@@ -59,12 +60,15 @@ export default class GraphNode {
       mappings.push(tracedLine);
     }
 
-    return Object.assign({}, this.map, {
-      mappings,
-      names: names.array,
-      sources: sources.array,
-      sourcesContent,
-    });
+    return defaults(
+      {
+        mappings,
+        names: names.array,
+        sources: sources.array,
+        sourcesContent,
+      },
+      this.map
+    );
   }
 
   traceSegment(
@@ -76,9 +80,7 @@ export default class GraphNode {
     if (!segments) return null;
 
     const index = binarySearch(segments, column, segmentComparator);
-    if (index < 0) {
-      return null;
-    }
+    if (index < 0) return null;
 
     const segment = segments[index];
     if (segment.length === 1) return null;

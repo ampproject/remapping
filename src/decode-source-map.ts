@@ -1,4 +1,5 @@
 import { decode } from 'sourcemap-codec';
+import defaults from './defaults';
 import { DecodedSourceMap, RawSourceMap, SourceMapInput } from './types';
 
 export default function decodeSourceMap(map: SourceMapInput): DecodedSourceMap {
@@ -11,5 +12,5 @@ export default function decodeSourceMap(map: SourceMapInput): DecodedSourceMap {
     mappings = decode(mappings);
   }
 
-  return Object.assign(Object.create(null), map, { mappings });
+  return defaults({ mappings }, map);
 }
