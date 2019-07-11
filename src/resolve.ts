@@ -11,6 +11,7 @@ function isAbsolute(url: string): boolean {
 export default function resolve(input: string, base: string | undefined): string {
   if (isAbsolute(input)) return new URL(input).href;
   if (base) {
+    base = base.replace(/\/?$/, '/');
     if (isAbsolute(base)) return new URL(input, base).href;
     throw new Error(`cannot handle relative base "${base}"`);
   }
