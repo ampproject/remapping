@@ -19,22 +19,27 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "lint:ts": "tslint  --project tsconfig.json --fix -t codeFrame '{src,test}/**/*.ts'",
-    "lint:prettier": "prettier --write '{src,test}/**/*.ts'",
-    "lint": "npm run lint:ts && npm run lint:prettier",
+    "lint:ts": "npm run test:lint:ts -- --fix",
+    "lint:prettier": "npm run test:lint:prettier --write",
+    "lint": "run-s -n lint:*",
     "prebuild": "rm -rf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts",
+    "build:ts": "tsc --module commonjs",
+    "build:rollup": "rollup -c rollup.config.ts",
+    "build": "run-s -n build:*",
     "test": "jest --coverage",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:watch": "jest --coverage --watch",
-    "test:lint": "npm run lint:ts && prettier --check '{src,test}/**/*.ts'",
-    "test:prod": "npm run test:lint && npm run test -- --no-cache"
+    "test:lint:ts": "tslint  --project tsconfig.json -t codeFrame '{src,test}/**/*.ts'",
+    "test:lint:prettier": "prettier --check '{src,test}/**/*.ts'",
+    "test:lint": "run-s -n test:lint:*",
+    "test:prod": "run-s -n test:lint 'test --no-cache'"
   },
   "devDependencies": {
     "@types/jest": "24.0.15",
     "@types/node": "12.6.2",
     "jest": "24.8.0",
     "jest-config": "24.8.0",
+    "npm-run-all": "4.1.5",
     "prettier": "1.18.2",
     "rollup": "1.16.7",
     "rollup-plugin-commonjs": "10.0.1",
