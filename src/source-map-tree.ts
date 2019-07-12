@@ -77,7 +77,7 @@ export default class SourceMapTree {
     name: string
   ): SourceMapSegmentObject<OriginalSource> | null {
     const segments = this.map.mappings[line];
-    if (!segments) throw new Error('sourcemap pointed to invalid line');
+    if (!segments) return null; // throw new Error('sourcemap pointed to invalid line');
 
     const index = binarySearch(segments, column, segmentComparator);
     if (index < 0) return null;

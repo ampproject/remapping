@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": ["main.mjs"],
+  "names": ["foo", "baz"],
+  "mappings": "AAAA,IAAMA,GAAG,GAAG,SAANA,GAAM;AAAA,SAAM,KAAN;AAAA,CAAZ;AAEA;;;AAEA,IAAMC,GAAG,GAAG,SAANA,GAAM;AAAA,SAAM,KAAN;AAAA,CAAZ",
+  "sourcesContent": ["const foo = () => 'foo';\n\n/* PLACEHOLDER */\n\nconst baz = () => 'baz';\n"],
+  "file": "main.js"
+}

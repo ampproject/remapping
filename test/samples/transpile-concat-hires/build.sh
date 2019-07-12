@@ -1,6 +1,7 @@
 #!/bin/bash
 DIR="$(dirname $0)"
 NODE_BIN=`npm bin`
+NODE_MODULES=`npm prefix`/node_modules
 
 rm "$DIR/files/*.js*"
 
@@ -9,11 +10,9 @@ if [ ! -f "$NODE_BIN/babel" ]; then
 fi
 "$NODE_BIN/babel" "$DIR/files" --config-file "$DIR/babel.config.js" --source-maps -d "$DIR/files"
 
-# Strip the sourceMappingURL to prevent rollup from auto collapsing sourcemaps
-for f in $DIR/files/*.js; do
-  sed '$d' $f > $f.tmp
-  mv $f.tmp $f
-done
+if [ ! -d "$NODE_MODULES/magic-string" ]; then
+  npm install --no-save magic-string
+fi
 
-npx rollup -i "$DIR/files/index.js" -f cjs -o "$DIR/files/bundle.js" --sourcemap
+node "$DIR/build.js"
 npx prettier "$DIR/files/*.map" --parser json --write
