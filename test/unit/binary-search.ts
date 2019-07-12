@@ -1,54 +1,75 @@
 import binarySearch from '../../src/binary-search';
 
 describe('binary search', () => {
-  const array = [0, 2, 4, 6, 8, 10, 12, 14, 16];
   function comparator(item: number, needle: number): number {
     return item - needle;
   }
 
   test('returns index of match', () => {
+    const array: number[] = [];
     for (let i = 0; i < 9; i++) {
-      const needle = i * 2;
-      const index = binarySearch(array, needle, comparator);
+      array.push(i * 2);
+      for (let j = 0; j < array.length; j++) {
+        const needle = j * 2;
+        const index = binarySearch(array, needle, comparator);
 
-      expect(index).toEqual(i);
+        expect(index).toEqual(j);
 
-      expect(array[index]).toEqual(needle);
+        expect(array[index]).toEqual(needle);
+      }
     }
   });
 
   test('returns negated index for non-match', () => {
     // Test middles, which have a number left and right of index.
-    for (let i = 1; i < 9; i++) {
-      const needle = i * 2 - 1;
-      const index = binarySearch(array, needle, comparator);
+    const array: number[] = [];
+    for (let i = 0; i < 9; i++) {
+      array.push(i * 2);
+      for (let j = 0; j < array.length; j++) {
+        const needle = j * 2 - 1;
+        const index = binarySearch(array, needle, comparator);
+        const negated = ~index;
 
-      expect(index).toBeLessThan(0);
-      expect(~index).toEqual(i);
+        expect(index).toBeLessThan(0);
+        expect(negated).toEqual(j);
 
-      expect(array[~index - 1]).toBeLessThan(needle);
-      expect(array[~index]).toBeGreaterThan(needle);
+        if (negated > 0) {
+          expect(array[negated - 1]).toBeLessThan(needle);
+        }
+        if (negated < array.length) {
+          expect(array[negated]).toBeGreaterThan(needle);
+        }
+      }
     }
+  });
 
-    // Test edges
-    {
-      // Too low
-      const needle = -1;
+  test('needle is lower than all elements', () => {
+    const array: number[] = [];
+    const needle = -1;
+
+    for (let i = 0; i < 9; i++) {
+      array.push(i * 2);
       const index = binarySearch(array, needle, comparator);
+      const negated = ~index;
 
       expect(index).toBeLessThan(0);
-      expect(~index).toEqual(0);
-      expect(array[~index]).toBeGreaterThan(needle);
+      expect(negated).toEqual(0);
+      expect(array[negated]).toBeGreaterThan(needle);
     }
+  });
 
-    {
-      // Too high
-      const needle = 18;
+  test('needle is higher than all elements', () => {
+    const array: number[] = [];
+    const needle = 18;
+
+    for (let i = 0; i < 9; i++) {
+      array.push(i * 2);
       const index = binarySearch(array, needle, comparator);
+      const negated = ~index;
 
       expect(index).toBeLessThan(0);
-      expect(~index).toEqual(9);
-      expect(array[~index - 1]).toBeLessThan(needle);
+      expect(negated).toEqual(array.length);
+      expect(array[negated - 1]).toBeLessThan(needle);
     }
   });
 
@@ -62,7 +83,7 @@ describe('binary search', () => {
   });
 
   test('multilpe items in array returns valid matches', () => {
-    const array = [1];
+    const array: number[] = [1];
     const needle = 1;
     const expectedIndex = 0;
 
