@@ -1,6 +1,10 @@
 import { encode } from 'sourcemap-codec';
 import { DecodedSourceMap, RawSourceMap } from './types';
 
+/**
+ * A SourceMap v3 compatible sourcemap, which only includes fields that were
+ * provided to it.
+ */
 export default class SourceMap implements RawSourceMap {
   file?: string;
   mappings: string;

@@ -20,7 +20,7 @@ describe('decodeSourceMap', () => {
     expect(decodeSourceMap(jsonRawMap)).toEqual(decodedMap);
   });
 
-  test('parses a decoded JSON sourcemap', () => {
+  test('parses a Decoded JSON sourcemap', () => {
     expect(decodeSourceMap(jsonDecodedMap)).toEqual(decodedMap);
   });
 
@@ -28,7 +28,7 @@ describe('decodeSourceMap', () => {
     expect(decodeSourceMap(rawMap)).toEqual(decodedMap);
   });
 
-  test('accepts a decoded map', () => {
+  test('accepts a Decoded map', () => {
     expect(decodeSourceMap(decodedMap)).toEqual(decodedMap);
   });
 });
