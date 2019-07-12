@@ -1,0 +1,11 @@
+{
+  "version": 3,
+  "file": null,
+  "sources": ["main.js", "placeholder.js"],
+  "sourcesContent": [
+    "var foo = function foo() {\n  return 'foo';\n};\n/* PLACEHOLDER */\n\n\nvar baz = function baz() {\n  return 'baz';\n};\n//# sourceMappingURL=main.js.map",
+    "var bar = function bar() {\n  return 'bar';\n};\n//# sourceMappingURL=placeholder.js.map"
+  ],
+  "names": [],
+  "mappings": "AAAA,IAAI,GAAG,GAAG,SAAS,GAAG,GAAG;EACvB,OAAO,KAAK,CAAC;CACd,CAAC;AACF;ACHA,IAAI,GAAG,GAAG,SAAS,GAAG,GAAG;EACvB,OAAO,KAAK,CAAC;CACd,CAAC;;uCACqC,vCDAtB;;;AAGjB,IAAI,GAAG,GAAG,SAAS,GAAG,GAAG;EACvB,OAAO,KAAK,CAAC;CACd,CAAC;"
+}

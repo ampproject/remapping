@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": ["placeholder.mjs"],
+  "names": ["bar"],
+  "mappings": "AAAA,IAAMA,GAAG,GAAG,SAANA,GAAM;AAAA,SAAM,KAAN;AAAA,CAAZ",
+  "sourcesContent": ["const bar = () => 'bar';\n"],
+  "file": "placeholder.js"
+}

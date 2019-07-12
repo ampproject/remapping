@@ -15,24 +15,34 @@ describe('transpile then concatenate', () => {
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
 
-    const a = consumer.originalPositionFor({
+    const foo = consumer.originalPositionFor({
+      column: 11,
+      line: 2,
+    });
+    expect(foo).toMatchObject({
+      column: 18,
+      line: 1,
+      source: 'main.mjs',
+    });
+
+    const bar = consumer.originalPositionFor({
       column: 11,
       line: 6,
     });
-    expect(a).toMatchObject({
-      column: 21,
+    expect(bar).toMatchObject({
+      column: 18,
       line: 1,
-      source: 'a.mjs',
+      source: 'placeholder.mjs',
     });
 
-    const b = consumer.originalPositionFor({
+    const baz = consumer.originalPositionFor({
       column: 11,
-      line: 10,
+      line: 13,
     });
-    expect(b).toMatchObject({
-      column: 21,
-      line: 1,
-      source: 'b.mjs',
+    expect(baz).toMatchObject({
+      column: 18,
+      line: 3,
+      source: 'main.mjs',
     });
   });
 
@@ -42,6 +52,6 @@ describe('transpile then concatenate', () => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
-    expect(remapped.sourcesContent).toEqual([read('a.mjs'), read('b.mjs')]);
+    expect(remapped.sourcesContent).toEqual([read('main.mjs'), read('placeholder.mjs')]);
   });
 });

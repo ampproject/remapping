@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { RawSourceMap, SourceMapConsumer } from 'source-map';
 import resorcery from '../../../src/resorcery';
 

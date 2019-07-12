@@ -26,8 +26,8 @@ export default class SourceMapTree {
       const segments = mapMappings[i];
       const tracedSegments: SourceMapSegment[] = [];
 
-      for (let i = 0; i < segments.length; i++) {
-        const segment = segments[i];
+      for (let j = 0; j < segments.length; j++) {
+        const segment = segments[j];
 
         if (segment.length === 1) continue;
         const source = this.sources[segment[1]];
