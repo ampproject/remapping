@@ -2,6 +2,7 @@ import buildSourceMapTree from '../../src/build-source-map-tree';
 import { DecodedSourceMap, RawSourceMap } from '../../src/types';
 
 describe('buildSourceMapTree', () => {
+  const root = '<root>';
   const rawMap: RawSourceMap = {
     mappings: 'AAAA',
     names: [],
@@ -17,28 +18,28 @@ describe('buildSourceMapTree', () => {
   const jsonDecodedMap = JSON.stringify(decodedMap);
 
   test('parses and decodes a JSON sourcemap', () => {
-    const tree = buildSourceMapTree(jsonRawMap, () => null);
+    const tree = buildSourceMapTree(jsonRawMap, root, () => null);
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Decoded JSON sourcemap', () => {
-    const tree = buildSourceMapTree(jsonDecodedMap, () => null);
+    const tree = buildSourceMapTree(jsonDecodedMap, root, () => null);
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Raw sourcemap', () => {
-    const tree = buildSourceMapTree(rawMap, () => null);
+    const tree = buildSourceMapTree(rawMap, root, () => null);
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Decoded sourcemap', () => {
-    const tree = buildSourceMapTree(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, root, () => null);
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('calls loader for any needed sourcemap', () => {
     const loader = jest.fn(() => null);
-    buildSourceMapTree(decodedMap, loader);
+    buildSourceMapTree(decodedMap, root, loader);
 
     expect(loader).toHaveBeenCalledWith(decodedMap.sources[0]);
     expect(loader.mock.calls.length).toBe(1);
@@ -48,12 +49,12 @@ describe('buildSourceMapTree', () => {
     // tslint:disable-next-line: no-any
     const loader = (): any => Promise.resolve(null);
     expect(() => {
-      buildSourceMapTree(decodedMap, loader);
+      buildSourceMapTree(decodedMap, root, loader);
     }).toThrow();
   });
 
   test('creates OriginalSource if no sourcemap', () => {
-    const tree = buildSourceMapTree(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, root, () => null);
     expect(tree.sources).toMatchObject([
       {
         filename: 'helloworld.js',
@@ -67,6 +68,7 @@ describe('buildSourceMapTree', () => {
         ...decodedMap,
         sourcesContent: ['1 + 1'],
       },
+      root,
       () => null
     );
 
@@ -78,7 +80,7 @@ describe('buildSourceMapTree', () => {
   });
 
   test('creates OriginalSource with null content if no sourceContent', () => {
-    const tree = buildSourceMapTree(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, root, () => null);
     expect(tree.sources).toMatchObject([
       {
         content: null,
@@ -92,6 +94,7 @@ describe('buildSourceMapTree', () => {
         ...decodedMap,
         sourcesContent: undefined,
       },
+      root,
       () => null
     );
 
@@ -110,7 +113,7 @@ describe('buildSourceMapTree', () => {
         sources: ['two.js'],
       })
       .mockReturnValue(null);
-    const tree = buildSourceMapTree(decodedMap, loader);
+    const tree = buildSourceMapTree(decodedMap, root, loader);
 
     expect(tree).toMatchObject({
       sources: [
@@ -120,8 +123,10 @@ describe('buildSourceMapTree', () => {
               filename: 'two.js',
             },
           ],
+          uri: 'helloworld.js',
         },
       ],
+      uri: root,
     });
 
     expect(loader).toHaveBeenCalledWith(decodedMap.sources[0]);
@@ -130,16 +135,40 @@ describe('buildSourceMapTree', () => {
   });
 
   test('calls loader with sourceRoot joined to source file', () => {
-    const loader = jest.fn(() => null);
-    buildSourceMapTree(
+    const loader = jest.fn();
+    loader
+      .mockReturnValueOnce({
+        ...rawMap,
+        sourceRoot: 'https://bar.com/',
+        sources: ['two.js'],
+      })
+      .mockReturnValue(null);
+
+    const tree = buildSourceMapTree(
       {
         ...decodedMap,
         sourceRoot: 'https://foo.com/',
       },
+      root,
       loader
     );
 
+    expect(tree).toMatchObject({
+      sources: [
+        {
+          sources: [
+            {
+              filename: 'https://bar.com/two.js',
+            },
+          ],
+          uri: 'https://foo.com/helloworld.js',
+        },
+      ],
+      uri: root,
+    });
+
     expect(loader).toHaveBeenCalledWith('https://foo.com/helloworld.js');
-    expect(loader.mock.calls.length).toBe(1);
+    expect(loader).toHaveBeenCalledWith('https://bar.com/two.js');
+    expect(loader.mock.calls.length).toBe(2);
   });
 });

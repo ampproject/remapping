@@ -4,15 +4,15 @@ import FastStringArray from './fast-string-array';
 import OriginalSource from './original-source';
 import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
 
-type Graph = OriginalSource | SourceMapTree;
-
 export default class SourceMapTree {
   map: DecodedSourceMap;
-  sources: Graph[];
+  sources: (OriginalSource | SourceMapTree)[];
+  uri: string;
 
-  constructor(map: DecodedSourceMap, sources: Graph[]) {
+  constructor(map: DecodedSourceMap, uri: string, sources: (OriginalSource | SourceMapTree)[]) {
     this.map = map;
     this.sources = sources;
+    this.uri = uri;
   }
 
   traceMappings(): DecodedSourceMap {
@@ -35,8 +35,8 @@ export default class SourceMapTree {
         const traced = source.traceSegment(
           segment[2],
           segment[3],
-          // TODO: Is this necessary?
-          segment.length === 5 ? mapNames[segment[4]] : ''
+          segment.length === 5 ? mapNames[segment[4]] : '',
+          this
         );
         if (!traced) continue;
 
@@ -74,11 +74,19 @@ export default class SourceMapTree {
   traceSegment(
     line: number,
     column: number,
-    name: string
-  ): SourceMapSegmentObject<OriginalSource> | null {
-    const segments = this.map.mappings[line];
-    if (!segments) return null; // throw new Error('sourcemap pointed to invalid line');
+    name: string,
+    pointer: SourceMapTree
+  ): SourceMapSegmentObject | null {
+    const { mappings } = this.map;
+    if (line >= mappings.length) {
+      const location = JSON.stringify({ line, column }, null, 2).replace(/\n\s*/g, ' ');
+      console.warn(
+        `sourcemap "${pointer.uri}" pointed to invalid location ${location} in ${this.uri}`
+      );
+      return null;
+    }
 
+    const segments = mappings[line];
     const index = binarySearch(segments, column, segmentComparator);
     if (index < 0) return null;
 
@@ -89,7 +97,8 @@ export default class SourceMapTree {
     return source.traceSegment(
       segment[2],
       segment[3],
-      segment.length === 5 ? this.map.names[segment[4]] : name
+      segment.length === 5 ? this.map.names[segment[4]] : name,
+      this
     );
   }
 }

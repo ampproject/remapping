@@ -20,11 +20,14 @@ export interface DecodedSourceMap extends SourceMapV3 {
   mappings: SourceMapSegment[][];
 }
 
-export interface SourceMapSegmentObject<T> {
+export interface SourceMapSegmentObject {
   column: number;
   line: number;
   name: string;
-  source: T;
+  source: {
+    content: string | null;
+    filename: string;
+  };
 }
 
 export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;

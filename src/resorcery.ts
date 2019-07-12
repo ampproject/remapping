@@ -20,6 +20,6 @@ export default function resorcery(
   loader: SourceMapLoader,
   excludeContent?: boolean
 ): SourceMap {
-  const graph = buildSourceMapTree(map, loader);
+  const graph = buildSourceMapTree(map, '<root>', loader);
   return new SourceMap(graph.traceMappings(), !!excludeContent);
 }

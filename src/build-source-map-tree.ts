@@ -17,6 +17,7 @@ import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
  */
 export default function buildSourceMapTree(
   map: SourceMapInput,
+  uri: string,
   loader: SourceMapLoader
 ): SourceMapTree {
   map = decodeSourceMap(map);
@@ -24,11 +25,11 @@ export default function buildSourceMapTree(
 
   const children = sources.map((sourceFile: string, i: number) => {
     // Each source file is loaded relative to the sourcemap's own sourceRoot.
-    const file = resolve(sourceFile, sourceRoot);
+    const uri = resolve(sourceFile, sourceRoot);
 
     // Use the provided loader callback to retreive the file's sourcemap.
     // TODO: We should eventually support async loading of sourcemap files.
-    const sourceMap = loader(file);
+    const sourceMap = loader(uri);
 
     // If there is no sourcemap, then it is an unmodified source file.
     if (!sourceMap) {
@@ -36,13 +37,13 @@ export default function buildSourceMapTree(
       // (done when generating the sourcemap) for it to be included as a
       // sourceContent in the output sourcemap.
       const sourceContent = sourcesContent ? sourcesContent[i] : null;
-      return new OriginalSource(sourceFile, sourceContent);
+      return new OriginalSource(uri, sourceContent);
     }
 
     // Else, it's a real sourcemap, and we need to recurse into it to load it's
     // source files.
-    return buildSourceMapTree(decodeSourceMap(sourceMap), loader);
+    return buildSourceMapTree(decodeSourceMap(sourceMap), uri, loader);
   });
 
-  return new SourceMapTree(map, children);
+  return new SourceMapTree(map, uri, children);
 }
