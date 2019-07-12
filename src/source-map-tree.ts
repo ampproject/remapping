@@ -4,15 +4,15 @@ import FastStringArray from './fast-string-array';
 import OriginalSource from './original-source';
 import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
 
+type Sources = OriginalSource | SourceMapTree;
+
 export default class SourceMapTree {
   map: DecodedSourceMap;
-  sources: (OriginalSource | SourceMapTree)[];
-  uri: string;
+  sources: Sources[];
 
-  constructor(map: DecodedSourceMap, uri: string, sources: (OriginalSource | SourceMapTree)[]) {
+  constructor(map: DecodedSourceMap, sources: Sources[]) {
     this.map = map;
     this.sources = sources;
-    this.uri = uri;
   }
 
   traceMappings(): DecodedSourceMap {
@@ -35,8 +35,7 @@ export default class SourceMapTree {
         const traced = source.traceSegment(
           segment[2],
           segment[3],
-          segment.length === 5 ? mapNames[segment[4]] : '',
-          this
+          segment.length === 5 ? mapNames[segment[4]] : ''
         );
         if (!traced) continue;
 
@@ -71,20 +70,9 @@ export default class SourceMapTree {
     );
   }
 
-  traceSegment(
-    line: number,
-    column: number,
-    name: string,
-    pointer: SourceMapTree
-  ): SourceMapSegmentObject | null {
+  traceSegment(line: number, column: number, name: string): SourceMapSegmentObject | null {
     const { mappings } = this.map;
-    if (line >= mappings.length) {
-      const location = JSON.stringify({ line, column }, null, 2).replace(/\n\s*/g, ' ');
-      console.warn(
-        `sourcemap "${pointer.uri}" pointed to invalid location ${location} in ${this.uri}`
-      );
-      return null;
-    }
+    if (line >= mappings.length) return null;
 
     const segments = mappings[line];
     const index = binarySearch(segments, column, segmentComparator);
@@ -97,8 +85,7 @@ export default class SourceMapTree {
     return source.traceSegment(
       segment[2],
       segment[3],
-      segment.length === 5 ? this.map.names[segment[4]] : name,
-      this
+      segment.length === 5 ? this.map.names[segment[4]] : name
     );
   }
 }
