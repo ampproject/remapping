@@ -15,7 +15,7 @@ import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
  * does not have an associated sourcemap, it is considered an original,
  * unmodified source file.
  */
-export default function buildSourceMapGraph(
+export default function buildSourceMapTree(
   map: SourceMapInput,
   loader: SourceMapLoader
 ): SourceMapTree {
@@ -41,7 +41,7 @@ export default function buildSourceMapGraph(
 
     // Else, it's a real sourcemap, and we need to recurse into it to load it's
     // source files.
-    return buildSourceMapGraph(decodeSourceMap(sourceMap), loader);
+    return buildSourceMapTree(decodeSourceMap(sourceMap), loader);
   });
 
   return new SourceMapTree(map, children);

@@ -1,7 +1,7 @@
-import buildSourceMapGraph from '../../src/build-source-map-graph';
+import buildSourceMapTree from '../../src/build-source-map-tree';
 import { DecodedSourceMap, RawSourceMap } from '../../src/types';
 
-describe('buildSourceMapGraph', () => {
+describe('buildSourceMapTree', () => {
   const rawMap: RawSourceMap = {
     mappings: 'AAAA',
     names: [],
@@ -17,28 +17,28 @@ describe('buildSourceMapGraph', () => {
   const jsonDecodedMap = JSON.stringify(decodedMap);
 
   test('parses and decodes a JSON sourcemap', () => {
-    const tree = buildSourceMapGraph(jsonRawMap, () => null);
+    const tree = buildSourceMapTree(jsonRawMap, () => null);
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Decoded JSON sourcemap', () => {
-    const tree = buildSourceMapGraph(jsonDecodedMap, () => null);
+    const tree = buildSourceMapTree(jsonDecodedMap, () => null);
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Raw sourcemap', () => {
-    const tree = buildSourceMapGraph(rawMap, () => null);
+    const tree = buildSourceMapTree(rawMap, () => null);
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Decoded sourcemap', () => {
-    const tree = buildSourceMapGraph(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, () => null);
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('calls loader for any needed sourcemap', () => {
     const loader = jest.fn(() => null);
-    buildSourceMapGraph(decodedMap, loader);
+    buildSourceMapTree(decodedMap, loader);
 
     expect(loader).toHaveBeenCalledWith(decodedMap.sources[0]);
     expect(loader.mock.calls.length).toBe(1);
@@ -48,12 +48,12 @@ describe('buildSourceMapGraph', () => {
     // tslint:disable-next-line: no-any
     const loader = (): any => Promise.resolve(null);
     expect(() => {
-      buildSourceMapGraph(decodedMap, loader);
+      buildSourceMapTree(decodedMap, loader);
     }).toThrow();
   });
 
   test('creates OriginalSource if no sourcemap', () => {
-    const tree = buildSourceMapGraph(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, () => null);
     expect(tree.sources).toMatchObject([
       {
         filename: 'helloworld.js',
@@ -62,7 +62,7 @@ describe('buildSourceMapGraph', () => {
   });
 
   test('creates OriginalSource with sourceContent', () => {
-    const tree = buildSourceMapGraph(
+    const tree = buildSourceMapTree(
       {
         ...decodedMap,
         sourcesContent: ['1 + 1'],
@@ -78,7 +78,7 @@ describe('buildSourceMapGraph', () => {
   });
 
   test('creates OriginalSource with null content if no sourceContent', () => {
-    const tree = buildSourceMapGraph(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, () => null);
     expect(tree.sources).toMatchObject([
       {
         content: null,
@@ -87,7 +87,7 @@ describe('buildSourceMapGraph', () => {
   });
 
   test('creates OriginalSource with null content if no sourcesContent', () => {
-    const tree = buildSourceMapGraph(
+    const tree = buildSourceMapTree(
       {
         ...decodedMap,
         sourcesContent: undefined,
@@ -110,7 +110,7 @@ describe('buildSourceMapGraph', () => {
         sources: ['two.js'],
       })
       .mockReturnValue(null);
-    const tree = buildSourceMapGraph(decodedMap, loader);
+    const tree = buildSourceMapTree(decodedMap, loader);
 
     expect(tree).toMatchObject({
       sources: [
@@ -131,7 +131,7 @@ describe('buildSourceMapGraph', () => {
 
   test('calls loader with sourceRoot joined to source file', () => {
     const loader = jest.fn(() => null);
-    buildSourceMapGraph(
+    buildSourceMapTree(
       {
         ...decodedMap,
         sourceRoot: 'https://foo.com/',

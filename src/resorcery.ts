@@ -1,4 +1,4 @@
-import buildSourceMapGraph from './build-source-map-graph';
+import buildSourceMapTree from './build-source-map-tree';
 import { SourceMapInput, SourceMapLoader } from './types';
 export { SourceMapSegment, RawSourceMap, DecodedSourceMap, SourceMapLoader } from './types';
 import SourceMap from './source-map';
@@ -20,6 +20,6 @@ export default function resorcery(
   loader: SourceMapLoader,
   excludeContent?: boolean
 ): SourceMap {
-  const graph = buildSourceMapGraph(map, loader);
+  const graph = buildSourceMapTree(map, loader);
   return new SourceMap(graph.traceMappings(), !!excludeContent);
 }

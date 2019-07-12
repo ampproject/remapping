@@ -3,6 +3,9 @@
     "tslint-config-standard",
     "tslint-config-prettier"
   ],
+  "linterOptions": {
+    "exclude": [ "dist" ]
+  },
   "rules": {
     "no-any": true,
     "ordered-imports": true,
