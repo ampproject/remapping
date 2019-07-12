@@ -59,6 +59,8 @@ export default class SourceMapTree {
       mappings.push(tracedSegments);
     }
 
+    // TODO: Make all sources relative to the sourceRoot.
+
     return defaults(
       {
         mappings,
@@ -71,7 +73,7 @@ export default class SourceMapTree {
   }
 
   traceSegment(line: number, column: number, name: string): SourceMapSegmentObject | null {
-    const { mappings } = this.map;
+    const { mappings, names } = this.map;
     if (line >= mappings.length) return null;
 
     const segments = mappings[line];
@@ -85,7 +87,7 @@ export default class SourceMapTree {
     return source.traceSegment(
       segment[2],
       segment[3],
-      segment.length === 5 ? this.map.names[segment[4]] : name
+      segment.length === 5 ? names[segment[4]] : name
     );
   }
 }

@@ -49,6 +49,49 @@ describe('resorcery', () => {
     expect(map).toEqual(translatedMap);
   });
 
+  // When we get a better resolver.
+  test.skip('resolves sourcemaps realtive to sourceRoot', () => {
+    const sourceRoot = 'foo/';
+    const map = resorcery(
+      {
+        ...rawMap,
+        sourceRoot,
+      },
+      (name: string) => {
+        if (name.endsWith('transpiled.js')) {
+          return transpiledMap;
+        }
+      }
+    );
+
+    expect(map).toEqual({
+      ...translatedMap,
+      sourceRoot,
+      sources: ['helloworld.js'],
+    });
+  });
+
+  test('resolves sourcemaps realtive to absolute sourceRoot', () => {
+    const sourceRoot = 'https://foo.com/';
+    const map = resorcery(
+      {
+        ...rawMap,
+        sourceRoot,
+      },
+      (name: string) => {
+        if (name.endsWith('transpiled.js')) {
+          return transpiledMap;
+        }
+      }
+    );
+
+    expect(map).toEqual({
+      ...translatedMap,
+      sourceRoot,
+      sources: [`${sourceRoot}helloworld.js`],
+    });
+  });
+
   test('includes null sourceContent if sourcemap has no sourcesContent', () => {
     const map = resorcery(rawMap, (name: string) => {
       if (name === 'transpiled.js') {
