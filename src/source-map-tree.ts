@@ -23,11 +23,11 @@ export default class SourceMapTree {
 
     const { mappings: mapMappings, names: mapNames } = this.map;
     for (let i = 0; i < mapMappings.length; i++) {
-      const line = mapMappings[i];
-      const tracedLine: SourceMapSegment[] = [];
+      const segments = mapMappings[i];
+      const tracedSegments: SourceMapSegment[] = [];
 
-      for (let i = 0; i < line.length; i++) {
-        const segment = line[i];
+      for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i];
 
         if (segment.length === 1) continue;
         const source = this.sources[segment[1]];
@@ -40,8 +40,8 @@ export default class SourceMapTree {
         );
         if (!traced) continue;
 
-        const { name } = traced;
-        const { filename, content } = traced.source;
+        const { column, line, name } = traced;
+        const { content, filename } = traced.source;
 
         const sourceIndex = sources.put(filename);
         sourcesContent[sourceIndex] = content;
@@ -51,13 +51,13 @@ export default class SourceMapTree {
         // would internally allocate 22 slots! That's 68 wasted bytes! Array
         // literals have the same capacity as their length, saving memory.
         if (name) {
-          tracedLine.push([segment[0], sourceIndex, traced.line, traced.column, names.put(name)]);
+          tracedSegments.push([segment[0], sourceIndex, line, column, names.put(name)]);
         } else {
-          tracedLine.push([segment[0], sourceIndex, traced.line, traced.column]);
+          tracedSegments.push([segment[0], sourceIndex, line, column]);
         }
       }
 
-      mappings.push(tracedLine);
+      mappings.push(tracedSegments);
     }
 
     return defaults(
@@ -77,7 +77,7 @@ export default class SourceMapTree {
     name: string
   ): SourceMapSegmentObject<OriginalSource> | null {
     const segments = this.map.mappings[line];
-    if (!segments) return null;
+    if (!segments) throw new Error('sourcemap pointed to invalid line');
 
     const index = binarySearch(segments, column, segmentComparator);
     if (index < 0) return null;
