@@ -1,6 +1,6 @@
 import decodeSourceMap from './decode-source-map';
 import OriginalSource from './original-source';
-import resolve from './resolve';
+import { dirname, resolve } from './resolve';
 import SourceMapTree from './source-map-tree';
 import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
 
@@ -26,7 +26,7 @@ export default function buildSourceMapTree(
   const children = sources.map((sourceFile: string, i: number) => {
     // Each source file is loaded relative to the sourcemap's own sourceRoot,
     // which is itself relative to the sourcemap's parent.
-    const uri = resolve(sourceFile, resolve(sourceRoot || '', relativeRoot));
+    const uri = resolve(sourceFile, resolve(sourceRoot || '', dirname(relativeRoot)));
 
     // Use the provided loader callback to retreive the file's sourcemap.
     // TODO: We should eventually support async loading of sourcemap files.
@@ -43,7 +43,7 @@ export default function buildSourceMapTree(
 
     // Else, it's a real sourcemap, and we need to recurse into it to load it's
     // source files.
-    return buildSourceMapTree(decodeSourceMap(sourceMap), loader, sourceRoot);
+    return buildSourceMapTree(decodeSourceMap(sourceMap), loader, uri);
   });
 
   return new SourceMapTree(map, children);

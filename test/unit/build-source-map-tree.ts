@@ -150,13 +150,13 @@ describe('buildSourceMapTree', () => {
         ...rawMap,
         file: 'helloworld.js',
         sourceRoot: 'https://foo.com/',
-        sources: ['two.js'],
+        sources: ['./assets/two.js'],
       })
       .mockReturnValueOnce({
         ...rawMap,
         file: 'two.js',
         // We need to support relative roots...
-        // sourceRoot: './assets/',
+        // sourceRoot: './deep/',
         sources: ['three.js'],
       })
       .mockReturnValue(null);
@@ -172,7 +172,7 @@ describe('buildSourceMapTree', () => {
               // two.js's map
               sources: [
                 {
-                  filename: 'https://foo.com/three.js',
+                  filename: 'https://foo.com/assets/three.js',
                 },
               ],
             },
@@ -182,8 +182,59 @@ describe('buildSourceMapTree', () => {
     });
 
     expect(loader).toHaveBeenCalledWith('helloworld.js');
+    expect(loader).toHaveBeenCalledWith('https://foo.com/assets/two.js');
+    expect(loader).toHaveBeenCalledWith('https://foo.com/assets/three.js');
+    expect(loader.mock.calls.length).toBe(3);
+  });
+
+  test('original sources are relative to the tree path, edge cases', () => {
+    const loader = jest.fn();
+    loader
+      .mockReturnValueOnce({
+        ...rawMap,
+        file: 'helloworld.js',
+        sources: ['/two.js'],
+      })
+      .mockReturnValueOnce({
+        ...rawMap,
+        file: 'two.js',
+        // We need to support relative roots...
+        // sourceRoot: './assets/',
+        sources: ['./assets/three.js'],
+      })
+      .mockReturnValue(null);
+    const tree = buildSourceMapTree(
+      {
+        ...decodedMap,
+        // We shouldn't need this, but we need absolute URLs because our resolver
+        // sucks.
+        sourceRoot: 'https://foo.com/deep',
+      },
+      loader
+    );
+
+    expect(tree).toMatchObject({
+      // Root map
+      sources: [
+        {
+          // helloworld.js's map
+          sources: [
+            {
+              // two.js's map
+              sources: [
+                {
+                  filename: 'https://foo.com/assets/three.js',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(loader).toHaveBeenCalledWith('https://foo.com/deep/helloworld.js');
     expect(loader).toHaveBeenCalledWith('https://foo.com/two.js');
-    expect(loader).toHaveBeenCalledWith('https://foo.com/three.js');
+    expect(loader).toHaveBeenCalledWith('https://foo.com/assets/three.js');
     expect(loader.mock.calls.length).toBe(3);
   });
 });
