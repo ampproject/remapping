@@ -49,8 +49,7 @@ describe('resorcery', () => {
     expect(map).toEqual(translatedMap);
   });
 
-  // When we get a better resolver.
-  test.skip('resolves sourcemaps realtive to sourceRoot', () => {
+  test('resolves sourcemaps realtive to sourceRoot', () => {
     const sourceRoot = 'foo/';
     const map = resorcery(
       {
@@ -67,7 +66,7 @@ describe('resorcery', () => {
     expect(map).toEqual({
       ...translatedMap,
       sourceRoot,
-      sources: ['helloworld.js'],
+      sources: ['foo/helloworld.js'],
     });
   });
 
