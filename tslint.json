@@ -8,6 +8,7 @@
   },
   "rules": {
     "no-any": true,
+    "no-unsafe-any": true,
     "ordered-imports": true,
     "object-literal-sort-keys": true,
     "typedef": [

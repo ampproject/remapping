@@ -11,7 +11,7 @@ export default class FastStringArray {
   array: ReadonlyArray<string>;
 
   constructor() {
-    this.indexes = Object.create(null);
+    this.indexes = Object.create(null) as { [key: string]: number };
     this.array = [];
   }
 
