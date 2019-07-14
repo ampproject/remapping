@@ -1,9 +1,9 @@
 import decodeSourceMap from './decode-source-map';
-import dirname from './dirname';
 import OriginalSource from './original-source';
 import { resolve } from './resolve';
 import SourceMapTree from './source-map-tree';
-import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
+import stripFilename from './strip-filename';
+import { SourceMapInput, SourceMapLoader } from './types';
 
 /**
  * Recursively builds a tree structure out of sourcemap files, with each node
@@ -27,7 +27,7 @@ export default function buildSourceMapTree(
   const children = sources.map((sourceFile: string, i: number) => {
     // Each source file is loaded relative to the sourcemap's own sourceRoot,
     // which is itself relative to the sourcemap's parent.
-    const uri = resolve(sourceFile, resolve(sourceRoot || '', dirname(relativeRoot)));
+    const uri = resolve(sourceFile, resolve(sourceRoot || '', stripFilename(relativeRoot)));
 
     // Use the provided loader callback to retreive the file's sourcemap.
     // TODO: We should eventually support async loading of sourcemap files.
