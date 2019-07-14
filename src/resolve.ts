@@ -8,8 +8,9 @@ declare var URL: unknown;
 const Url = (typeof URL !== 'undefined' ? URL : require('url').URL) as Url;
 
 // Matches "..", which must be preceeded by "/" or the start of the string, and
-// must be followed by a "/".
-const parentRegex = /(^|\/)\.\.(?:\/)/g;
+// must be followed by a "/". We do not eat the following "/", so that the next
+// iteration can match on it.
+const parentRegex = /(^|\/)\.\.(?=\/)/g;
 
 function isAbsoluteUrl(url: string): boolean {
   try {
@@ -17,14 +18,6 @@ function isAbsoluteUrl(url: string): boolean {
   } catch (e) {
     return false;
   }
-}
-
-function isProtocolRelativeUrl(url: string): boolean {
-  return url.startsWith('//');
-}
-
-function isPathAbsolute(path: string): boolean {
-  return path.startsWith('/');
 }
 
 /**
@@ -36,98 +29,126 @@ function uniqInStr(str: string): string {
     /* istanbul ignore next */
     uniq += uniq;
   }
-  return `z${uniq}/`;
+  return uniq;
 }
 
 /**
- * Resolves a protocol relative URL, but keeps it protocol relative.
- * Essentially just for the normalization.
+ * Normalizes a protocol relative URL, but keeps it protocol relative by
+ * stripping out the protocl before returning it.
  */
-function resolveProtocolRelative(input: string, absoluteBase: string): string {
+function normalizeProtocolRelative(input: string, absoluteBase: string): string {
   const { href, protocol } = new Url(input, absoluteBase);
   return href.slice(protocol.length);
 }
 
 /**
- * Resolves a relative URL, while keeping it relative.
- * Essentially just for the normalization.
+ * Normalizes a simple path (one that has no ".."s, or is absolute so ".."s can
+ * be normalized absolutely).
  */
-function resolveToAfterOrigin(input: string): string {
+function normalizeSimplePath(input: string): string {
   const { href } = new Url(input, 'https://foo.com/');
   return href.slice('https://foo.com/'.length);
 }
 
-function resolvePath(input: string, base: string): string {
-  const joined = isPathAbsolute(input) ? input : base + input;
-  if (!parentRegex.test(joined)) {
-    return resolveToAfterOrigin(joined);
-  }
+/**
+ * Normalizes a path, ensuring that excess ".."s are preserved for relative
+ * paths in the output.
+ *
+ * If the input is absolute, this will return an absolutey normalized path, but
+ * it will not have a leading "/".
+ *
+ * If the input has a leading "..", the output will have a leading "..".
+ *
+ * If the input has a leading ".", the output will not have a leading "."
+ * unless there are too many ".."s, in which case there will be a leading "..".
+ */
+function normalizePath(input: string): string {
+  // If there are no ".."s, we can treat this as if it were an absolute path.
+  // The return won't be an absolute path, so it's easy.
+  if (!parentRegex.test(input)) return normalizeSimplePath(input);
 
-  const uniq = uniqInStr(joined);
-  let prefix = '';
-  let total = 0;
-  do {
-    prefix += uniq;
-    total++;
-  } while (parentRegex.test(joined));
+  // We already found one "..". Let's see how many there are.
+  let total = 1;
+  while (parentRegex.test(input)) total++;
 
-  if (joined.startsWith('/')) prefix = prefix.slice(0, -1);
-  let relative = resolveToAfterOrigin(prefix + joined);
+  // If there are ".."s, we need to prefix the the path with the same number of
+  // unique directories. This is to ensure that we "remember" how many parent
+  // directories we are accessing. Eg, "../../.." must keep 3, and "foo/../.."
+  // must keep 1.
+  const uniqDirectory = `z${uniqInStr(input)}/`;
 
-  const search = new RegExp(`^(${uniq})*`, 'g');
-  relative = relative.replace(search, (all: string) => {
-    const leftover = all.length / uniq.length;
+  // uniqDirectory is just a "z", followed by numbers, followed by a "/". So
+  // generating a runtime regex from it is safe. We'll use this search regex to
+  // strip out our uniq directory names and insert any needed ".."s.
+  const search = new RegExp(`^(?:${uniqDirectory})*`);
+
+  // Now we can resolve the total path. If there are excess ".."s, they will
+  // eliminate one or more of the unique directories we prefix with.
+  const relative = normalizeSimplePath(uniqDirectory.repeat(total) + input);
+
+  // We can now count the number of unique directories that were eliminated. If
+  // there were 3, and 1 was eliminated, we know we only need to add 1 "..". If
+  // 2 were eliminated, we need to insert 2 ".."s. If all 3 were eliminated,
+  // then we need 3, etc. This replace is guranteed to match (it may match 0 or
+  // more times), and we can count the total match to see how many were eliminated.
+  return relative.replace(search, (all: string) => {
+    const leftover = all.length / uniqDirectory.length;
     return '../'.repeat(total - leftover);
   });
-
-  return relative;
 }
 
 /**
  * Attempts to resolve `input` URL relative to `base`.
  */
 export function resolve(input: string, base: string | undefined): string {
-  base = base || '';
+  if (!base) {
+    base = '';
+  } else if (!base.endsWith('/')) {
+    // Bases are always implied to contain a directory path, per Chrome and
+    // Mozilla's implementations.
+    base += '/';
+  }
 
-  // Absolute inputs are very easy to resolve right.
+  // Absolute URLs are very easy to resolve right.
   if (isAbsoluteUrl(input)) return new Url(input).href;
 
   if (base) {
-    // Bases are always implied to contain a directory path, Chrome and
-    // Mozilla's implementations.
-    if (!base.endsWith('/')) base += '/';
-
-    // Absolute paths are easy...
+    // Absolute URLs are easy...
     if (isAbsoluteUrl(base)) return new Url(input, base).href;
 
-    // If it's protocl relative, we'll normalize it but keep it protocol
-    // relative.
-    if (isProtocolRelativeUrl(base)) return resolveProtocolRelative(input, `https:${base}`);
+    // If base is protocol relative, we'll resolve with it but keep the result
+    // protocol relative.
+    if (base.startsWith('//')) return normalizeProtocolRelative(input, `https:${base}`);
   }
 
-  if (isProtocolRelativeUrl(input)) {
-    // If input is protocol relative, we just need to extract the protocol from
-    // the base if it's absolute.
-    if (isAbsoluteUrl(base)) return new Url(input, base).href;
-
-    // Else, we'll normalize it but keep it protocol relative.
-    return resolveProtocolRelative(input, 'https://foo.com/');
+  if (input.startsWith('//')) {
+    // Normalize input, but keep it protocol relative. We know base doesn't
+    // supply a protocol, because that would have been handled above.
+    return normalizeProtocolRelative(input, 'https://foo.com/');
   }
 
-  // We now know both input and base are paths.
-  const resolved = resolvePath(input, base);
+  // Absolute paths don't need any special handling, because they cannot have
+  // extra "." or ".."s. That'll all be stripped away. Input takes priority here,
+  // because if input is an absolute path, base's path won't affect it in any way.
+  if (input.startsWith('/')) return '/' + normalizeSimplePath(input);
 
-  // If either was an absolute path, our path resolver will have stripped the
-  // leading slash. Resolving it again is easy enough, plus it'll strip out any
-  // leading ".." that could have accumlated if input has more parent accessors
-  // than base had depth.
-  if (isPathAbsolute(input) || isPathAbsolute(base)) {
-    return '/' + resolveToAfterOrigin(resolved);
+  // We know that base ends with a "/", and input does not start with one, so
+  // it's safe to join.
+  const joined = base + input;
+
+  // If base is an absolute path, then input will be relative to it.
+  if (base.startsWith('/')) return '/' + normalizeSimplePath(joined);
+
+  // We now know both input and base are relative paths.
+  const relative = normalizePath(joined);
+
+  // If base started with a leading ".", or there is no base and input started
+  // with a ".", then we need to ensure that the relative path starts with a
+  // ".". We don't know if relative starts with a "..", though, so check before
+  // prepending.
+  if (joined.startsWith('.') && !relative.startsWith('.')) {
+    return './' + relative;
   }
 
-  // If either path started with a dot, let's keep the dot.
-  if (!resolved.startsWith('.') && (base.startsWith('.') || (!base && input.startsWith('.')))) {
-    return `./${resolved}`;
-  }
-  return resolved;
+  return relative;
 }
