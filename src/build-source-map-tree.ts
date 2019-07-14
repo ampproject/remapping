@@ -1,6 +1,6 @@
 import decodeSourceMap from './decode-source-map';
 import OriginalSource from './original-source';
-import { resolve } from './resolve';
+import resolve from './resolve';
 import SourceMapTree from './source-map-tree';
 import stripFilename from './strip-filename';
 import { SourceMapInput, SourceMapLoader } from './types';
