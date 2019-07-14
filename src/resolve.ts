@@ -121,11 +121,9 @@ export function resolve(input: string, base: string | undefined): string {
     if (base.startsWith('//')) return normalizeProtocolRelative(input, `https:${base}`);
   }
 
-  if (input.startsWith('//')) {
-    // Normalize input, but keep it protocol relative. We know base doesn't
-    // supply a protocol, because that would have been handled above.
-    return normalizeProtocolRelative(input, 'https://foo.com/');
-  }
+  // Normalize input, but keep it protocol relative. We know base doesn't supply
+  // a protocol, because that would have been handled above.
+  if (input.startsWith('//')) return normalizeProtocolRelative(input, 'https://foo.com/');
 
   // Absolute paths don't need any special handling, because they cannot have
   // extra "." or ".."s. That'll all be stripped away. Input takes priority here,
