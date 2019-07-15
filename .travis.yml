@@ -8,11 +8,8 @@ node_js:
   - '12'
   - '10'
   - '8'
-  - '6'
 script:
-  - npm run test:prod && npm run build
-after_success:
-  - npm run travis-deploy-once "npm run report-coverage"
+  - npx run-s test:prod build
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
