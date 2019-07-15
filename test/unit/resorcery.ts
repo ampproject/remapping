@@ -8,7 +8,6 @@ describe('resorcery', () => {
     // file, line 2, column 1, using 1st name.
     mappings: 'AACCA',
     names: ['add'],
-    sourceRoot: '',
     sources: ['transpiled.js'],
     sourcesContent: ['1+1'],
     version: 3,
@@ -28,7 +27,8 @@ describe('resorcery', () => {
     // file, line 3, column 2, using first name
     mappings: 'AAEEA',
     names: ['add'],
-    sourceRoot: '',
+    // TODO: support sourceRoot
+    // sourceRoot: '',
     sources: ['helloworld.js'],
     sourcesContent: ['\n\n  1 + 1;'],
     version: 3,
@@ -65,7 +65,8 @@ describe('resorcery', () => {
 
     expect(map).toEqual({
       ...translatedMap,
-      sourceRoot,
+      // TODO: support sourceRoot
+      // sourceRoot,
       sources: ['foo/helloworld.js'],
     });
   });
@@ -86,7 +87,8 @@ describe('resorcery', () => {
 
     expect(map).toEqual({
       ...translatedMap,
-      sourceRoot,
+      // TODO: support sourceRoot
+      // sourceRoot,
       sources: [`${sourceRoot}helloworld.js`],
     });
   });

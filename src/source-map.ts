@@ -19,7 +19,11 @@ export default class SourceMap implements RawSourceMap {
     if ('file' in map) this.file = map.file;
     this.mappings = encode(map.mappings);
     this.names = map.names;
-    if ('sourceRoot' in map) this.sourceRoot = map.sourceRoot;
+
+    // TODO: We first need to make all source URIs relative to the sourceRoot
+    // before we can support a sourceRoot.
+    // if ('sourceRoot' in map) this.sourceRoot = map.sourceRoot;
+
     this.sources = map.sources;
     if (!excludeContent && 'sourcesContent' in map) this.sourcesContent = map.sourcesContent;
   }

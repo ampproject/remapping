@@ -119,6 +119,7 @@ describe('SourceMapTree', () => {
       expect(traced).toMatchObject(extras);
     });
 
+    // TODO: support sourceRoot
     test.skip('resolves source files realtive to sourceRoot', () => {
       const map: DecodedSourceMap = {
         ...baseMap,
