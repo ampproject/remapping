@@ -5,6 +5,11 @@ import SourceMapTree from './source-map-tree';
 import stripFilename from './strip-filename';
 import { SourceMapInput, SourceMapLoader } from './types';
 
+function asArray<T>(value: T | T[]): T[] {
+  if (Array.isArray(value)) return value;
+  return [value];
+}
+
 /**
  * Recursively builds a tree structure out of sourcemap files, with each node
  * being either an `OriginalSource` "leaf" or a `SourceMapTree` composed of
@@ -17,11 +22,22 @@ import { SourceMapInput, SourceMapLoader } from './types';
  * unmodified source file.
  */
 export default function buildSourceMapTree(
-  map: SourceMapInput,
+  input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
   relativeRoot?: string
 ): SourceMapTree {
-  map = decodeSourceMap(map);
+  const maps = asArray(input).map(decodeSourceMap);
+  const map = maps.pop()!;
+
+  for (let i = 0; i < maps.length; i++) {
+    if (maps[i].sources.length !== 1) {
+      throw new Error(
+        `Transformation map ${i} must have exactly one source file.\n` +
+          'Did you specify these with the most recent transformation maps first?'
+      );
+    }
+  }
+
   const { sourceRoot, sources, sourcesContent } = map;
 
   const children = sources.map((sourceFile: string, i: number) => {
@@ -47,5 +63,9 @@ export default function buildSourceMapTree(
     return buildSourceMapTree(decodeSourceMap(sourceMap), loader, uri);
   });
 
-  return new SourceMapTree(map, children);
+  let tree = new SourceMapTree(map, children);
+  for (let i = maps.length - 1; i >= 0; i--) {
+    tree = new SourceMapTree(maps[i], [tree]);
+  }
+  return tree;
 }
