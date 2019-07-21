@@ -24,7 +24,7 @@
     "lint": "run-s -n lint:*",
     "prebuild": "rm -rf dist",
     "build:ts": "tsc --module commonjs",
-    "build:rollup": "rollup -c rollup.config.ts",
+    "build:rollup": "rollup -c rollup.config.js",
     "build": "run-s -n build:*",
     "test": "jest --coverage",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
