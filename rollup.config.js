@@ -11,6 +11,7 @@ const esm = !!process.env.ESM;
 
 function common(esm) {
   return {
+    // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
     external: [],
     input: `src/${libraryName}.ts`,
     output: esm
@@ -19,8 +20,10 @@ function common(esm) {
     plugins: [
       // Compile TypeScript files
       typescript(esm ? {} : { target: 'ES5' }),
+
       // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
       commonjs(),
+
       // Allow node_modules resolution, so you can use 'external' to control
       // which external modules to include in the bundle
       // https://github.com/rollup/rollup-plugin-node-resolve#usage
@@ -29,7 +32,6 @@ function common(esm) {
       // Resolve source maps to the original source
       sourceMaps(),
     ],
-    // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
     watch: {
       include: 'src/**',
     },

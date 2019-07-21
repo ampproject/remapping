@@ -49,6 +49,13 @@ describe('resorcery', () => {
     expect(map).toEqual(translatedMap);
   });
 
+  test('traces transformations through sourcemap', () => {
+    const maps = [rawMap, transpiledMap];
+    const map = resorcery(maps, () => null);
+
+    expect(map).toEqual(translatedMap);
+  });
+
   test('resolves sourcemaps realtive to sourceRoot', () => {
     const sourceRoot = 'foo/';
     const map = resorcery(

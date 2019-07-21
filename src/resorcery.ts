@@ -15,10 +15,10 @@ import { SourceMapInput, SourceMapLoader } from './types';
  * content from the output sourcemap.
  */
 export default function resorcery(
-  map: SourceMapInput,
+  input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
   excludeContent?: boolean
 ): SourceMap {
-  const graph = buildSourceMapTree(map, loader);
+  const graph = buildSourceMapTree(input, loader);
   return new SourceMap(graph.traceMappings(), !!excludeContent);
 }

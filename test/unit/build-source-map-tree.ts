@@ -237,4 +237,39 @@ describe('buildSourceMapTree', () => {
     expect(loader).toHaveBeenCalledWith('https://foo.com/assets/three.js');
     expect(loader.mock.calls.length).toBe(3);
   });
+
+  test('transformation maps of a sourcemap may be passed before the sourcemap', () => {
+    const maps = [
+      decodedMap, // "transformation map"
+      decodedMap,
+    ];
+    const tree = buildSourceMapTree(maps, () => null);
+
+    expect(tree).toMatchObject({
+      // Transformation map
+      sources: [
+        {
+          // helloworld.js's map
+          sources: [
+            {
+              filename: 'helloworld.js',
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  test('throws when transformation map has more than one source', () => {
+    const maps = [
+      {
+        ...decodedMap,
+        sources: ['one.js', 'two.js'],
+      }, // "transformation map"
+      decodedMap,
+    ];
+    expect(() => {
+      buildSourceMapTree(maps, () => null);
+    }).toThrow();
+  });
 });
