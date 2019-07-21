@@ -264,10 +264,7 @@ describe('buildSourceMapTree', () => {
     const maps = [
       {
         ...decodedMap,
-        sources: [
-          'one.js',
-          'two.js',
-        ],
+        sources: ['one.js', 'two.js'],
       }, // "transformation map"
       decodedMap,
     ];
