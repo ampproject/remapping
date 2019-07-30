@@ -2,12 +2,12 @@
 DIR="$(dirname $0)"
 NODE_BIN=`npm bin`
 
-rm "$DIR/files/*.js*"
+rm "$DIR"/files/*.js*
 
 if [ ! -f "$NODE_BIN/babel" ]; then
   npm install --no-save @babel/cli @babel/preset-env
 fi
-"$NODE_BIN/babel" "$DIR/files" --config-file "$DIR/babel.config.js" --source-maps -d "$DIR/files"
+"$NODE_BIN/babel" "$DIR/files" --config-file "./$DIR/babel.config.js" --source-maps -d "$DIR/files"
 
 # Strip the sourceMappingURL to prevent rollup from auto collapsing sourcemaps
 for f in $DIR/files/*.js; do
