@@ -14,7 +14,7 @@ import { SourceMapInput, SourceMapLoader } from './types';
  * Pass `excludeContent` content to exclude any self-containing source file
  * content from the output sourcemap.
  */
-export default function resorcery(
+export default function remapping(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
   excludeContent?: boolean

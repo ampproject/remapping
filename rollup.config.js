@@ -5,7 +5,7 @@ import typescript from 'rollup-plugin-typescript';
 
 const pkg = require('./package.json');
 
-const libraryName = 'resorcery';
+const libraryName = 'remapping';
 
 const esm = !!process.env.ESM;
 

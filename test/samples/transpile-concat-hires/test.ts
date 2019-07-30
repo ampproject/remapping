@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { RawSourceMap, SourceMapConsumer } from 'source-map';
-import resorcery from '../../../src/resorcery';
+import remapping from '../../../src/remapping';
 
 function read(filename: string): string {
   return readFileSync(`${__dirname}/files/${filename}`, 'utf8');
@@ -9,7 +9,7 @@ function read(filename: string): string {
 describe('transpile then concatenate', () => {
   test('concated sections point to source files', () => {
     const map = read('bundle.js.map');
-    const remapped = resorcery(map, file => {
+    const remapped = remapping(map, file => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
@@ -48,7 +48,7 @@ describe('transpile then concatenate', () => {
 
   test('inherits sourcesContent of original sources', () => {
     const map = read('bundle.js.map');
-    const remapped = resorcery(map, file => {
+    const remapped = remapping(map, file => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 

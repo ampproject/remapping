@@ -1,7 +1,7 @@
-import resorcery from '../../src/resorcery';
+import remapping from '../../src/remapping';
 import { RawSourceMap } from '../../src/types';
 
-describe('resorcery', () => {
+describe('remapping', () => {
   const rawMap: RawSourceMap = {
     file: 'transpiled.min.js',
     // 0th column of 1st line of output file translates into the 1st source
@@ -35,12 +35,12 @@ describe('resorcery', () => {
   };
 
   test('does not alter a lone sourcemap', () => {
-    const map = resorcery(rawMap, () => null);
+    const map = remapping(rawMap, () => null);
     expect(map).toEqual(rawMap);
   });
 
   test('traces SourceMapSegments through child sourcemaps', () => {
-    const map = resorcery(rawMap, (name: string) => {
+    const map = remapping(rawMap, (name: string) => {
       if (name === 'transpiled.js') {
         return transpiledMap;
       }
@@ -51,14 +51,14 @@ describe('resorcery', () => {
 
   test('traces transformations through sourcemap', () => {
     const maps = [rawMap, transpiledMap];
-    const map = resorcery(maps, () => null);
+    const map = remapping(maps, () => null);
 
     expect(map).toEqual(translatedMap);
   });
 
   test('resolves sourcemaps realtive to sourceRoot', () => {
     const sourceRoot = 'foo/';
-    const map = resorcery(
+    const map = remapping(
       {
         ...rawMap,
         sourceRoot,
@@ -80,7 +80,7 @@ describe('resorcery', () => {
 
   test('resolves sourcemaps realtive to absolute sourceRoot', () => {
     const sourceRoot = 'https://foo.com/';
-    const map = resorcery(
+    const map = remapping(
       {
         ...rawMap,
         sourceRoot,
@@ -101,7 +101,7 @@ describe('resorcery', () => {
   });
 
   test('includes null sourceContent if sourcemap has no sourcesContent', () => {
-    const map = resorcery(rawMap, (name: string) => {
+    const map = remapping(rawMap, (name: string) => {
       if (name === 'transpiled.js') {
         return {
           ...transpiledMap,
@@ -114,7 +114,7 @@ describe('resorcery', () => {
   });
 
   test('excludes null sourceContent if sourcemap is not self-containing', () => {
-    const map = resorcery(rawMap, (name: string) => {
+    const map = remapping(rawMap, (name: string) => {
       if (name === 'transpiled.js') {
         return {
           ...transpiledMap,
@@ -127,7 +127,7 @@ describe('resorcery', () => {
   });
 
   test('excludes sourcesContent if `excludeContent` is set', () => {
-    const map = resorcery(
+    const map = remapping(
       rawMap,
       (name: string) => {
         if (name === 'transpiled.js') {

@@ -1,18 +1,18 @@
 {
-  "name": "@jridgewell/resorcery",
+  "name": "@jridgewell/remapping",
   "version": "0.0.3",
   "description": "",
   "keywords": [],
-  "main": "dist/resorcery.umd.js",
-  "module": "dist/resorcery.mjs",
-  "typings": "dist/types/resorcery.d.ts",
+  "main": "dist/remapping.umd.js",
+  "module": "dist/remapping.mjs",
+  "typings": "dist/types/remapping.d.ts",
   "files": [
     "dist"
   ],
   "author": "Justin Ridgewell <jridgewell@google.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jridgewell/resorcery.git"
+    "url": "git+https://github.com/jridgewell/remapping.git"
   },
   "license": "MIT",
   "engines": {
