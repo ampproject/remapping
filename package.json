@@ -1,8 +1,8 @@
 {
   "name": "@jridgewell/remapping",
   "version": "0.0.3",
-  "description": "",
-  "keywords": [],
+  "description": "Remap sequential sourcemaps through transformations to point at the original source code",
+  "keywords": ["source", "map", "remap"],
   "main": "dist/remapping.umd.js",
   "module": "dist/remapping.mjs",
   "typings": "dist/types/remapping.d.ts",
