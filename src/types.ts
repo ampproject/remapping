@@ -23,10 +23,16 @@ interface SourceMapV3 {
   version: 3;
 }
 
+type Column = number;
+type SourcesIndex = number;
+type SourceLine = number;
+type SourceColumn = number;
+type NamesIndex = number;
+
 export type SourceMapSegment =
-  | [number]
-  | [number, number, number, number]
-  | [number, number, number, number, number];
+  | [Column]
+  | [Column, SourcesIndex, SourceLine, SourceColumn]
+  | [Column, SourcesIndex, SourceLine, SourceColumn, NamesIndex];
 
 export interface RawSourceMap extends SourceMapV3 {
   mappings: string;

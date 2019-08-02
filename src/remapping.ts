@@ -25,7 +25,7 @@ import { SourceMapInput, SourceMapLoader } from './types';
  * `loader` will be called every time we encounter a source file. If it returns
  * a sourcemap, we will recurse into that sourcemap to continue the trace. If
  * it returns a falsey value, that source file is treated as an original,
- * unmodified soruce file.
+ * unmodified source file.
  *
  * Pass `excludeContent` content to exclude any self-containing source file
  * content from the output sourcemap.

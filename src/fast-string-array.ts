@@ -15,12 +15,12 @@
  */
 
 /**
- * FastStringArray acts like a `Set` (allowing only one ocurrence of a string
+ * FastStringArray acts like a `Set` (allowing only one occurrence of a string
  * `key`), but provides the index of the `key` in the backing array.
  *
  * This is designed to allow synchronizing a second array with the contents of
  * the backing array, like how `sourcesContent[i]` is the source content
- * associated with `source[i]`, and there are never dulpicates.
+ * associated with `source[i]`, and there are never duplicates.
  */
 export default class FastStringArray {
   private indexes: { [key: string]: number };

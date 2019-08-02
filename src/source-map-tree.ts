@@ -24,7 +24,7 @@ type Sources = OriginalSource | SourceMapTree;
 
 /**
  * SourceMapTree represents a single sourcemap, with the ability to trace
- * mapings into its child nodes (which may themseleves be SourceMapTrees).
+ * mappings into its child nodes (which may themselves be SourceMapTrees).
  */
 export default class SourceMapTree {
   map: DecodedSourceMap;
@@ -54,7 +54,7 @@ export default class SourceMapTree {
       for (let j = 0; j < segments.length; j++) {
         const segment = segments[j];
 
-        // 1-length segments only move the current generated colum, there's no
+        // 1-length segments only move the current generated column, there's no
         // source information to gather from it.
         if (segment.length === 1) continue;
         const source = this.sources[segment[1]];
@@ -76,8 +76,8 @@ export default class SourceMapTree {
         const sourceIndex = sources.put(filename);
         sourcesContent[sourceIndex] = content;
 
-        // This looks like unnecessary duplication, but it noticably increases
-        // preformance. If we were to push the nameIndex onto length-4 array, v8
+        // This looks like unnecessary duplication, but it noticeably increases
+        // performance. If we were to push the nameIndex onto length-4 array, v8
         // would internally allocate 22 slots! That's 68 wasted bytes! Array
         // literals have the same capacity as their length, saving memory.
         if (name) {
@@ -105,7 +105,7 @@ export default class SourceMapTree {
 
   /**
    * traceSegment is only called on children SourceMapTrees. It recurses down
-   * into its own child SourceMapTrees, until we find the orignal source map.
+   * into its own child SourceMapTrees, until we find the original source map.
    */
   traceSegment(line: number, column: number, name: string): SourceMapSegmentObject | null {
     const { mappings, names } = this.map;
@@ -122,7 +122,7 @@ export default class SourceMapTree {
     if (index < 0) return null;
     const segment = segments[index];
 
-    // 1-length segments only move the current generated colum, there's no
+    // 1-length segments only move the current generated column, there's no
     // source information to gather from it.
     if (segment.length === 1) return null;
     const source = this.sources[segment[1]];

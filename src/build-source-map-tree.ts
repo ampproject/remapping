@@ -61,7 +61,7 @@ export default function buildSourceMapTree(
     // which is itself relative to the sourcemap's parent.
     const uri = resolve(sourceFile, resolve(sourceRoot || '', stripFilename(relativeRoot)));
 
-    // Use the provided loader callback to retreive the file's sourcemap.
+    // Use the provided loader callback to retrieve the file's sourcemap.
     // TODO: We should eventually support async loading of sourcemap files.
     const sourceMap = loader(uri);
 
