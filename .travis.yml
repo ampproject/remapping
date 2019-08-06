@@ -9,7 +9,8 @@ node_js:
   - '10'
   - '8'
 script:
-  - npx run-s test:prod build
+  - npm run test:prod
+  - npm run build
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
