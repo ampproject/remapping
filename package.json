@@ -1,8 +1,12 @@
 {
   "name": "@ampproject/remapping",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Remap sequential sourcemaps through transformations to point at the original source code",
-  "keywords": ["source", "map", "remap"],
+  "keywords": [
+    "source",
+    "map",
+    "remap"
+  ],
   "main": "dist/remapping.umd.js",
   "module": "dist/remapping.mjs",
   "typings": "dist/types/remapping.d.ts",
