@@ -1,5 +1,5 @@
 {
-  "name": "@jridgewell/remapping",
+  "name": "@ampproject/remapping",
   "version": "0.0.3",
   "description": "Remap sequential sourcemaps through transformations to point at the original source code",
   "keywords": ["source", "map", "remap"],
@@ -12,7 +12,7 @@
   "author": "Justin Ridgewell <jridgewell@google.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jridgewell/remapping.git"
+    "url": "git+https://github.com/ampproject/remapping.git"
   },
   "license": "Apache-2.0",
   "engines": {
