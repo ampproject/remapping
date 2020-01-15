@@ -41,7 +41,7 @@
     "prepublishOnly": "npm run preversion"
   },
   "devDependencies": {
-    "@types/jest": "24.0.23",
+    "@types/jest": "24.9.0",
     "@types/node": "12.12.8",
     "jest": "24.9.0",
     "jest-config": "24.9.0",
