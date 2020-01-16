@@ -31,7 +31,12 @@ describe('SourceMapTree', () => {
     const child = new SourceMapTree(
       {
         mappings: [
-          [[0, 0, 0, 0], [1, 0, 0, 0], [2, 0, 0, 0], [4, 0, 1, 1]], // line 0
+          [
+            [0, 0, 0, 0],
+            [1, 0, 0, 0],
+            [2, 0, 0, 0],
+            [4, 0, 1, 1],
+          ], // line 0
           [[1, 0, 0, 0, 0]], // line 1
         ],
         names: ['child'],
@@ -154,7 +159,12 @@ describe('SourceMapTree', () => {
   describe('traceSegment()', () => {
     const map: DecodedSourceMap = {
       mappings: [
-        [[0, 0, 0, 0], [1, 0, 0, 0], [2, 0, 0, 0], [4, 0, 1, 1]], // line 0
+        [
+          [0, 0, 0, 0],
+          [1, 0, 0, 0],
+          [2, 0, 0, 0],
+          [4, 0, 1, 1],
+        ], // line 0
         [[1, 0, 0, 0]], // line 1
         [[0]], // line 2
         [[0, 0, 0, 0, 0]], // line 3
