@@ -128,17 +128,15 @@ describe('buildSourceMapTree', () => {
       .mockReturnValue(null);
     const tree = buildSourceMapTree(decodedMap, loader);
 
-    expect(tree).toMatchObject({
-      sources: [
-        {
-          sources: [
-            {
-              filename: 'two.js',
-            },
-          ],
-        },
-      ],
-    });
+    expect(tree.sources).toMatchObject([
+      {
+        sources: [
+          {
+            filename: 'two.js',
+          },
+        ],
+      },
+    ]);
 
     expect(loader).toHaveBeenCalledWith('helloworld.js');
     expect(loader).toHaveBeenCalledWith('two.js');
@@ -178,24 +176,21 @@ describe('buildSourceMapTree', () => {
       .mockReturnValue(null);
     const tree = buildSourceMapTree(decodedMap, loader);
 
-    expect(tree).toMatchObject({
-      // Root map
-      sources: [
-        {
-          // helloworld.js's map
-          sources: [
-            {
-              // two.js's map
-              sources: [
-                {
-                  filename: 'https://foo.com/assets/three.js',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
+    expect(tree.sources).toMatchObject([
+      {
+        // helloworld.js's map
+        sources: [
+          {
+            // two.js's map
+            sources: [
+              {
+                filename: 'https://foo.com/assets/three.js',
+              },
+            ],
+          },
+        ],
+      },
+    ]);
 
     expect(loader).toHaveBeenCalledWith('helloworld.js');
     expect(loader).toHaveBeenCalledWith('https://foo.com/assets/two.js');
@@ -229,24 +224,21 @@ describe('buildSourceMapTree', () => {
       loader
     );
 
-    expect(tree).toMatchObject({
-      // Root map
-      sources: [
-        {
-          // helloworld.js's map
-          sources: [
-            {
-              // two.js's map
-              sources: [
-                {
-                  filename: 'https://foo.com/assets/three.js',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
+    expect(tree.sources).toMatchObject([
+      {
+        // helloworld.js's map
+        sources: [
+          {
+            // two.js's map
+            sources: [
+              {
+                filename: 'https://foo.com/assets/three.js',
+              },
+            ],
+          },
+        ],
+      },
+    ]);
 
     expect(loader).toHaveBeenCalledWith('https://foo.com/deep/helloworld.js');
     expect(loader).toHaveBeenCalledWith('https://foo.com/two.js');
@@ -261,19 +253,16 @@ describe('buildSourceMapTree', () => {
     ];
     const tree = buildSourceMapTree(maps, () => null);
 
-    expect(tree).toMatchObject({
-      // Transformation map
-      sources: [
-        {
-          // helloworld.js's map
-          sources: [
-            {
-              filename: 'helloworld.js',
-            },
-          ],
-        },
-      ],
-    });
+    expect(tree.sources).toMatchObject([
+      {
+        // helloworld.js's map
+        sources: [
+          {
+            filename: 'helloworld.js',
+          },
+        ],
+      },
+    ]);
   });
 
   test('throws when transformation map has more than one source', () => {
@@ -284,8 +273,93 @@ describe('buildSourceMapTree', () => {
       }, // "transformation map"
       decodedMap,
     ];
+
     expect(() => {
       buildSourceMapTree(maps, () => null);
     }).toThrow();
+  });
+
+  test('parses map with null source', () => {
+    const loader = jest.fn();
+    loader
+      .mockReturnValueOnce({
+        ...rawMap,
+        sources: ['two.js'],
+      })
+      .mockReturnValue(null);
+    const tree = buildSourceMapTree(
+      {
+        ...decodedMap,
+        sources: [null],
+      },
+      loader
+    );
+
+    expect(tree.map).toMatchObject({
+      sources: [null],
+    });
+
+    expect(loader).toHaveBeenCalledWith('');
+  });
+
+  test('parses maps descending from null source', () => {
+    const loader = jest.fn();
+    loader
+      .mockReturnValueOnce({
+        ...rawMap,
+        sources: ['two.js'],
+      })
+      .mockReturnValue(null);
+    const tree = buildSourceMapTree(
+      {
+        ...decodedMap,
+        sources: [null],
+      },
+      loader
+    );
+
+    expect(tree.sources).toMatchObject([
+      {
+        sources: [
+          {
+            filename: 'two.js',
+          },
+        ],
+      },
+    ]);
+
+    expect(loader).toHaveBeenCalledWith('');
+    expect(loader).toHaveBeenCalledWith('two.js');
+  });
+
+  test('parses maps descending from null source with sourceRoot', () => {
+    const loader = jest.fn();
+    loader
+      .mockReturnValueOnce({
+        ...rawMap,
+        sources: ['two.js'],
+      })
+      .mockReturnValue(null);
+    const tree = buildSourceMapTree(
+      {
+        ...decodedMap,
+        sourceRoot: 'https://foo.com/',
+        sources: [null],
+      },
+      loader
+    );
+
+    expect(tree.sources).toMatchObject([
+      {
+        sources: [
+          {
+            filename: 'https://foo.com/two.js',
+          },
+        ],
+      },
+    ]);
+
+    expect(loader).toHaveBeenCalledWith('https://foo.com/');
+    expect(loader).toHaveBeenCalledWith('https://foo.com/two.js');
   });
 });

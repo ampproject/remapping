@@ -22,11 +22,11 @@ import { DecodedSourceMap, RawSourceMap } from './types';
  * provided to it.
  */
 export default class SourceMap implements RawSourceMap {
-  file?: string;
+  file?: string | null;
   mappings: string;
   sourceRoot?: string;
   names: string[];
-  sources: string[];
+  sources: (string | null)[];
   sourcesContent?: (string | null)[];
   version: 3;
 

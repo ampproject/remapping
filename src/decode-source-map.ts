@@ -16,7 +16,7 @@
 
 import { decode } from 'sourcemap-codec';
 import defaults from './defaults';
-import { DecodedSourceMap, RawSourceMap, SourceMapInput } from './types';
+import { DecodedSourceMap, RawSourceMap, SourceMapInput, SourceMapSegment } from './types';
 
 /**
  * Decodes an input sourcemap into a `DecodedSourceMap` sourcemap object.
@@ -32,7 +32,27 @@ export default function decodeSourceMap(map: SourceMapInput): DecodedSourceMap {
   let { mappings } = map;
   if (typeof mappings === 'string') {
     mappings = decode(mappings);
+  } else {
+    // Clone the Line so that we can sort it. We don't want to mutate an array
+    // that we don't own directly.
+    mappings = mappings.map(cloneSegmentLine);
   }
+  // Sort each Line's segments. There's no guarantee that segments are sorted for us,
+  // and even Chrome's implementation sorts:
+  // https://cs.chromium.org/chromium/src/third_party/devtools-frontend/src/front_end/sdk/SourceMap.js?l=507-508&rcl=109232bcf479c8f4ef8ead3cf56c49eb25f8c2f0
+  mappings.forEach(sortSegments);
 
   return defaults({ mappings }, map);
+}
+
+function cloneSegmentLine(segments: SourceMapSegment[]): SourceMapSegment[] {
+  return segments.slice();
+}
+
+function sortSegments(segments: SourceMapSegment[]): void {
+  segments.sort(segmentComparator);
+}
+
+function segmentComparator(a: SourceMapSegment, b: SourceMapSegment): number {
+  return a[0] - b[0];
 }

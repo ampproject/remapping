@@ -15,10 +15,10 @@
  */
 
 interface SourceMapV3 {
-  file?: string;
+  file?: string | null;
   names: string[];
   sourceRoot?: string;
-  sources: string[];
+  sources: (string | null)[];
   sourcesContent?: (string | null)[];
   version: 3;
 }
