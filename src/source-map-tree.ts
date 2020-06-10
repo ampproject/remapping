@@ -116,7 +116,7 @@ export default class SourceMapTree {
 
     const segments = mappings[line];
 
-    if (segments.length == 0) return null;
+    if (segments.length === 0) return null;
 
     let index = binarySearch(segments, column, segmentComparator);
 
@@ -124,7 +124,7 @@ export default class SourceMapTree {
     // closest segment before it, and offset the source column
     if (index < 0) {
       index = ~index - 1;
-      if (index < 0) return null; //we come before any mapped segment
+      if (index < 0) return null; // we come before any mapped segment
     }
 
     const segment = segments[index];
