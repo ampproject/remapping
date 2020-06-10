@@ -31,7 +31,7 @@ describe('transpile then minify', () => {
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
     const alert = consumer.originalPositionFor({
-      column: 61,
+      column: 47,
       line: 16,
     });
     expect(alert).toEqual({

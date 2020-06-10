@@ -30,33 +30,35 @@ describe('transpile then concatenate', () => {
     });
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
-
+    // middle o in foo in bundle.js
     const foo = consumer.originalPositionFor({
       column: 11,
       line: 17,
     });
     expect(foo).toMatchObject({
-      column: 18,
+      column: 20,
       line: 17,
       source: 'main.mjs',
     });
-
+    
+    // the a in bar in bundle.js
     const bar = consumer.originalPositionFor({
       column: 11,
       line: 36,
     });
     expect(bar).toMatchObject({
-      column: 18,
+      column: 20,
       line: 17,
       source: 'placeholder.mjs',
     });
 
+    //the a in baz in bundle.js
     const baz = consumer.originalPositionFor({
       column: 11,
       line: 43,
     });
     expect(baz).toMatchObject({
-      column: 18,
+      column: 20,
       line: 21,
       source: 'main.mjs',
     });
