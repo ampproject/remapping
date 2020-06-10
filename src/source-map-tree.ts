@@ -120,7 +120,7 @@ export default class SourceMapTree {
 
     let index = binarySearch(segments, column, segmentComparator);
 
-    // If we can't find an segment that lines up to this column, we use the 
+    // If we can't find an segment that lines up to this column, we use the
     // closest segment before it, and offset the source column
     if (index < 0) {
       index = ~index - 1;
@@ -129,13 +129,13 @@ export default class SourceMapTree {
 
     const segment = segments[index];
     if (!segment) return null;
-    
+
     // 1-length segments only move the current generated column, there's no
     // source information to gather from it.
     if (segment.length === 1) return null;
     const source = this.sources[segment[1]];
 
-    // calculate the new column based on the difference between the column we 
+    // calculate the new column based on the difference between the column we
     // were searching for, and the start of the segment we found
     const offset = column - segment[0];
     const originalCol = segment[3] + offset;

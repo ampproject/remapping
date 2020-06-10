@@ -168,7 +168,10 @@ describe('SourceMapTree', () => {
         [[1, 0, 0, 0]], // line 1 - maps to line 0 col 0
         [[0]], // line 2 has 1 length segment
         [[0, 0, 0, 0, 0]], // line 3 has a name
-        [[0, 0, 4, 0], [5, 0, 4, 6]], // line 4 is identical to line 4 of source except col 5 was removed eg 01234567890 -> 012346789
+        [
+          [0, 0, 4, 0],
+          [5, 0, 4, 6],
+        ], // line 4 is identical to line 4 of source except col 5 was removed eg 01234567890 -> 012346789
         [[0, 0, 5, 0], [5], [6, 0, 5, 5]], // line 4 is identical to line 4 of source except a char was added at col 5 eg 01234*56789 -> 0123*456789
       ],
       names: ['name'],
@@ -183,27 +186,26 @@ describe('SourceMapTree', () => {
     });
 
     test('traces all generated cols on a line back to their source when source had characters removed', () => {
-      let expectedCols = [0, 1, 2, 3, 4, 6, 7, 8, 9]
+      let expectedCols = [0, 1, 2, 3, 4, 6, 7, 8, 9];
       let expectedLine = 4;
-      for (var genCol = 0; genCol < expectedCols.length; genCol++ ) {
-         const trace = source.traceSegment(4, genCol, '');
-         expect(trace).toMatchObject({ line: expectedLine, column: expectedCols[genCol] });
+      for (var genCol = 0; genCol < expectedCols.length; genCol++) {
+        const trace = source.traceSegment(4, genCol, '');
+        expect(trace).toMatchObject({ line: expectedLine, column: expectedCols[genCol] });
       }
     });
 
     test('traces all generated cols on a line back to their source when source had characters added', () => {
-      let expectedCols = [0, 1, 2, 3, 4, null, 5, 6, 7, 8, 9]
+      let expectedCols = [0, 1, 2, 3, 4, null, 5, 6, 7, 8, 9];
       let expectedLine = 5;
-      for (var genCol = 0; genCol < expectedCols.length; genCol++ ) {
-         const trace = source.traceSegment(5, genCol, '');
-         if (expectedCols[genCol] == null) {
-           expect(trace).toBeNull()
-         } else {
-           expect(trace).toMatchObject({ line: expectedLine, column: expectedCols[genCol] });
-         }
+      for (var genCol = 0; genCol < expectedCols.length; genCol++) {
+        const trace = source.traceSegment(5, genCol, '');
+        if (expectedCols[genCol] == null) {
+          expect(trace).toBeNull();
+        } else {
+          expect(trace).toMatchObject({ line: expectedLine, column: expectedCols[genCol] });
+        }
       }
     });
-
 
     test('returns null if line is longer than mapping lines', () => {
       const trace = source.traceSegment(10, 0, '');

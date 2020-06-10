@@ -40,7 +40,7 @@ describe('transpile then concatenate', () => {
       line: 17,
       source: 'main.mjs',
     });
-    
+
     // the a in bar in bundle.js
     const bar = consumer.originalPositionFor({
       column: 11,
