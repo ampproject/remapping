@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import resolve from 'rollup-plugin-node-resolve';
+import resolve from '@rollup/plugin-node-resolve';
 import sourceMaps from 'rollup-plugin-sourcemaps';
-import typescript from 'rollup-plugin-typescript';
+import typescript from '@rollup/plugin-typescript';
 
 const pkg = require('./package.json');
 
@@ -28,22 +28,22 @@ function common(esm) {
   return {
     // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
     external: [],
-    input: `src/${libraryName}.ts`,
+    input: `src/remapping.ts`,
     output: esm
-      ? { file: pkg.module, format: 'es', sourcemap: true }
-      : { file: pkg.main, name: libraryName, format: 'umd', sourcemap: true },
+      ? { format: 'es', dir: 'dist', entryFileNames: '[name].mjs', sourcemap: true }
+      : { format: 'umd', name: 'dedent', dir: 'dist', entryFileNames: '[name].umd.js', sourcemap: true },
+
     plugins: [
       // Compile TypeScript files
       typescript(esm ? {} : { target: 'ES5' }),
 
-      // Allow node_modules resolution, so you can use 'external' to control
-      // which external modules to include in the bundle
-      // https://github.com/rollup/rollup-plugin-node-resolve#usage
+      // Allow node_modules resolution
       resolve(),
 
       // Resolve source maps to the original source
       sourceMaps(),
     ],
+
     watch: {
       include: 'src/**',
     },
