@@ -187,22 +187,20 @@ describe('SourceMapTree', () => {
 
     test('traces all generated cols on a line back to their source when source had characters removed', () => {
       let expectedCols = [0, 0, 0, 0, 0, 6, 6, 6, 6];
-      let expectedLine = 4;
       for (var genCol = 0; genCol < expectedCols.length; genCol++) {
         const trace = source.traceSegment(4, genCol, '');
-        expect(trace).toMatchObject({ line: expectedLine, column: expectedCols[genCol] });
+        expect(trace).toMatchObject({ line: 4, column: expectedCols[genCol] });
       }
     });
 
     test('traces all generated cols on a line back to their source when source had characters added', () => {
       let expectedCols = [0, 0, 0, 0, 0, null, 5, 5, 5, 5, 5];
-      let expectedLine = 5;
       for (var genCol = 0; genCol < expectedCols.length; genCol++) {
         const trace = source.traceSegment(5, genCol, '');
         if (expectedCols[genCol] == null) {
           expect(trace).toBeNull();
         } else {
-          expect(trace).toMatchObject({ line: expectedLine, column: expectedCols[genCol] });
+          expect(trace).toMatchObject({ line: 5, column: expectedCols[genCol] });
         }
       }
     });
