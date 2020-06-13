@@ -56,7 +56,9 @@ export default function buildSourceMapTree(
 
   const { sourceRoot, sources, sourcesContent } = map;
 
-  const children = sources.map((sourceFile: string | null, i: number) => {
+  const children = sources.map((sourceFile: string | null, i: number):
+    | SourceMapTree
+    | OriginalSource => {
     // Each source file is loaded relative to the sourcemap's own sourceRoot,
     // which is itself relative to the sourcemap's parent.
     const uri = resolve(sourceFile || '', resolve(sourceRoot || '', stripFilename(relativeRoot)));
