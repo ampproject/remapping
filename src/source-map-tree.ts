@@ -135,8 +135,7 @@ export default class SourceMapTree {
     if (segment.length === 1) return null;
     const source = this.sources[segment[1]];
 
-     
-    const originalCol = segment[3]
+    const originalCol = segment[3];
     const originalLine = segment[2];
     // So now we can recurse down, until we hit the original source file.
     return source.traceSegment(
