@@ -199,9 +199,9 @@ describe('SourceMapTree', () => {
     });
 
     test('traces all generated cols on a line back to their source when source had characters added', () => {
-      let expectedCols = [0, 0, 0, 0, 0, null, 5, 5, 5, 5, 5];
-      let expectedLine = 5;
-      for (var genCol = 0; genCol < expectedCols.length; genCol++) {
+      const expectedCols = [0, 0, 0, 0, 0, null, 5, 5, 5, 5, 5];
+      const expectedLine = 5;
+      for (let genCol = 0; genCol < expectedCols.length; genCol++) {
         const trace = source.traceSegment(5, genCol, '');
         if (expectedCols[genCol] == null) {
           expect(trace).toBeNull();
