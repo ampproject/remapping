@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import typescript from 'rollup-plugin-typescript';
@@ -36,9 +35,6 @@ function common(esm) {
     plugins: [
       // Compile TypeScript files
       typescript(esm ? {} : { target: 'ES5' }),
-
-      // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
-      commonjs(),
 
       // Allow node_modules resolution, so you can use 'external' to control
       // which external modules to include in the bundle
