@@ -172,7 +172,11 @@ describe('SourceMapTree', () => {
           [0, 0, 4, 0],
           [5, 0, 4, 6],
         ], // line 4 is identical to line 4 of source except col 5 was removed eg 01234567890 -> 012346789
-        [[0, 0, 5, 0], [5], [6, 0, 5, 5]], // line 4 is identical to line 4 of source except a char was added at col 5 eg 01234*56789 -> 0123*456789
+        [
+          [0, 0, 5, 0],
+          [5],
+          [6, 0, 5, 5]
+        ], // line 4 is identical to line 4 of source except a char was added at col 5 eg 01234*56789 -> 0123*456789
       ],
       names: ['name'],
       sources: ['child.js'],
