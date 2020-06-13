@@ -25,7 +25,7 @@ function read(filename: string): string {
 describe('transpile then concatenate', () => {
   test('concated sections point to source files', () => {
     const map = read('bundle.js.map');
-    const remapped = remapping(map, file => {
+    const remapped = remapping(map, (file) => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
@@ -54,7 +54,7 @@ describe('transpile then concatenate', () => {
 
   test('inherits sourcesContent of original sources', () => {
     const map = read('bundle.js.map');
-    const remapped = remapping(map, file => {
+    const remapped = remapping(map, (file) => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
