@@ -30,38 +30,44 @@ describe('transpile then concatenate', () => {
     });
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
-    // middle o in foo in bundle.js
-    const foo = consumer.originalPositionFor({
-      column: 11,
-      line: 17,
-    });
-    expect(foo).toMatchObject({
-      column: 18,
-      line: 17,
-      source: 'main.mjs',
-    });
+    // the foo in bundle.js
+    for (let j = 10; j <= 12; j++) {
+      const foo = consumer.originalPositionFor({
+        column: j,
+        line: 17,
+      });
+      expect(foo).toMatchObject({
+        column: 18,
+        line: 17,
+        source: 'main.mjs',
+      });
+    }
 
-    // the a in bar in bundle.js
-    const bar = consumer.originalPositionFor({
-      column: 11,
-      line: 36,
-    });
-    expect(bar).toMatchObject({
-      column: 18,
-      line: 17,
-      source: 'placeholder.mjs',
-    });
+    // the bar in bundle.js
+    for (let j = 10; j <= 12; j++) {
+      const bar = consumer.originalPositionFor({
+        column: j,
+        line: 36,
+      });
+      expect(bar).toMatchObject({
+        column: 18,
+        line: 17,
+        source: 'placeholder.mjs',
+      });
+    }
 
-    //the a in baz in bundle.js
-    const baz = consumer.originalPositionFor({
-      column: 11,
-      line: 43,
-    });
-    expect(baz).toMatchObject({
-      column: 18,
-      line: 21,
-      source: 'main.mjs',
-    });
+    //the baz in bundle.js
+    for (let j = 10; j <= 12; j++) {
+      const baz = consumer.originalPositionFor({
+        column: j,
+        line: 43,
+      });
+      expect(baz).toMatchObject({
+        column: 18,
+        line: 21,
+        source: 'main.mjs',
+      });
+    }
   });
 
   test('inherits sourcesContent of original sources', () => {
