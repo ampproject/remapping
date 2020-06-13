@@ -190,9 +190,9 @@ describe('SourceMapTree', () => {
     });
 
     test('traces all generated cols on a line back to their source when source had characters removed', () => {
-      let expectedCols = [0, 0, 0, 0, 0, 6, 6, 6, 6];
-      let expectedLine = 4;
-      for (var genCol = 0; genCol < expectedCols.length; genCol++) {
+      const expectedCols = [0, 0, 0, 0, 0, 6, 6, 6, 6];
+      const expectedLine = 4;
+      for (let genCol = 0; genCol < expectedCols.length; genCol++) {
         const trace = source.traceSegment(4, genCol, '');
         expect(trace).toMatchObject({ line: expectedLine, column: expectedCols[genCol] });
       }
