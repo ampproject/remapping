@@ -165,9 +165,14 @@ describe('SourceMapTree', () => {
           [2, 0, 0, 0],
           [4, 0, 1, 1],
         ], // line 0
-        [[1, 0, 0, 0]], // line 1
-        [[0]], // line 2
-        [[0, 0, 0, 0, 0]], // line 3
+        [[1, 0, 0, 0]], // line 1 - maps to line 0 col 0
+        [[0]], // line 2 has 1 length segment
+        [[0, 0, 0, 0, 0]], // line 3 has a name
+        [
+          [0, 0, 4, 0],
+          [5, 0, 4, 6],
+        ], // line 4 is identical to line 4 of source except col 5 was removed eg 01234567890 -> 012346789
+        [[0, 0, 5, 0], [5], [6, 0, 5, 5]], // line 4 is identical to line 4 of source except a char was added at col 5 eg 01234*56789 -> 0123*456789
       ],
       names: ['name'],
       sources: ['child.js'],
@@ -180,12 +185,33 @@ describe('SourceMapTree', () => {
       expect(trace).toMatchObject({ line: 1, column: 1 });
     });
 
+    test('traces all generated cols on a line back to their source when source had characters removed', () => {
+      const expectedCols = [0, 0, 0, 0, 0, 6, 6, 6, 6];
+      for (let genCol = 0; genCol < expectedCols.length; genCol++) {
+        const trace = source.traceSegment(4, genCol, '');
+        expect(trace).toMatchObject({ line: 4, column: expectedCols[genCol] });
+      }
+    });
+
+    test('traces all generated cols on a line back to their source when source had characters added', () => {
+      const expectedCols = [0, 0, 0, 0, 0, null, 5, 5, 5, 5, 5];
+      for (let genCol = 0; genCol < expectedCols.length; genCol++) {
+        const trace = source.traceSegment(5, genCol, '');
+        if (expectedCols[genCol] == null) {
+          expect(trace).toBeNull();
+        } else {
+          expect(trace).toMatchObject({ line: 5, column: expectedCols[genCol] });
+        }
+      }
+    });
+
     test('returns null if line is longer than mapping lines', () => {
       const trace = source.traceSegment(10, 0, '');
       expect(trace).toBe(null);
     });
 
     test('returns null if no matching segment column', () => {
+      //line 1 col 0 of generated doesn't exist in the original source
       const trace = source.traceSegment(1, 0, '');
       expect(trace).toBe(null);
     });

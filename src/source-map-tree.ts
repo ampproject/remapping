@@ -115,11 +115,19 @@ export default class SourceMapTree {
     if (line >= mappings.length) return null;
 
     const segments = mappings[line];
-    const index = binarySearch(segments, column, segmentComparator);
 
-    // If we can't find an segment that lines up to this column, then we can't
-    // trace it further.
-    if (index < 0) return null;
+    if (segments.length === 0) return null;
+
+    let index = binarySearch(segments, column, segmentComparator);
+
+    if (index === -1) return null; // we come before any mapped segment
+
+    // If we can't find a segment that lines up to this column, we use the
+    // segment before.
+    if (index < 0) {
+      index = ~index - 1;
+    }
+
     const segment = segments[index];
 
     // 1-length segments only move the current generated column, there's no
