@@ -186,7 +186,7 @@ describe('SourceMapTree', () => {
     });
 
     test('traces all generated cols on a line back to their source when source had characters removed', () => {
-      let expectedCols = [0, 1, 2, 3, 4, 6, 7, 8, 9];
+      let expectedCols = [0, 0, 0, 0, 0, 6, 6, 6, 6];
       let expectedLine = 4;
       for (var genCol = 0; genCol < expectedCols.length; genCol++) {
         const trace = source.traceSegment(4, genCol, '');
@@ -195,7 +195,7 @@ describe('SourceMapTree', () => {
     });
 
     test('traces all generated cols on a line back to their source when source had characters added', () => {
-      let expectedCols = [0, 1, 2, 3, 4, null, 5, 6, 7, 8, 9];
+      let expectedCols = [0, 0, 0, 0, 0, null, 5, 5, 5, 5, 5];
       let expectedLine = 5;
       for (var genCol = 0; genCol < expectedCols.length; genCol++) {
         const trace = source.traceSegment(5, genCol, '');

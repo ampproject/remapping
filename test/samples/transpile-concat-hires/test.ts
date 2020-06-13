@@ -36,7 +36,7 @@ describe('transpile then concatenate', () => {
       line: 17,
     });
     expect(foo).toMatchObject({
-      column: 20,
+      column: 18,
       line: 17,
       source: 'main.mjs',
     });
@@ -47,7 +47,7 @@ describe('transpile then concatenate', () => {
       line: 36,
     });
     expect(bar).toMatchObject({
-      column: 20,
+      column: 18,
       line: 17,
       source: 'placeholder.mjs',
     });
@@ -58,7 +58,7 @@ describe('transpile then concatenate', () => {
       line: 43,
     });
     expect(baz).toMatchObject({
-      column: 20,
+      column: 18,
       line: 21,
       source: 'main.mjs',
     });
