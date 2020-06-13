@@ -120,27 +120,25 @@ export default class SourceMapTree {
 
     let index = binarySearch(segments, column, segmentComparator);
 
-    // If we can't find an segment that lines up to this column, we use the
-    // closest segment before it.
+    if (index === -1) return null; // we come before any mapped segment
+
+    // If we can't find a segment that lines up to this column, we use the
+    // segment before.
     if (index < 0) {
       index = ~index - 1;
-      if (index < 0) return null; // we come before any mapped segment
     }
 
     const segment = segments[index];
-    if (!segment) return null;
 
     // 1-length segments only move the current generated column, there's no
     // source information to gather from it.
     if (segment.length === 1) return null;
     const source = this.sources[segment[1]];
 
-    const originalCol = segment[3];
-    const originalLine = segment[2];
     // So now we can recurse down, until we hit the original source file.
     return source.traceSegment(
-      originalLine,
-      originalCol,
+      segment[2],
+      segment[3],
       // A child map's recorded name for this segment takes precedence over the
       // parent's mapped name. Imagine a mangler changing the name over, etc.
       segment.length === 5 ? names[segment[4]] : name
