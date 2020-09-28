@@ -36,7 +36,7 @@
     "test:lint:ts": "tslint  --project tsconfig.json -t codeFrame '{src,test}/**/*.ts'",
     "test:lint:prettier": "prettier --check '{src,test}/**/*.ts'",
     "test:lint": "run-s -n test:lint:*",
-    "test:prod": "run-s -n test:lint 'test --no-cache'",
+    "test:prod": "run-s -n test:lint 'test -- --no-cache'",
     "preversion": "run-s test:prod build",
     "prepublishOnly": "npm run preversion"
   },
