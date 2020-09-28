@@ -18,20 +18,31 @@ import remapping from '../../src/remapping';
 import { DecodedSourceMap, RawSourceMap } from '../../src/types';
 
 describe('remapping', () => {
+
+  // transform chain:
+  // 1+1                  \n 1+1             \n\n  1 + 1;
+  // line 0 column 0   <  line 1 column 1 <  line 2 column 2
+  // transpiled.min.js <  transpiled.js   <  helloworld.js
+  //                    v                  v
+  //                 rawMap           transpiledMap
+  //                              v
+  //                        translatedMap
+
+  // segment = output_column [, source, line, column [, name]]
+  // all decoded numbers are zero-based
+
   const rawMap: RawSourceMap = {
     file: 'transpiled.min.js',
-    // 0th column of 1st line of output file translates into the 1st source
-    // file, line 2, column 1, using 1st name.
-    mappings: 'AACCA',
+    // line 0, column 0 <- source 0, line 1, column 1, name 0
+    mappings: 'AACCA', // [[[ 0, 0, 1, 1, 0 ]]]
     names: ['add'],
     sources: ['transpiled.js'],
-    sourcesContent: ['1+1'],
+    sourcesContent: ['\n 1+1'],
     version: 3,
   };
   const transpiledMap: RawSourceMap = {
-    // 1st column of 2nd line of output file translates into the 1st source
-    // file, line 3, column 2
-    mappings: ';CAEE',
+    // line 1, column 1 <- source 0, line 2, column 2
+    mappings: ';CAEE', // [ [], [[ 1, 0, 2, 2 ]] ]
     names: [],
     sources: ['helloworld.js'],
     sourcesContent: ['\n\n  1 + 1;'],
@@ -39,9 +50,8 @@ describe('remapping', () => {
   };
   const translatedMap: RawSourceMap = {
     file: 'transpiled.min.js',
-    // 0th column of 1st line of output file translates into the 1st source
-    // file, line 3, column 2, using first name
-    mappings: 'AAEEA',
+    // line 0, column 0 <- source 0, line 2, column 2, name 0
+    mappings: 'AAEEA', // [[[ 0, 0, 2, 2, 0 ]]]
     names: ['add'],
     // TODO: support sourceRoot
     // sourceRoot: '',
@@ -49,16 +59,48 @@ describe('remapping', () => {
     sourcesContent: ['\n\n  1 + 1;'],
     version: 3,
   };
-  const decodedMap: DecodedSourceMap = {
-    file: 'transpiled.min.js',
-    mappings: [[[0, 0, 2, 2, 0]]],
-    names: ['add'],
-    // TODO: support sourceRoot
-    // sourceRoot: '',
-    sources: ['helloworld.js'],
-    sourcesContent: ['\n\n  1 + 1;'],
-    version: 3,
+
+  const rawMapDecoded: DecodedSourceMap = {
+    ...rawMap,
+    mappings: [[[ 0, 0, 1, 1, 0 ]]],
   };
+  const transpiledMapDecoded: DecodedSourceMap = {
+    ...transpiledMap,
+    mappings: [ [], [[ 1, 0, 2, 2 ]] ],
+  };
+  const translatedMapDecoded: DecodedSourceMap = {
+    ...translatedMap,
+    mappings: [[[ 0, 0, 2, 2, 0 ]]],
+  };
+
+  // segments in reverse order to test `segmentsAreSorted` option
+  // sort order is preserved in result
+  // transform chain:
+  // line 0 column 0   <  line 1 column 1 <  line 2 column 2
+  // line 0 column 1   <  line 1 column 2 <  line 2 column 1
+  // transpiled.min.js <  transpiled.js   <  helloworld.js
+  //                    v                  v
+  //                 rawMap           transpiledMap
+  const rawMapDecodedReversed: DecodedSourceMap = {
+    ...rawMap,
+    // line 0, column 1 <- source 0, line 1, column 2, name 0
+    // line 0, column 0 <- source 0, line 1, column 1
+    mappings: [[ [ 1, 0, 1, 2, 0 ], [ 0, 0, 1, 1 ] ]],
+  };
+  const transpiledMapDecodedReversed: DecodedSourceMap = {
+    ...transpiledMap,
+    // line 1, column 2 <- source 0, line 2, column 1
+    // line 1, column 1 <- source 0, line 2, column 2
+    mappings: [ [], [ [ 2, 0, 2, 1 ], [ 1, 0, 2, 2 ] ] ],
+  };
+  const translatedMapDecodedReversed: DecodedSourceMap = {
+    ...translatedMap,
+    // line 0, column 1 <- source 0, line 2, column 1, name 0
+    // line 0, column 0 <- source 0, line 2, column 2
+    mappings: [[ [ 1, 0, 2, 1, 0 ], [ 0, 0, 2, 2 ] ]],
+  };
+
+
 
   test('does not alter a lone sourcemap', () => {
     const map = remapping(rawMap, () => null);
@@ -178,6 +220,35 @@ describe('remapping', () => {
       true
     );
 
-    expect(map).toEqual(decodedMap);
+    expect(map).toEqual(translatedMapDecoded);
+  });
+
+  test('accepts decoded mappings as input', () => {
+    const map = remapping(
+      rawMapDecoded,
+      (name: string) => {
+        if (name === 'transpiled.js') {
+          return transpiledMapDecoded;
+        }
+      }
+    );
+
+    expect(map).toEqual(translatedMap);
+  });
+
+  test('skips sorting of segments if `segmentsAreSorted` is set', () => {
+    const map = remapping(
+      rawMapDecodedReversed,
+      (name: string) => {
+        if (name === 'transpiled.js') {
+          return transpiledMapDecodedReversed;
+        }
+      },
+      false,
+      true,
+      true
+    );
+
+    expect(map).toEqual(translatedMapDecodedReversed);
   });
 });

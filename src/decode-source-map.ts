@@ -24,7 +24,7 @@ import { DecodedSourceMap, RawSourceMap, SourceMapInput, SourceMapSegment } from
  * Valid input maps include a `DecodedSourceMap`, a `RawSourceMap`, or JSON
  * representations of either type.
  */
-export default function decodeSourceMap(map: SourceMapInput): DecodedSourceMap {
+export default function decodeSourceMap(map: SourceMapInput, segmentsAreSorted?: boolean): DecodedSourceMap {
   if (typeof map === 'string') {
     map = JSON.parse(map) as DecodedSourceMap | RawSourceMap;
   }
@@ -32,15 +32,17 @@ export default function decodeSourceMap(map: SourceMapInput): DecodedSourceMap {
   let { mappings } = map;
   if (typeof mappings === 'string') {
     mappings = decode(mappings);
-  } else {
+  } else if (!segmentsAreSorted) {
     // Clone the Line so that we can sort it. We don't want to mutate an array
     // that we don't own directly.
     mappings = mappings.map(cloneSegmentLine);
   }
-  // Sort each Line's segments. There's no guarantee that segments are sorted for us,
-  // and even Chrome's implementation sorts:
-  // https://cs.chromium.org/chromium/src/third_party/devtools-frontend/src/front_end/sdk/SourceMap.js?l=507-508&rcl=109232bcf479c8f4ef8ead3cf56c49eb25f8c2f0
-  mappings.forEach(sortSegments);
+  if (!segmentsAreSorted) {
+    // Sort each Line's segments. There's no guarantee that segments are sorted for us,
+    // and even Chrome's implementation sorts:
+    // https://cs.chromium.org/chromium/src/third_party/devtools-frontend/src/front_end/sdk/SourceMap.js?l=507-508&rcl=109232bcf479c8f4ef8ead3cf56c49eb25f8c2f0
+    mappings.forEach(sortSegments);
+  }
 
   return defaults({ mappings }, map);
 }

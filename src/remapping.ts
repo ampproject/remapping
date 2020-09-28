@@ -36,9 +36,10 @@ export default function remapping(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
   excludeContent?: boolean,
-  decodeMappings?: boolean
+  decodeMappings?: boolean,
+  segmentsAreSorted?: boolean
 ): SourceMap | DecodedSourceMap {
-  const graph = buildSourceMapTree(input, loader);
+  const graph = buildSourceMapTree(input, loader, '', !!segmentsAreSorted);
   return decodeMappings
     ? graph.traceMappings()
     : new SourceMap(graph.traceMappings(), !!excludeContent);

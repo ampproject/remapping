@@ -40,9 +40,10 @@ function asArray<T>(value: T | T[]): T[] {
 export default function buildSourceMapTree(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
-  relativeRoot?: string
+  relativeRoot?: string,
+  segmentsAreSorted?: boolean
 ): SourceMapTree {
-  const maps = asArray(input).map(decodeSourceMap);
+  const maps = asArray(input).map((map: SourceMapInput): DecodedSourceMap => decodeSourceMap(map, segmentsAreSorted)) as DecodedSourceMap[];
   const map = maps.pop()!;
 
   for (let i = 0; i < maps.length; i++) {
