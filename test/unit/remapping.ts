@@ -15,7 +15,7 @@
  */
 
 import remapping from '../../src/remapping';
-import { RawSourceMap } from '../../src/types';
+import { DecodedSourceMap, RawSourceMap } from '../../src/types';
 
 describe('remapping', () => {
   const rawMap: RawSourceMap = {
@@ -42,6 +42,16 @@ describe('remapping', () => {
     // 0th column of 1st line of output file translates into the 1st source
     // file, line 3, column 2, using first name
     mappings: 'AAEEA',
+    names: ['add'],
+    // TODO: support sourceRoot
+    // sourceRoot: '',
+    sources: ['helloworld.js'],
+    sourcesContent: ['\n\n  1 + 1;'],
+    version: 3,
+  };
+  const decodedMap: DecodedSourceMap = {
+    file: 'transpiled.min.js',
+    mappings: [[[0, 0, 2, 2, 0]]],
     names: ['add'],
     // TODO: support sourceRoot
     // sourceRoot: '',
@@ -154,5 +164,20 @@ describe('remapping', () => {
     );
 
     expect(map).not.toHaveProperty('sourcesContent');
+  });
+
+  test('returns decoded mappings if `decodeMappings` is set', () => {
+    const map = remapping(
+      rawMap,
+      (name: string) => {
+        if (name === 'transpiled.js') {
+          return transpiledMap;
+        }
+      },
+      false,
+      true
+    );
+
+    expect(map).toEqual(decodedMap);
   });
 });
