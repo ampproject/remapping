@@ -19,7 +19,7 @@ import OriginalSource from './original-source';
 import resolve from './resolve';
 import SourceMapTree from './source-map-tree';
 import stripFilename from './strip-filename';
-import { SourceMapInput, SourceMapLoader } from './types';
+import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
 
 function asArray<T>(value: T | T[]): T[] {
   if (Array.isArray(value)) return value;
@@ -43,7 +43,12 @@ export default function buildSourceMapTree(
   relativeRoot?: string,
   segmentsAreSorted?: boolean
 ): SourceMapTree {
-  const maps = asArray(input).map((map: SourceMapInput): DecodedSourceMap => decodeSourceMap(map, segmentsAreSorted)) as DecodedSourceMap[];
+  const maps = asArray(input).map(
+    (map: SourceMapInput): DecodedSourceMap => {
+      return decodeSourceMap(map, segmentsAreSorted);
+    }
+  );
+  // as DecodedSourceMap[];
   const map = maps.pop()!;
 
   for (let i = 0; i < maps.length; i++) {
@@ -79,7 +84,7 @@ export default function buildSourceMapTree(
 
     // Else, it's a real sourcemap, and we need to recurse into it to load its
     // source files.
-    return buildSourceMapTree(decodeSourceMap(sourceMap), loader, uri);
+    return buildSourceMapTree(decodeSourceMap(sourceMap, segmentsAreSorted), loader, uri);
   });
 
   let tree = new SourceMapTree(map, children);

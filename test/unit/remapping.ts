@@ -18,7 +18,6 @@ import remapping from '../../src/remapping';
 import { DecodedSourceMap, RawSourceMap } from '../../src/types';
 
 describe('remapping', () => {
-
   // transform chain:
   // 1+1                  \n 1+1             \n\n  1 + 1;
   // line 0 column 0   <  line 1 column 1 <  line 2 column 2
@@ -62,15 +61,15 @@ describe('remapping', () => {
 
   const rawMapDecoded: DecodedSourceMap = {
     ...rawMap,
-    mappings: [[[ 0, 0, 1, 1, 0 ]]],
+    mappings: [[[0, 0, 1, 1, 0]]],
   };
   const transpiledMapDecoded: DecodedSourceMap = {
     ...transpiledMap,
-    mappings: [ [], [[ 1, 0, 2, 2 ]] ],
+    mappings: [[], [[1, 0, 2, 2]]],
   };
   const translatedMapDecoded: DecodedSourceMap = {
     ...translatedMap,
-    mappings: [[[ 0, 0, 2, 2, 0 ]]],
+    mappings: [[[0, 0, 2, 2, 0]]],
   };
 
   // segments in reverse order to test `segmentsAreSorted` option
@@ -85,22 +84,36 @@ describe('remapping', () => {
     ...rawMap,
     // line 0, column 1 <- source 0, line 1, column 2, name 0
     // line 0, column 0 <- source 0, line 1, column 1
-    mappings: [[ [ 1, 0, 1, 2, 0 ], [ 0, 0, 1, 1 ] ]],
+    mappings: [
+      [
+        [1, 0, 1, 2, 0],
+        [0, 0, 1, 1],
+      ],
+    ],
   };
   const transpiledMapDecodedReversed: DecodedSourceMap = {
     ...transpiledMap,
     // line 1, column 2 <- source 0, line 2, column 1
     // line 1, column 1 <- source 0, line 2, column 2
-    mappings: [ [], [ [ 2, 0, 2, 1 ], [ 1, 0, 2, 2 ] ] ],
+    mappings: [
+      [],
+      [
+        [2, 0, 2, 1],
+        [1, 0, 2, 2],
+      ],
+    ],
   };
   const translatedMapDecodedReversed: DecodedSourceMap = {
     ...translatedMap,
     // line 0, column 1 <- source 0, line 2, column 1, name 0
     // line 0, column 0 <- source 0, line 2, column 2
-    mappings: [[ [ 1, 0, 2, 1, 0 ], [ 0, 0, 2, 2 ] ]],
+    mappings: [
+      [
+        [1, 0, 2, 1, 0],
+        [0, 0, 2, 2],
+      ],
+    ],
   };
-
-
 
   test('does not alter a lone sourcemap', () => {
     const map = remapping(rawMap, () => null);
@@ -202,13 +215,15 @@ describe('remapping', () => {
           return transpiledMap;
         }
       },
-      true
+      {
+        excludeContent: true,
+      }
     );
 
     expect(map).not.toHaveProperty('sourcesContent');
   });
 
-  test('returns decoded mappings if `decodeMappings` is set', () => {
+  test('returns decoded mappings if `skipEncodeMappings` is set', () => {
     const map = remapping(
       rawMap,
       (name: string) => {
@@ -216,22 +231,20 @@ describe('remapping', () => {
           return transpiledMap;
         }
       },
-      false,
-      true
+      {
+        skipEncodeMappings: true,
+      }
     );
 
     expect(map).toEqual(translatedMapDecoded);
   });
 
   test('accepts decoded mappings as input', () => {
-    const map = remapping(
-      rawMapDecoded,
-      (name: string) => {
-        if (name === 'transpiled.js') {
-          return transpiledMapDecoded;
-        }
+    const map = remapping(rawMapDecoded, (name: string) => {
+      if (name === 'transpiled.js') {
+        return transpiledMapDecoded;
       }
-    );
+    });
 
     expect(map).toEqual(translatedMap);
   });
@@ -244,11 +257,29 @@ describe('remapping', () => {
           return transpiledMapDecodedReversed;
         }
       },
-      false,
-      true,
-      true
+      {
+        skipEncodeMappings: true,
+        segmentsAreSorted: true,
+      }
     );
-
     expect(map).toEqual(translatedMapDecodedReversed);
+  });
+
+  test('throws error when old API is used', () => {
+    try {
+      remapping(
+        rawMapDecoded,
+        (name: string) => {
+          if (name === 'transpiled.js') {
+            return transpiledMapDecoded;
+          }
+        },
+        true as any // old API
+      );
+      // fail
+      expect(1).toEqual(0);
+    } catch (error) {
+      expect(error.message).toEqual('Please use the new API');
+    }
   });
 });

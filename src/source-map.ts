@@ -15,25 +15,25 @@
  */
 
 import { encode } from 'sourcemap-codec';
-import { DecodedSourceMap, RawSourceMap } from './types';
+import { DecodedSourceMap, RawOrDecodedSourceMap, SourceMapSegment } from './types';
 
 /**
  * A SourceMap v3 compatible sourcemap, which only includes fields that were
  * provided to it.
  */
-export default class SourceMap implements RawSourceMap {
+export default class SourceMap implements RawOrDecodedSourceMap {
   file?: string | null;
-  mappings: string;
+  mappings: string | SourceMapSegment[][];
   sourceRoot?: string;
   names: string[];
   sources: (string | null)[];
   sourcesContent?: (string | null)[];
   version: 3;
 
-  constructor(map: DecodedSourceMap, excludeContent: boolean) {
+  constructor(map: DecodedSourceMap, excludeContent: boolean, skipEncodeMappings: boolean) {
     this.version = 3; // SourceMap spec says this should be first.
     if ('file' in map) this.file = map.file;
-    this.mappings = encode(map.mappings);
+    this.mappings = skipEncodeMappings ? map.mappings : encode(map.mappings);
     this.names = map.names;
 
     // TODO: We first need to make all source URIs relative to the sourceRoot

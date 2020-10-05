@@ -24,7 +24,10 @@ import { DecodedSourceMap, RawSourceMap, SourceMapInput, SourceMapSegment } from
  * Valid input maps include a `DecodedSourceMap`, a `RawSourceMap`, or JSON
  * representations of either type.
  */
-export default function decodeSourceMap(map: SourceMapInput, segmentsAreSorted?: boolean): DecodedSourceMap {
+export default function decodeSourceMap(
+  map: SourceMapInput,
+  segmentsAreSorted?: boolean
+): DecodedSourceMap {
   if (typeof map === 'string') {
     map = JSON.parse(map) as DecodedSourceMap | RawSourceMap;
   }

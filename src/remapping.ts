@@ -16,7 +16,13 @@
 
 import buildSourceMapTree from './build-source-map-tree';
 import SourceMap from './source-map';
-import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
+import {
+  DecodedSourceMap,
+  RawOrDecodedSourceMap,
+  RawSourceMap,
+  SourceMapInput,
+  SourceMapLoader,
+} from './types';
 
 /**
  * Traces through all the mappings in the root sourcemap, through the sources
@@ -30,17 +36,28 @@ import { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
  * Pass `excludeContent` to exclude any self-containing source file content
  * from the output sourcemap.
  *
- * Pass `decodeMappings` to get a sourcemap with decoded mappings.
+ * Pass `skipEncodeMappings` to get a sourcemap with decoded mappings.
+ *
+ * Pass `segmentsAreSorted` to skip sorting of segments. Only use when segments
+ * are guaranteed to be sorted, otherwise mappings will be wrong.
  */
 export default function remapping(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
-  excludeContent?: boolean,
-  decodeMappings?: boolean,
-  segmentsAreSorted?: boolean
-): SourceMap | DecodedSourceMap {
-  const graph = buildSourceMapTree(input, loader, '', !!segmentsAreSorted);
-  return decodeMappings
-    ? graph.traceMappings()
-    : new SourceMap(graph.traceMappings(), !!excludeContent);
+  options?: {
+    excludeContent?: boolean;
+    skipEncodeMappings?: boolean;
+    segmentsAreSorted?: boolean;
+  }
+): RawOrDecodedSourceMap {
+  // TODO remove in future
+  // tslint:disable-next-line:strict-type-predicates
+  if (typeof options === 'boolean') throw new Error('Please use the new API');
+
+  const graph = buildSourceMapTree(input, loader, '', !!(options && options.segmentsAreSorted));
+  return new SourceMap(
+    graph.traceMappings(),
+    !!(options && options.excludeContent),
+    !!(options && options.skipEncodeMappings)
+  );
 }

@@ -42,6 +42,10 @@ export interface DecodedSourceMap extends SourceMapV3 {
   mappings: SourceMapSegment[][];
 }
 
+export interface RawOrDecodedSourceMap extends SourceMapV3 {
+  mappings: string | SourceMapSegment[][];
+}
+
 export interface SourceMapSegmentObject {
   column: number;
   line: number;
