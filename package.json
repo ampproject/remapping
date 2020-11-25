@@ -51,7 +51,7 @@
     "rollup": "2.16.1",
     "rollup-plugin-sourcemaps": "0.6.2",
     "source-map": "0.6.1",
-    "ts-jest": "26.1.0",
+    "ts-jest": "26.4.4",
     "tslib": "2.0.1",
     "tslint": "6.1.2",
     "tslint-config-prettier": "1.18.0",
