@@ -43,7 +43,7 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "8.0.1",
     "@rollup/plugin-typescript": "4.1.2",
-    "@types/jest": "26.0.0",
+    "@types/jest": "26.0.16",
     "jest": "26.0.1",
     "jest-config": "26.0.1",
     "npm-run-all": "4.1.5",
