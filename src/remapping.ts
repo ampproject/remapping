@@ -17,7 +17,7 @@
 import buildSourceMapTree from './build-source-map-tree';
 import SourceMap from './source-map';
 
-import type { SourceMapInput, SourceMapLoader } from './types';
+import type { SourceMapInput, SourceMapLoader, Options } from './types';
 
 /**
  * Traces through all the mappings in the root sourcemap, through the sources
@@ -28,14 +28,19 @@ import type { SourceMapInput, SourceMapLoader } from './types';
  * it returns a falsey value, that source file is treated as an original,
  * unmodified source file.
  *
- * Pass `excludeContent` content to exclude any self-containing source file
- * content from the output sourcemap.
+ * Pass `excludeContent` to exclude any self-containing source file content
+ * from the output sourcemap.
+ *
+ * Pass `decodedMappings` to receive a SourceMap with decoded (instead of
+ * VLQ encoded) mappings.
  */
 export default function remapping(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
-  excludeContent?: boolean
+  options?: boolean | Options
 ): SourceMap {
+  const opts =
+    typeof options === 'object' ? options : { excludeContent: !!options, decodedMappings: false };
   const graph = buildSourceMapTree(input, loader);
-  return new SourceMap(graph.traceMappings(), !!excludeContent);
+  return new SourceMap(graph.traceMappings(), opts);
 }
