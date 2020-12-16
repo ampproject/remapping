@@ -27,7 +27,7 @@ describe('binary search', () => {
       array.push(i * 2);
       for (let j = 0; j < array.length; j++) {
         const needle = j * 2;
-        const index = binarySearch(array, needle, comparator);
+        const index = binarySearch(array, needle, comparator, 0, array.length - 1);
 
         expect(index).toEqual(j);
 
@@ -43,7 +43,7 @@ describe('binary search', () => {
       array.push(i * 2);
       for (let j = 0; j < array.length; j++) {
         const needle = j * 2 - 1;
-        const index = binarySearch(array, needle, comparator);
+        const index = binarySearch(array, needle, comparator, 0, array.length - 1);
         const negated = ~index;
 
         expect(index).toBeLessThan(0);
@@ -65,7 +65,7 @@ describe('binary search', () => {
 
     for (let i = 0; i < 9; i++) {
       array.push(i * 2);
-      const index = binarySearch(array, needle, comparator);
+      const index = binarySearch(array, needle, comparator, 0, array.length - 1);
       const negated = ~index;
 
       expect(index).toBeLessThan(0);
@@ -80,7 +80,7 @@ describe('binary search', () => {
 
     for (let i = 0; i < 9; i++) {
       array.push(i * 2);
-      const index = binarySearch(array, needle, comparator);
+      const index = binarySearch(array, needle, comparator, 0, array.length - 1);
       const negated = ~index;
 
       expect(index).toBeLessThan(0);
@@ -92,13 +92,13 @@ describe('binary search', () => {
   test('empty array', () => {
     const array: number[] = [];
     const needle = 1;
-    const index = binarySearch(array, needle, comparator);
+    const index = binarySearch(array, needle, comparator, 0, array.length - 1);
 
     expect(index).toBeLessThan(0);
     expect(~index).toEqual(0);
   });
 
-  test('multilpe items in array returns valid matches', () => {
+  test('multiple items in array returns valid matches', () => {
     const array: number[] = [1];
     const needle = 1;
     const expectedIndex = 0;
@@ -107,10 +107,183 @@ describe('binary search', () => {
     for (; attempts < 10; attempts++) {
       array.push(needle);
 
-      const index = binarySearch(array, needle, comparator);
+      const index = binarySearch(array, needle, comparator, 0, array.length - 1);
       if (index !== expectedIndex) break;
     }
 
     expect(attempts).toBeLessThan(10);
+  });
+
+  describe('low', () => {
+    test('low equals needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, j, array.length - 1);
+
+          expect(index).toEqual(j);
+
+          expect(array[index]).toEqual(needle);
+        }
+      }
+    });
+
+    test('low higher than needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, j + 1, array.length - 1);
+          const negated = ~index;
+
+          expect(index).toBeLessThan(0);
+          expect(negated).toBe(j + 1);
+        }
+      }
+    });
+
+    test('low lower than needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, j - 1, array.length - 1);
+
+          expect(index).toBe(j);
+        }
+      }
+    });
+  });
+
+  describe('low', () => {
+    test('low equals needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, j, array.length - 1);
+
+          expect(index).toEqual(j);
+
+          expect(array[index]).toEqual(needle);
+        }
+      }
+    });
+
+    test('low higher than needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, j + 1, array.length - 1);
+          const negated = ~index;
+
+          expect(index).toBeLessThan(0);
+          expect(negated).toBe(j + 1);
+        }
+      }
+    });
+
+    test('low lower than needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, j - 1, array.length - 1);
+
+          expect(index).toBe(j);
+        }
+      }
+    });
+
+    test('low equals -1', () => {
+      const array: number[] = [];
+      Object.defineProperty(array, '-1', {
+        get() {
+          throw new Error('access to negative index');
+        },
+      });
+
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, -1, array.length - 1);
+
+          expect(index).toBe(j);
+        }
+      }
+    });
+  });
+
+  describe('high', () => {
+    test('high equals needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, 0, j);
+
+          expect(index).toEqual(j);
+
+          expect(array[index]).toEqual(needle);
+        }
+      }
+    });
+
+    test('high higher than needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, 0, j + 1);
+
+          expect(index).toBe(j);
+        }
+      }
+    });
+
+    test('high lower than needle index', () => {
+      const array: number[] = [];
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, 0, j - 1);
+          const negated = ~index;
+
+          expect(index).toBeLessThan(0);
+          expect(negated).toBe(j);
+        }
+      }
+    });
+
+    test('high equals -1', () => {
+      const array: number[] = [];
+      Object.defineProperty(array, '-1', {
+        get() {
+          throw new Error('access to negative index');
+        },
+      });
+
+      for (let i = 0; i < 9; i++) {
+        array.push(i * 2);
+        for (let j = 0; j < array.length; j++) {
+          const needle = j * 2;
+          const index = binarySearch(array, needle, comparator, 0, -1);
+
+          expect(index).toBe(-1);
+        }
+      }
+    });
   });
 });
