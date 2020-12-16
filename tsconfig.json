@@ -9,11 +9,8 @@
     "sourceMap": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "declarationDir": "dist/types",
-    "outDir": "dist",
-    "rootDir": "src",
+    "outDir": "dist/lib",
     "typeRoots": [
       "node_modules/@types"
     ]
@@ -22,6 +19,7 @@
     "dist"
   ],
   "include": [
-    "src"
+    "src",
+    "test"
   ]
 }

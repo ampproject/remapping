@@ -15,39 +15,23 @@
  */
 
 import resolve from '@rollup/plugin-node-resolve';
-import sourceMaps from 'rollup-plugin-sourcemaps';
 import typescript from '@rollup/plugin-typescript';
 
-const pkg = require('./package.json');
 
-const libraryName = 'remapping';
-
-const esm = !!process.env.ESM;
-
-function common(esm) {
+function configure(esm) {
   return {
-    // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-    external: [],
-    input: `src/remapping.ts`,
+    input: 'src/remapping.ts',
     output: esm
       ? { format: 'es', dir: 'dist', entryFileNames: '[name].mjs', sourcemap: true }
-      : { format: 'umd', name: 'dedent', dir: 'dist', entryFileNames: '[name].umd.js', sourcemap: true },
-
+      : { format: 'umd', name: 'remapping', dir: 'dist', entryFileNames: '[name].umd.js', sourcemap: true },
     plugins: [
-      // Compile TypeScript files
-      typescript(esm ? {} : { target: 'ES5' }),
-
-      // Allow node_modules resolution
+      typescript({ tsconfig: './tsconfig.build.json' }),
       resolve(),
-
-      // Resolve source maps to the original source
-      sourceMaps(),
     ],
-
     watch: {
       include: 'src/**',
     },
   };
 }
 
-export default [common(false), common(true)];
+export default [configure(false), configure(true)];
