@@ -32,26 +32,41 @@ export default function decodeSourceMap(map: SourceMapInput): DecodedSourceMap {
 
   let { mappings } = map;
   if (typeof mappings === 'string') {
-    mappings = decode(mappings);
+    mappings = sortMappings(decode(mappings), true);
   } else {
     // Clone the Line so that we can sort it. We don't want to mutate an array
     // that we don't own directly.
-    mappings = mappings.map(cloneSegmentLine);
+    mappings = sortMappings(mappings, false);
   }
-  // Sort each Line's segments. There's no guarantee that segments are sorted for us,
-  // and even Chrome's implementation sorts:
-  // https://cs.chromium.org/chromium/src/third_party/devtools-frontend/src/front_end/sdk/SourceMap.js?l=507-508&rcl=109232bcf479c8f4ef8ead3cf56c49eb25f8c2f0
-  mappings.forEach(sortSegments);
 
   return defaults({ mappings }, map);
 }
 
-function cloneSegmentLine(segments: SourceMapSegment[]): SourceMapSegment[] {
-  return segments.slice();
+function firstUnsortedSegmentLine(mappings: SourceMapSegment[][]): number {
+  for (let i = 0; i < mappings.length; i++) {
+    const segments = mappings[i];
+    for (let j = 1; j < segments.length; j++) {
+      if (segments[j][0] < segments[j - 1][0]) {
+        return i;
+      }
+    }
+  }
+  return mappings.length;
 }
 
-function sortSegments(segments: SourceMapSegment[]): void {
-  segments.sort(segmentComparator);
+function sortMappings(mappings: SourceMapSegment[][], owned: boolean): SourceMapSegment[][] {
+  const unosrtedIndex = firstUnsortedSegmentLine(mappings);
+  if (unosrtedIndex === mappings.length) return mappings;
+  if (!owned) mappings = mappings.slice();
+  for (let i = unosrtedIndex; i < mappings.length; i++) {
+    mappings[i] = sortSegments(mappings[i], owned);
+  }
+  return mappings;
+}
+
+function sortSegments(segments: SourceMapSegment[], owned: boolean): SourceMapSegment[] {
+  if (!owned) segments = segments.slice();
+  return segments.sort(segmentComparator);
 }
 
 function segmentComparator(a: SourceMapSegment, b: SourceMapSegment): number {
