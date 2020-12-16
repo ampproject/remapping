@@ -19,7 +19,8 @@ import OriginalSource from './original-source';
 import resolve from './resolve';
 import SourceMapTree from './source-map-tree';
 import stripFilename from './strip-filename';
-import { SourceMapInput, SourceMapLoader } from './types';
+
+import type { SourceMapInput, SourceMapLoader } from './types';
 
 function asArray<T>(value: T | T[]): T[] {
   if (Array.isArray(value)) return value;

@@ -17,8 +17,9 @@
 import binarySearch from './binary-search';
 import defaults from './defaults';
 import FastStringArray from './fast-string-array';
-import OriginalSource from './original-source';
-import { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
+
+import type OriginalSource from './original-source';
+import type { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
 
 type Sources = OriginalSource | SourceMapTree;
 

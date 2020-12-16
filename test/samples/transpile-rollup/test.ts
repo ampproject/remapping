@@ -15,7 +15,8 @@
  */
 
 import { readFileSync } from 'fs';
-import { RawSourceMap, SourceMapConsumer } from 'source-map';
+import type { RawSourceMap } from 'source-map';
+import { SourceMapConsumer } from 'source-map';
 import remapping from '../../../src/remapping';
 
 function read(filename: string): string {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SourceMapSegmentObject } from './types';
+import type { SourceMapSegmentObject } from './types';
 
 /**
  * A "leaf" node in the sourcemap tree, representing an original, unmodified

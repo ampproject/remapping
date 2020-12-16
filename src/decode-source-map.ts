@@ -16,7 +16,8 @@
 
 import { decode } from 'sourcemap-codec';
 import defaults from './defaults';
-import { DecodedSourceMap, RawSourceMap, SourceMapInput, SourceMapSegment } from './types';
+
+import type { DecodedSourceMap, RawSourceMap, SourceMapInput, SourceMapSegment } from './types';
 
 /**
  * Decodes an input sourcemap into a `DecodedSourceMap` sourcemap object.

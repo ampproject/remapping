@@ -16,7 +16,8 @@
 
 import buildSourceMapTree from './build-source-map-tree';
 import SourceMap from './source-map';
-import { SourceMapInput, SourceMapLoader } from './types';
+
+import type { SourceMapInput, SourceMapLoader } from './types';
 
 /**
  * Traces through all the mappings in the root sourcemap, through the sources

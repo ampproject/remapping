@@ -15,7 +15,7 @@
  */
 
 import SourceMap from '../../src/source-map';
-import { DecodedSourceMap } from '../../src/types';
+import type { DecodedSourceMap } from '../../src/types';
 
 describe('SourceMap', () => {
   const decoded: DecodedSourceMap = {

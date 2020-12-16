@@ -22,6 +22,7 @@ describe('defaults', () => {
   const enumerableOwn = 'enumberableOwn';
   const nonenumerableOwn = 'nonenumberableOwn';
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   function defineProperty(target: {}, prop: string, enumerable: boolean): void {
     Object.defineProperty(target, prop, { enumerable, value: {} });
   }

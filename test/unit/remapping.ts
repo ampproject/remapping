@@ -15,7 +15,7 @@
  */
 
 import remapping from '../../src/remapping';
-import { RawSourceMap } from '../../src/types';
+import type { RawSourceMap } from '../../src/types';
 
 describe('remapping', () => {
   const rawMap: RawSourceMap = {

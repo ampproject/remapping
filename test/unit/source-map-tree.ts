@@ -16,7 +16,7 @@
 
 import OriginalSource from '../../src/original-source';
 import SourceMapTree from '../../src/source-map-tree';
-import { DecodedSourceMap } from '../../src/types';
+import type { DecodedSourceMap } from '../../src/types';
 
 describe('SourceMapTree', () => {
   describe('traceMappings()', () => {

@@ -15,7 +15,8 @@
  */
 
 import { encode } from 'sourcemap-codec';
-import { DecodedSourceMap, RawSourceMap } from './types';
+
+import type { DecodedSourceMap, RawSourceMap } from './types';
 
 /**
  * A SourceMap v3 compatible sourcemap, which only includes fields that were

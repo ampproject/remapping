@@ -15,7 +15,7 @@
  */
 
 import buildSourceMapTree from '../../src/build-source-map-tree';
-import { DecodedSourceMap, RawSourceMap } from '../../src/types';
+import type { DecodedSourceMap, RawSourceMap } from '../../src/types';
 
 describe('buildSourceMapTree', () => {
   const rawMap: RawSourceMap = {
