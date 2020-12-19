@@ -55,3 +55,8 @@ export interface SourceMapSegmentObject {
 export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;
 
 export type SourceMapLoader = (file: string) => SourceMapInput | null | undefined;
+
+export type Options = {
+  excludeContent: boolean;
+  decodedMappings: boolean;
+};
