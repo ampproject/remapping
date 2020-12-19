@@ -30,10 +30,16 @@ type Sources = OriginalSource | SourceMapTree;
 export default class SourceMapTree {
   map: DecodedSourceMap;
   sources: Sources[];
+  private lastLine: number;
+  private lastColumn: number;
+  private lastIndex: number;
 
   constructor(map: DecodedSourceMap, sources: Sources[]) {
     this.map = map;
     this.sources = sources;
+    this.lastLine = 0;
+    this.lastColumn = 0;
+    this.lastIndex = 0;
   }
 
   /**
@@ -119,15 +125,30 @@ export default class SourceMapTree {
 
     if (segments.length === 0) return null;
 
-    let index = binarySearch(segments, column, segmentComparator);
+    let low = 0;
+    let high = segments.length - 1;
+    if (line === this.lastLine) {
+      if (column >= this.lastColumn) {
+        low = this.lastIndex;
+      } else {
+        high = this.lastIndex;
+      }
+    }
+    let index = binarySearch(segments, column, segmentComparator, low, high);
+    this.lastLine = line;
+    this.lastColumn = column;
 
-    if (index === -1) return null; // we come before any mapped segment
+    if (index === -1) {
+      this.lastIndex = index;
+      return null; // we come before any mapped segment
+    }
 
     // If we can't find a segment that lines up to this column, we use the
     // segment before.
     if (index < 0) {
       index = ~index - 1;
     }
+    this.lastIndex = index;
 
     const segment = segments[index];
 

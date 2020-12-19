@@ -165,7 +165,7 @@ describe('SourceMapTree', () => {
           [2, 0, 0, 0],
           [4, 0, 1, 1],
         ], // line 0
-        [[1, 0, 0, 0]], // line 1 - maps to line 0 col 0
+        [[2, 0, 0, 0]], // line 1 - maps to line 0 col 0
         [[0]], // line 2 has 1 length segment
         [[0, 0, 0, 0, 0]], // line 3 has a name
         [
@@ -198,7 +198,7 @@ describe('SourceMapTree', () => {
       for (let genCol = 0; genCol < expectedCols.length; genCol++) {
         const trace = source.traceSegment(5, genCol, '');
         if (expectedCols[genCol] == null) {
-          expect(trace).toBeNull();
+          expect(trace).toBe(null);
         } else {
           expect(trace).toMatchObject({ line: 5, column: expectedCols[genCol] });
         }
@@ -229,6 +229,54 @@ describe('SourceMapTree', () => {
     test('overrides name if segment is 5-length', () => {
       const trace = source.traceSegment(3, 0, 'foo');
       expect(trace).toMatchObject({ name: 'name' });
+    });
+
+    describe('tracing same line multiple times', () => {
+      describe('later column', () => {
+        test('returns matching segment after match', () => {
+          expect(source.traceSegment(0, 1, '')).not.toBe(null);
+          const trace = source.traceSegment(0, 4, '');
+          expect(trace).toMatchObject({ line: 1, column: 1 });
+        });
+
+        test('returns matching segment after null match', () => {
+          expect(source.traceSegment(1, 0, '')).toBe(null);
+          const trace = source.traceSegment(1, 2, '');
+          expect(trace).toMatchObject({ line: 0, column: 0 });
+        });
+
+        test('returns null segment segment after null match', () => {
+          expect(source.traceSegment(1, 0, '')).toBe(null);
+          const trace = source.traceSegment(1, 1, '');
+          expect(trace).toBe(null);
+        });
+
+        test('returns matching segment after almost match', () => {
+          expect(source.traceSegment(4, 2, '')).not.toBe(null);
+          const trace = source.traceSegment(4, 5, '');
+          expect(trace).toMatchObject({ line: 4, column: 6 });
+        });
+      });
+
+      describe('earlier column', () => {
+        test('returns matching segment after match', () => {
+          expect(source.traceSegment(0, 4, '')).not.toBe(null);
+          const trace = source.traceSegment(0, 1, '');
+          expect(trace).toMatchObject({ line: 0, column: 0 });
+        });
+
+        test('returns null segment segment after null match', () => {
+          expect(source.traceSegment(1, 1, '')).toBe(null);
+          const trace = source.traceSegment(1, 0, '');
+          expect(trace).toBe(null);
+        });
+
+        test('returns matching segment after almost match', () => {
+          expect(source.traceSegment(4, 2, '')).not.toBe(null);
+          const trace = source.traceSegment(4, 0, '');
+          expect(trace).toMatchObject({ line: 4, column: 0 });
+        });
+      });
     });
   });
 });

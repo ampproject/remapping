@@ -42,11 +42,11 @@
 export default function binarySearch<T, S>(
   haystack: ArrayLike<T>,
   needle: S,
-  comparator: (item: T, needle: S) => number
+  comparator: (item: T, needle: S) => number,
+  low: number,
+  high: number
 ): number {
-  let low = 0;
-  let high = haystack.length - 1;
-
+  low = Math.max(low, 0);
   while (low <= high) {
     const mid = low + ((high - low) >> 1);
     const cmp = comparator(haystack[mid], needle);
