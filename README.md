@@ -22,7 +22,7 @@ npm install @ampproject/remapping
 function remapping(
   map: SourceMap | SourceMap[],
   loader: (file: string) => (SourceMap | null | undefined),
-  excludeContent?: boolean
+  options?: { excludeContent: boolean, decodedMappings: boolean }
 ): SourceMap;
 ```
 
@@ -109,3 +109,18 @@ console.log(remapped);
 //   version: 3,
 // };
 ```
+
+### Options
+
+#### excludeContent
+
+By default, `excludeContent` is `false`. Passing `{ excludeContent: true }`
+will exclude the `sourcesContent` field from the returned sourcemap. This is
+mainly useful when you want to reduce the size out the sourcemap.
+
+#### decodedMappings
+
+By default, `decodedMappings` is `false`. Passing `{ decodedMappings: true }`
+will leave the `mappings` field in a [decoded
+state](https://github.com/rich-harris/sourcemap-codec) instead of encoding
+into a VLQ string.
