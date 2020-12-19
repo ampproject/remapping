@@ -29,7 +29,6 @@ describe('transpile then concatenate', () => {
     const remapped = remapping(map, (file) => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
-    console.log(JSON.stringify(remapped, null, 2));
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
     // the foo in bundle.js
