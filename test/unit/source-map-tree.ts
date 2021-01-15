@@ -154,6 +154,39 @@ describe('SourceMapTree', () => {
         sources: ['child.js'],
       });
     });
+
+    describe('redundant segments', () => {
+      it('skips redundant segments on the same line', () => {
+        const map: DecodedSourceMap = {
+          ...baseMap,
+          mappings: [
+            [
+              [0, 0, 0, 0],
+              [1, 0, 0, 0],
+            ],
+          ],
+        };
+
+        const source = new SourceMapTree(map, [child]);
+        const traced = source.traceMappings();
+        expect(traced).toMatchObject({
+          mappings: [[[0, 0, 0, 0]]],
+        });
+      });
+
+      it('keeps redundant segments on another line', () => {
+        const map: DecodedSourceMap = {
+          ...baseMap,
+          mappings: [[[0, 0, 0, 0]], [[0, 0, 0, 0]]],
+        };
+
+        const source = new SourceMapTree(map, [child]);
+        const traced = source.traceMappings();
+        expect(traced).toMatchObject({
+          mappings: [[[0, 0, 0, 0]], [[0, 0, 0, 0]]],
+        });
+      });
+    });
   });
 
   describe('traceSegment()', () => {
