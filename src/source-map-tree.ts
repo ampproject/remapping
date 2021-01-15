@@ -57,6 +57,7 @@ export default class SourceMapTree {
     for (let i = 0; i < rootMappings.length; i++) {
       const segments = rootMappings[i];
       const tracedSegments: SourceMapSegment[] = [];
+      let lastTraced: SourceMapSegment | undefined = undefined;
 
       for (let j = 0; j < segments.length; j++) {
         const segment = segments[j];
@@ -83,15 +84,27 @@ export default class SourceMapTree {
         const sourceIndex = sources.put(filename);
         sourcesContent[sourceIndex] = content;
 
+        if (
+          lastTraced &&
+          lastTraced[1] === sourceIndex &&
+          lastTraced[2] === line &&
+          lastTraced[3] === column
+        ) {
+          // This is a duplicate mapping pointing at the exact same starting point in the source file.
+          // It doesn't provide any new information, and only bloats the sourcemap.
+          continue;
+        }
+
         // This looks like unnecessary duplication, but it noticeably increases
         // performance. If we were to push the nameIndex onto length-4 array, v8
         // would internally allocate 22 slots! That's 68 wasted bytes! Array
         // literals have the same capacity as their length, saving memory.
         if (name) {
-          tracedSegments.push([segment[0], sourceIndex, line, column, names.put(name)]);
+          lastTraced = [segment[0], sourceIndex, line, column, names.put(name)];
         } else {
-          tracedSegments.push([segment[0], sourceIndex, line, column]);
+          lastTraced = [segment[0], sourceIndex, line, column];
         }
+        tracedSegments.push(lastTraced);
       }
 
       mappings.push(tracedSegments);
