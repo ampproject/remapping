@@ -54,7 +54,7 @@ describe('SourceMapTree', () => {
 
       const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
-      expect(traced.mappings).toEqual([[]]);
+      expect(traced.mappings).toEqual([]);
     });
 
     test('skips segment if trace returns null', () => {
@@ -68,7 +68,7 @@ describe('SourceMapTree', () => {
 
       const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
-      expect(traced.mappings).toEqual([[]]);
+      expect(traced.mappings).toEqual([]);
     });
 
     test('traces name if segment is 5-length', () => {
@@ -152,6 +152,34 @@ describe('SourceMapTree', () => {
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         sources: ['child.js'],
+      });
+    });
+
+    test('truncates mappings to the last line with segment', () => {
+      const map: DecodedSourceMap = {
+        ...baseMap,
+        mappings: [[[0, 0, 0, 0]], [], []],
+        sourceRoot,
+      };
+
+      const source = new SourceMapTree(map, [child]);
+      const traced = source.traceMappings();
+      expect(traced).toMatchObject({
+        mappings: [[[0, 0, 0, 0]]],
+      });
+    });
+
+    test('truncates empty mappings', () => {
+      const map: DecodedSourceMap = {
+        ...baseMap,
+        mappings: [[], [], []],
+        sourceRoot,
+      };
+
+      const source = new SourceMapTree(map, [child]);
+      const traced = source.traceMappings();
+      expect(traced).toMatchObject({
+        mappings: [],
       });
     });
 
