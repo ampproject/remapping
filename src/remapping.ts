@@ -18,6 +18,14 @@ import buildSourceMapTree from './build-source-map-tree';
 import SourceMap from './source-map';
 
 import type { SourceMapInput, SourceMapLoader, Options } from './types';
+export type {
+  SourceMapSegment,
+  RawSourceMap,
+  DecodedSourceMap,
+  SourceMapInput,
+  SourceMapLoader,
+  Options,
+} from './types';
 
 /**
  * Traces through all the mappings in the root sourcemap, through the sources
