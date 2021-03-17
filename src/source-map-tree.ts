@@ -54,6 +54,7 @@ export default class SourceMapTree {
     const sourcesContent: (string | null)[] = [];
     const { mappings: rootMappings, names: rootNames } = this.map;
 
+    let lastLineWithSegment = -1;
     for (let i = 0; i < rootMappings.length; i++) {
       const segments = rootMappings[i];
       const tracedSegments: SourceMapSegment[] = [];
@@ -105,9 +106,13 @@ export default class SourceMapTree {
           lastTraced = [segment[0], sourceIndex, line, column];
         }
         tracedSegments.push(lastTraced);
+        lastLineWithSegment = i;
       }
 
       mappings.push(tracedSegments);
+    }
+    if (mappings.length > lastLineWithSegment + 1) {
+      mappings.length = lastLineWithSegment + 1;
     }
 
     // TODO: Make all sources relative to the sourceRoot.
