@@ -31,30 +31,33 @@ describe('buildSourceMapTree', () => {
     mappings: [[[0, 0, 0, 0]]],
   };
   const jsonDecodedMap = JSON.stringify(decodedMap);
+  function isEdit() {
+    return false;
+  }
 
   test('parses and decodes a JSON sourcemap', () => {
-    const tree = buildSourceMapTree(jsonRawMap, () => null);
+    const tree = buildSourceMapTree(jsonRawMap, () => null, isEdit, '');
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Decoded JSON sourcemap', () => {
-    const tree = buildSourceMapTree(jsonDecodedMap, () => null);
+    const tree = buildSourceMapTree(jsonDecodedMap, () => null, isEdit, '');
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Raw sourcemap', () => {
-    const tree = buildSourceMapTree(rawMap, () => null);
+    const tree = buildSourceMapTree(rawMap, () => null, isEdit, '');
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('parses a Decoded sourcemap', () => {
-    const tree = buildSourceMapTree(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, () => null, isEdit, '');
     expect(tree.map).toEqual(decodedMap);
   });
 
   test('calls loader for any needed sourcemap', () => {
     const loader = jest.fn(() => null);
-    buildSourceMapTree(decodedMap, loader);
+    buildSourceMapTree(decodedMap, loader, isEdit, '');
 
     expect(loader).toHaveBeenCalledWith('helloworld.js');
     expect(loader.mock.calls.length).toBe(1);
@@ -64,12 +67,12 @@ describe('buildSourceMapTree', () => {
     // tslint:disable-next-line: no-any
     const loader = (): any => Promise.resolve(null);
     expect(() => {
-      buildSourceMapTree(decodedMap, loader);
+      buildSourceMapTree(decodedMap, loader, isEdit, '');
     }).toThrow();
   });
 
   test('creates OriginalSource if no sourcemap', () => {
-    const tree = buildSourceMapTree(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, () => null, isEdit, '');
     expect(tree.sources).toMatchObject([
       {
         filename: 'helloworld.js',
@@ -84,7 +87,7 @@ describe('buildSourceMapTree', () => {
         sourcesContent: ['1 + 1'],
       },
       () => null
-    );
+    , isEdit, '');
 
     expect(tree.sources).toMatchObject([
       {
@@ -94,7 +97,7 @@ describe('buildSourceMapTree', () => {
   });
 
   test('creates OriginalSource with null content if no sourceContent', () => {
-    const tree = buildSourceMapTree(decodedMap, () => null);
+    const tree = buildSourceMapTree(decodedMap, () => null, isEdit, '');
     expect(tree.sources).toMatchObject([
       {
         content: null,
@@ -109,7 +112,7 @@ describe('buildSourceMapTree', () => {
         sourcesContent: undefined,
       },
       () => null
-    );
+    , isEdit, '');
 
     expect(tree.sources).toMatchObject([
       {
@@ -126,7 +129,7 @@ describe('buildSourceMapTree', () => {
         sources: ['two.js'],
       })
       .mockReturnValue(null);
-    const tree = buildSourceMapTree(decodedMap, loader);
+    const tree = buildSourceMapTree(decodedMap, loader, isEdit, '');
 
     expect(tree.sources).toMatchObject([
       {
@@ -151,7 +154,7 @@ describe('buildSourceMapTree', () => {
         sourceRoot: 'https://foo.com/',
       },
       loader
-    );
+    , isEdit, '');
 
     expect(loader).toHaveBeenCalledWith('https://foo.com/helloworld.js');
     expect(loader.mock.calls.length).toBe(1);
@@ -174,7 +177,7 @@ describe('buildSourceMapTree', () => {
         sources: ['three.js'],
       })
       .mockReturnValue(null);
-    const tree = buildSourceMapTree(decodedMap, loader);
+    const tree = buildSourceMapTree(decodedMap, loader, isEdit, '');
 
     expect(tree.sources).toMatchObject([
       {
@@ -222,7 +225,7 @@ describe('buildSourceMapTree', () => {
         sourceRoot: 'https://foo.com/deep',
       },
       loader
-    );
+    , isEdit, '');
 
     expect(tree.sources).toMatchObject([
       {
@@ -251,7 +254,7 @@ describe('buildSourceMapTree', () => {
       decodedMap, // "transformation map"
       decodedMap,
     ];
-    const tree = buildSourceMapTree(maps, () => null);
+    const tree = buildSourceMapTree(maps, () => null, isEdit, '');
 
     expect(tree.sources).toMatchObject([
       {
@@ -275,7 +278,7 @@ describe('buildSourceMapTree', () => {
     ];
 
     expect(() => {
-      buildSourceMapTree(maps, () => null);
+      buildSourceMapTree(maps, () => null, isEdit, '');
     }).toThrow();
   });
 
@@ -293,7 +296,7 @@ describe('buildSourceMapTree', () => {
         sources: [null],
       },
       loader
-    );
+    , isEdit, '');
 
     expect(tree.map).toMatchObject({
       sources: [null],
@@ -316,7 +319,7 @@ describe('buildSourceMapTree', () => {
         sources: [null],
       },
       loader
-    );
+    , isEdit, '');
 
     expect(tree.sources).toMatchObject([
       {
@@ -347,7 +350,7 @@ describe('buildSourceMapTree', () => {
         sources: [null],
       },
       loader
-    );
+    , isEdit, '');
 
     expect(tree.sources).toMatchObject([
       {

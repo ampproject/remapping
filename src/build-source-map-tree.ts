@@ -27,6 +27,10 @@ function asArray<T>(value: T | T[]): T[] {
   return [value];
 }
 
+function id(relativeRoot: string, index: number): string {
+  return `${relativeRoot}.${index}`;
+}
+
 /**
  * Recursively builds a tree structure out of sourcemap files, with each node
  * being either an `OriginalSource` "leaf" or a `SourceMapTree` composed of
@@ -41,21 +45,40 @@ function asArray<T>(value: T | T[]): T[] {
 export default function buildSourceMapTree(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
-  relativeRoot?: string
+  isEdit: (map: SourceMapInput) => boolean,
+  relativeRoot: string
 ): SourceMapTree {
-  const maps = asArray(input).map(decodeSourceMap);
+  const maps = asArray(input).map((map: SourceMapInput) => {
+    return { isEdit: isEdit(map), decoded: decodeSourceMap(map) };
+  });
   const map = maps.pop()!;
 
   for (let i = 0; i < maps.length; i++) {
-    if (maps[i].sources.length !== 1) {
+    if (maps[i].decoded.sources.length !== 1) {
       throw new Error(
-        `Transformation map ${i} must have exactly one source file.\n` +
+        `Transformation map ${id(
+          relativeRoot || 'input',
+          i
+        )} must have exactly one source file.\n` +
           'Did you specify these with the most recent transformation maps first?'
       );
     }
   }
+  if (map.isEdit) {
+    if (map.decoded.sources.length !== 1) {
+      throw new Error(
+        `Edit map ${id(relativeRoot || 'input', maps.length)} must have exactly one source file.`
+      );
+    }
+  } else {
+    if (map.decoded.sources.length === 0) {
+      throw new Error(
+        `Sourcemap ${id(relativeRoot || 'input', maps.length)} must have at least one source file.`
+      );
+    }
+  }
 
-  const { sourceRoot, sources, sourcesContent } = map;
+  const { sourceRoot, sources, sourcesContent } = map.decoded;
 
   const children = sources.map((sourceFile: string | null, i: number):
     | SourceMapTree
@@ -79,12 +102,13 @@ export default function buildSourceMapTree(
 
     // Else, it's a real sourcemap, and we need to recurse into it to load its
     // source files.
-    return buildSourceMapTree(decodeSourceMap(sourceMap), loader, uri);
+    return buildSourceMapTree(sourceMap, loader, isEdit, uri);
   });
 
-  let tree = new SourceMapTree(map, children);
+  let tree = new SourceMapTree(map.decoded, map.isEdit, children);
   for (let i = maps.length - 1; i >= 0; i--) {
-    tree = new SourceMapTree(maps[i], [tree]);
+    const { decoded, isEdit } = maps[i];
+    tree = new SourceMapTree(decoded, isEdit, [tree]);
   }
   return tree;
 }

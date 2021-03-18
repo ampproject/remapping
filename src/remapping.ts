@@ -48,7 +48,16 @@ export default function remapping(
   options?: boolean | Options
 ): SourceMap {
   const opts =
-    typeof options === 'object' ? options : { excludeContent: !!options, decodedMappings: false };
-  const graph = buildSourceMapTree(input, loader);
+    typeof options === 'object'
+      ? options
+      : { excludeContent: !!options, decodedMappings: false, isEdit };
+  const graph = buildSourceMapTree(input, loader, opts.isEdit || isEdit, '');
   return new SourceMap(graph.traceMappings(), opts);
+}
+
+/**
+ * Default implementation of isEdit
+ */
+function isEdit() {
+  return false;
 }

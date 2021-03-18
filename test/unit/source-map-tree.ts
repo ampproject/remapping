@@ -20,6 +20,7 @@ import type { DecodedSourceMap } from '../../src/types';
 
 describe('SourceMapTree', () => {
   describe('traceMappings()', () => {
+    const isEdit = false;
     const sourceRoot = 'https://foobar.com';
     const baseMap: DecodedSourceMap = {
       mappings: [],
@@ -43,7 +44,7 @@ describe('SourceMapTree', () => {
         sources: ['original.js'],
         version: 3,
       },
-      [new OriginalSource(`${sourceRoot}/original.js`, '')]
+      isEdit, [new OriginalSource(`${sourceRoot}/original.js`, '')]
     );
 
     test('skips segment if segment is 1-length', () => {
@@ -52,7 +53,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0]]],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced.mappings).toEqual([]);
     });
@@ -66,7 +67,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced.mappings).toEqual([]);
     });
@@ -83,7 +84,7 @@ describe('SourceMapTree', () => {
         names: [name],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 0, 0, 0]]],
@@ -100,7 +101,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 1, 1]]],
@@ -116,7 +117,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 0, 0, 0]]],
@@ -135,7 +136,7 @@ describe('SourceMapTree', () => {
         ...extras,
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject(extras);
     });
@@ -148,7 +149,7 @@ describe('SourceMapTree', () => {
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         sources: ['child.js'],
@@ -162,7 +163,7 @@ describe('SourceMapTree', () => {
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 0, 0]]],
@@ -176,7 +177,7 @@ describe('SourceMapTree', () => {
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(map, isEdit, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [],
@@ -195,7 +196,7 @@ describe('SourceMapTree', () => {
           ],
         };
 
-        const source = new SourceMapTree(map, [child]);
+        const source = new SourceMapTree(map, isEdit, [child]);
         const traced = source.traceMappings();
         expect(traced).toMatchObject({
           mappings: [[[0, 0, 0, 0]]],
@@ -208,7 +209,7 @@ describe('SourceMapTree', () => {
           mappings: [[[0, 0, 0, 0]], [[0, 0, 0, 0]]],
         };
 
-        const source = new SourceMapTree(map, [child]);
+        const source = new SourceMapTree(map, isEdit, [child]);
         const traced = source.traceMappings();
         expect(traced).toMatchObject({
           mappings: [[[0, 0, 0, 0]], [[0, 0, 0, 0]]],
@@ -218,6 +219,7 @@ describe('SourceMapTree', () => {
   });
 
   describe('traceSegment()', () => {
+    const isEdit = false;
     const map: DecodedSourceMap = {
       mappings: [
         [
@@ -239,17 +241,19 @@ describe('SourceMapTree', () => {
       sources: ['child.js'],
       version: 3,
     };
-    const source = new SourceMapTree(map, [new OriginalSource('child.js', '')]);
+    const source = new SourceMapTree(map, isEdit, [new OriginalSource('child.js', '')]);
+    const outputLine = 0;
+    const outputColumn = 0;
 
     test('traces LineSegments to the segment with matching generated column', () => {
-      const trace = source.traceSegment(0, 4, '');
+      const trace = source.traceSegment(outputLine, outputColumn, 0, 4, '');
       expect(trace).toMatchObject({ line: 1, column: 1 });
     });
 
     test('traces all generated cols on a line back to their source when source had characters removed', () => {
       const expectedCols = [0, 0, 0, 0, 0, 6, 6, 6, 6];
       for (let genCol = 0; genCol < expectedCols.length; genCol++) {
-        const trace = source.traceSegment(4, genCol, '');
+        const trace = source.traceSegment(outputLine, outputColumn, 4, genCol, '');
         expect(trace).toMatchObject({ line: 4, column: expectedCols[genCol] });
       }
     });
@@ -257,7 +261,7 @@ describe('SourceMapTree', () => {
     test('traces all generated cols on a line back to their source when source had characters added', () => {
       const expectedCols = [0, 0, 0, 0, 0, null, 5, 5, 5, 5, 5];
       for (let genCol = 0; genCol < expectedCols.length; genCol++) {
-        const trace = source.traceSegment(5, genCol, '');
+        const trace = source.traceSegment(outputLine, outputColumn, 5, genCol, '');
         if (expectedCols[genCol] == null) {
           expect(trace).toBe(null);
         } else {
@@ -267,74 +271,74 @@ describe('SourceMapTree', () => {
     });
 
     test('returns null if line is longer than mapping lines', () => {
-      const trace = source.traceSegment(10, 0, '');
+      const trace = source.traceSegment(outputLine, outputColumn, 10, 0, '');
       expect(trace).toBe(null);
     });
 
     test('returns null if no matching segment column', () => {
       //line 1 col 0 of generated doesn't exist in the original source
-      const trace = source.traceSegment(1, 0, '');
+      const trace = source.traceSegment(outputLine, outputColumn, 1, 0, '');
       expect(trace).toBe(null);
     });
 
     test('returns null if segment is 1-length', () => {
-      const trace = source.traceSegment(2, 0, '');
+      const trace = source.traceSegment(outputLine, outputColumn, 2, 0, '');
       expect(trace).toBe(null);
     });
 
     test('passes in outer name to trace', () => {
-      const trace = source.traceSegment(0, 0, 'foo');
+      const trace = source.traceSegment(outputLine, outputColumn, 0, 0, 'foo');
       expect(trace).toMatchObject({ name: 'foo' });
     });
 
     test('overrides name if segment is 5-length', () => {
-      const trace = source.traceSegment(3, 0, 'foo');
+      const trace = source.traceSegment(outputLine, outputColumn, 3, 0, 'foo');
       expect(trace).toMatchObject({ name: 'name' });
     });
 
     describe('tracing same line multiple times', () => {
       describe('later column', () => {
         test('returns matching segment after match', () => {
-          expect(source.traceSegment(0, 1, '')).not.toBe(null);
-          const trace = source.traceSegment(0, 4, '');
+          expect(source.traceSegment(outputLine, outputColumn, 0, 1, '')).not.toBe(null);
+          const trace = source.traceSegment(outputLine, outputColumn, 0, 4, '');
           expect(trace).toMatchObject({ line: 1, column: 1 });
         });
 
         test('returns matching segment after null match', () => {
-          expect(source.traceSegment(1, 0, '')).toBe(null);
-          const trace = source.traceSegment(1, 2, '');
+          expect(source.traceSegment(outputLine, outputColumn, 1, 0, '')).toBe(null);
+          const trace = source.traceSegment(outputLine, outputColumn, 1, 2, '');
           expect(trace).toMatchObject({ line: 0, column: 0 });
         });
 
         test('returns null segment segment after null match', () => {
-          expect(source.traceSegment(1, 0, '')).toBe(null);
-          const trace = source.traceSegment(1, 1, '');
+          expect(source.traceSegment(outputLine, outputColumn, 1, 0, '')).toBe(null);
+          const trace = source.traceSegment(outputLine, outputColumn, 1, 1, '');
           expect(trace).toBe(null);
         });
 
         test('returns matching segment after almost match', () => {
-          expect(source.traceSegment(4, 2, '')).not.toBe(null);
-          const trace = source.traceSegment(4, 5, '');
+          expect(source.traceSegment(outputLine, outputColumn, 4, 2, '')).not.toBe(null);
+          const trace = source.traceSegment(outputLine, outputColumn, 4, 5, '');
           expect(trace).toMatchObject({ line: 4, column: 6 });
         });
       });
 
       describe('earlier column', () => {
         test('returns matching segment after match', () => {
-          expect(source.traceSegment(0, 4, '')).not.toBe(null);
-          const trace = source.traceSegment(0, 1, '');
+          expect(source.traceSegment(outputLine, outputColumn, 0, 4, '')).not.toBe(null);
+          const trace = source.traceSegment(outputLine, outputColumn, 0, 1, '');
           expect(trace).toMatchObject({ line: 0, column: 0 });
         });
 
         test('returns null segment segment after null match', () => {
-          expect(source.traceSegment(1, 1, '')).toBe(null);
-          const trace = source.traceSegment(1, 0, '');
+          expect(source.traceSegment(outputLine, outputColumn, 1, 1, '')).toBe(null);
+          const trace = source.traceSegment(outputLine, outputColumn, 1, 0, '');
           expect(trace).toBe(null);
         });
 
         test('returns matching segment after almost match', () => {
-          expect(source.traceSegment(4, 2, '')).not.toBe(null);
-          const trace = source.traceSegment(4, 0, '');
+          expect(source.traceSegment(outputLine, outputColumn, 4, 2, '')).not.toBe(null);
+          const trace = source.traceSegment(outputLine, outputColumn, 4, 0, '');
           expect(trace).toMatchObject({ line: 4, column: 0 });
         });
       });

@@ -44,12 +44,12 @@ export interface DecodedSourceMap extends SourceMapV3 {
 
 export interface SourceMapSegmentObject {
   column: number;
+  content: string | null;
+  filename: string;
   line: number;
   name: string;
-  source: {
-    content: string | null;
-    filename: string;
-  };
+  outputColumn: number;
+  outputLine: number;
 }
 
 export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;

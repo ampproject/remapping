@@ -24,44 +24,24 @@ describe('OriginalSource', () => {
   });
 
   describe('traceSegment()', () => {
-    test('returns the same line number', () => {
+    test('returns a SourceMapSegmentObject struct of input params', () => {
+      const outputColumn = Math.random();
+      const outputLine = Math.random();
       const line = Math.random();
       const column = Math.random();
       const name = String(Math.random());
 
-      const trace = source.traceSegment(line, column, name);
+      const traced = source.traceSegment(outputLine, outputColumn, line, column, name);
 
-      expect(trace.line).toBe(line);
-    });
-
-    test('returns the same column number', () => {
-      const line = Math.random();
-      const column = Math.random();
-      const name = String(Math.random());
-
-      const trace = source.traceSegment(line, column, name);
-
-      expect(trace.column).toBe(column);
-    });
-
-    test('returns the same name', () => {
-      const line = Math.random();
-      const column = Math.random();
-      const name = String(Math.random());
-
-      const trace = source.traceSegment(line, column, name);
-
-      expect(trace.name).toBe(name);
-    });
-
-    test('returns the original source itself', () => {
-      const line = Math.random();
-      const column = Math.random();
-      const name = String(Math.random());
-
-      const trace = source.traceSegment(line, column, name);
-
-      expect(trace.source).toBe(source);
+      expect(traced).toMatchObject({
+        outputColumn,
+        outputLine,
+        line,
+        column,
+        name,
+        filename: source.filename,
+        content: source.content,
+      });
     });
   });
 });

@@ -29,11 +29,29 @@ export default class OriginalSource {
     this.content = content;
   }
 
+  traceLine(line: number): SourceMapSegmentObject[] {
+    return [this.traceSegment(0, line, line, 0, '')];
+  }
+
   /**
    * Tracing a `SourceMapSegment` ends when we get to an `OriginalSource`,
    * meaning this line/column location originated from this source file.
    */
-  traceSegment(line: number, column: number, name: string): SourceMapSegmentObject {
-    return { column, line, name, source: this };
+  traceSegment(
+    outputLine: number,
+    outputColumn: number,
+    line: number,
+    column: number,
+    name: string
+  ): SourceMapSegmentObject {
+    return {
+      outputLine,
+      outputColumn,
+      line,
+      column,
+      name,
+      filename: this.filename,
+      content: this.content,
+    };
   }
 }
