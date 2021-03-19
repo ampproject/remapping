@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": null,
+  "sources": ["main.js"],
+  "sourcesContent": [
+    "/**\n * Copyright 2019 The AMP HTML Authors. All Rights Reserved.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nvar foo = function foo() {\n  return 'foo';\n};\n/* REMOVE START */\n\n\nvar bar = function bar() {\n  return 'bar';\n};\n/* REMOVE END */\n\n\nvar baz = function baz() {\n  return 'baz';\n};\n/* INSERT START */\n\n\nvar qux = function qux() {\n  return 'qux';\n};\n/* INSERT END */\n\n\nvar quux = function quux() {\n  return 'quux';\n};\n//# sourceMappingURL=main.js.map"
+  ],
+  "names": [],
+  "mappings": "AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA,IAAI,GAAG,YAAY,GAAG;AACtB,UAAU,GAAG;AACb,EACkB;AAClB;AACA;AACA;AACA;AACA;AAEA;AACA;AACA;AACA;AACA,EAAE;;;;;GACgB;AAClB;AACA;AACA;AACA;AACA;AACA;;;;AACA;AACA;AACA;AACA;AACA;AACA"
+}

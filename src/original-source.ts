@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { SourceMapSegmentObject } from './types';
+import type { SourceMapSegment, SourceMapSegmentObject } from './types';
 
 /**
  * A "leaf" node in the sourcemap tree, representing an original, unmodified
@@ -29,8 +29,8 @@ export default class OriginalSource {
     this.content = content;
   }
 
-  traceLine(line: number): SourceMapSegmentObject[] {
-    return [this.traceSegment(0, line, line, 0, '')];
+  traceLine(line: number, into: (s: SourceMapSegmentObject) => SourceMapSegment): SourceMapSegment[] {
+    return [into(this.traceSegment(line, line, 0, ''))];
   }
 
   /**
@@ -38,14 +38,12 @@ export default class OriginalSource {
    * meaning this line/column location originated from this source file.
    */
   traceSegment(
-    outputLine: number,
     outputColumn: number,
     line: number,
     column: number,
     name: string
   ): SourceMapSegmentObject {
     return {
-      outputLine,
       outputColumn,
       line,
       column,

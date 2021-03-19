@@ -26,16 +26,14 @@ describe('OriginalSource', () => {
   describe('traceSegment()', () => {
     test('returns a SourceMapSegmentObject struct of input params', () => {
       const outputColumn = Math.random();
-      const outputLine = Math.random();
       const line = Math.random();
       const column = Math.random();
       const name = String(Math.random());
 
-      const traced = source.traceSegment(outputLine, outputColumn, line, column, name);
+      const traced = source.traceSegment(outputColumn, line, column, name);
 
       expect(traced).toMatchObject({
         outputColumn,
-        outputLine,
         line,
         column,
         name,

@@ -49,10 +49,9 @@ export interface SourceMapSegmentObject {
   line: number;
   name: string;
   outputColumn: number;
-  outputLine: number;
 }
 
-type InputMap = string | RawSourceMap | DecodedSourceMap;
+export type InputMap = string | RawSourceMap | DecodedSourceMap;
 export type EditMap = { edit: boolean; map: InputMap };
 export type SourceMapInput = InputMap | EditMap;
 
