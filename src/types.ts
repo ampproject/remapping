@@ -52,7 +52,9 @@ export interface SourceMapSegmentObject {
   outputLine: number;
 }
 
-export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;
+type InputMap = string | RawSourceMap | DecodedSourceMap;
+export type EditMap = { edit: boolean; map: InputMap };
+export type SourceMapInput = InputMap | EditMap;
 
 export type SourceMapLoader = (file: string) => SourceMapInput | null | undefined;
 

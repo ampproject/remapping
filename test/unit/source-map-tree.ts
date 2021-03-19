@@ -44,7 +44,8 @@ describe('SourceMapTree', () => {
         sources: ['original.js'],
         version: 3,
       },
-      isEdit, [new OriginalSource(`${sourceRoot}/original.js`, '')]
+      isEdit,
+      [new OriginalSource(`${sourceRoot}/original.js`, '')]
     );
 
     test('skips segment if segment is 1-length', () => {

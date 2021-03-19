@@ -19,12 +19,13 @@ import SourceMap from './source-map';
 
 import type { SourceMapInput, SourceMapLoader, Options } from './types';
 export type {
-  SourceMapSegment,
-  RawSourceMap,
   DecodedSourceMap,
+  EditMap,
+  Options,
+  RawSourceMap,
   SourceMapInput,
   SourceMapLoader,
-  Options,
+  SourceMapSegment,
 } from './types';
 
 /**
@@ -48,16 +49,7 @@ export default function remapping(
   options?: boolean | Options
 ): SourceMap {
   const opts =
-    typeof options === 'object'
-      ? options
-      : { excludeContent: !!options, decodedMappings: false, isEdit };
-  const graph = buildSourceMapTree(input, loader, opts.isEdit || isEdit, '');
+    typeof options === 'object' ? options : { excludeContent: !!options, decodedMappings: false };
+  const graph = buildSourceMapTree(input, loader, '');
   return new SourceMap(graph.traceMappings(), opts);
-}
-
-/**
- * Default implementation of isEdit
- */
-function isEdit() {
-  return false;
 }

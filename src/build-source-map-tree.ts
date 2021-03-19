@@ -20,7 +20,7 @@ import resolve from './resolve';
 import SourceMapTree from './source-map-tree';
 import stripFilename from './strip-filename';
 
-import type { SourceMapInput, SourceMapLoader } from './types';
+import type { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
 
 function asArray<T>(value: T | T[]): T[] {
   if (Array.isArray(value)) return value;
@@ -29,6 +29,13 @@ function asArray<T>(value: T | T[]): T[] {
 
 function id(relativeRoot: string, index: number): string {
   return `${relativeRoot}.${index}`;
+}
+
+function toDecodedMap(map: SourceMapInput): { isEdit: boolean; decoded: DecodedSourceMap } {
+  if (typeof map === 'string' || !('map' in map)) {
+    return { isEdit: false, decoded: decodeSourceMap(map) };
+  }
+  return { isEdit: !!map.edit, decoded: decodeSourceMap(map.map) };
 }
 
 /**
@@ -45,12 +52,9 @@ function id(relativeRoot: string, index: number): string {
 export default function buildSourceMapTree(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
-  isEdit: (map: SourceMapInput) => boolean,
   relativeRoot: string
 ): SourceMapTree {
-  const maps = asArray(input).map((map: SourceMapInput) => {
-    return { isEdit: isEdit(map), decoded: decodeSourceMap(map) };
-  });
+  const maps = asArray(input).map(toDecodedMap);
   const map = maps.pop()!;
 
   for (let i = 0; i < maps.length; i++) {
@@ -102,7 +106,7 @@ export default function buildSourceMapTree(
 
     // Else, it's a real sourcemap, and we need to recurse into it to load its
     // source files.
-    return buildSourceMapTree(sourceMap, loader, isEdit, uri);
+    return buildSourceMapTree(sourceMap, loader, uri);
   });
 
   let tree = new SourceMapTree(map.decoded, map.isEdit, children);
