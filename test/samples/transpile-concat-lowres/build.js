@@ -15,19 +15,11 @@
  */
 
 const MagicString = require('magic-string');
-const parser = require('@babel/parser');
-const { default: traverse } = require('@babel/traverse');
 const { readFileSync, writeFileSync } = require('fs');
 
 function load(filename) {
   const contents = readFileSync(`${__dirname}/files/${filename}`, 'utf8');
-  const s = new MagicString(contents, { filename });
-  const ast = parser.parse(contents);
-  traverse.cheap(ast, (node) => {
-    s.addSourcemapLocation(node.start);
-    s.addSourcemapLocation(node.end);
-  });
-  return s;
+  return new MagicString(contents, { filename });
 }
 function save(filename, contents) {
   writeFileSync(`${__dirname}/files/${filename}`, contents);
@@ -48,7 +40,7 @@ bundle.addSource(placeholder);
 bundle.addSource(after);
 
 save('bundle.js', bundle.toString());
-save('bundle.js.map', bundle.generateMap({ 
+save('bundle.js.map', bundle.generateMap({
   hires: false,
   includeContent: true,
 }).toString());

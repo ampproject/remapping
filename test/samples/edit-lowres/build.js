@@ -19,8 +19,7 @@ const { readFileSync, writeFileSync } = require('fs');
 
 function load(filename) {
   const contents = readFileSync(`${__dirname}/files/${filename}`, 'utf8');
-  const s = new MagicString(contents, { filename });
-  return s;
+  return new MagicString(contents, { filename });
 }
 function save(filename, contents) {
   writeFileSync(`${__dirname}/files/${filename}`, contents);

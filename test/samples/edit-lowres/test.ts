@@ -26,48 +26,49 @@ function read(filename: string): string {
 describe('lowres edit map', () => {
   test('concated sections point to source files', () => {
     const map = read('bundle.js.map');
-    const remapped = remapping({ edit: true, map }, (file) => {
+    const remapped = remapping(map, (file) => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
+    writeFileSync('remapped.js', read('bundle.js').replace('bundle.js.map', 'remapped.js.map'));
     writeFileSync('remapped.js.map', remapped.toString());
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
 
-    const foo = consumer.originalPositionFor({
+    const bar = consumer.originalPositionFor({
       column: 11,
       line: 17,
     });
-    expect(foo).toMatchObject({
+    expect(bar).toMatchObject({
       column: 18,
       line: 17,
       source: 'main.mjs',
     });
 
-    const bar = consumer.originalPositionFor({
-      column: 11,
-      line: 36,
+    const removeStart = consumer.originalPositionFor({
+      column: 2,
+      line: 18,
     });
-    expect(bar).toMatchObject({
-      column: 18,
-      line: 17,
-      source: 'placeholder.mjs',
+    expect(removeStart).toMatchObject({
+      column: 0,
+      line: 18,
+      source: 'main.mjs',
     });
 
-    const baz = consumer.originalPositionFor({
-      column: 11,
-      line: 43,
+    const insertEnd = consumer.originalPositionFor({
+      column: 1,
+      line: 39,
     });
-    expect(baz).toMatchObject({
-      column: 18,
-      line: 19,
+    expect(insertEnd).toMatchObject({
+      column: 0,
+      line: 24,
       source: 'main.mjs',
     });
   });
 
   test('inherits sourcesContent of original sources', () => {
     const map = read('bundle.js.map');
-    const remapped = remapping({ edit: true, map }, (file) => {
+    const remapped = remapping(map, (file) => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
