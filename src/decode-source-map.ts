@@ -17,7 +17,7 @@
 import { decode } from 'sourcemap-codec';
 import defaults from './defaults';
 
-import type { DecodedSourceMap, RawSourceMap, InputMap, SourceMapSegment } from './types';
+import type { DecodedSourceMap, RawSourceMap, SourceMapInput, SourceMapSegment } from './types';
 
 /**
  * Decodes an input sourcemap into a `DecodedSourceMap` sourcemap object.
@@ -25,7 +25,7 @@ import type { DecodedSourceMap, RawSourceMap, InputMap, SourceMapSegment } from 
  * Valid input maps include a `DecodedSourceMap`, a `RawSourceMap`, or JSON
  * representations of either type.
  */
-export default function decodeSourceMap(map: InputMap): DecodedSourceMap {
+export default function decodeSourceMap(map: SourceMapInput): DecodedSourceMap {
   if (typeof map === 'string') {
     map = JSON.parse(map) as DecodedSourceMap | RawSourceMap;
   }

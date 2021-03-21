@@ -51,9 +51,7 @@ export interface SourceMapSegmentObject {
   outputColumn: number;
 }
 
-export type InputMap = string | RawSourceMap | DecodedSourceMap;
-export type EditMap = { edit: boolean; map: InputMap };
-export type SourceMapInput = InputMap | EditMap;
+export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;
 
 export type SourceMapLoader = (file: string) => SourceMapInput | null | undefined;
 

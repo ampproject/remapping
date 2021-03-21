@@ -20,7 +20,7 @@ import resolve from './resolve';
 import SourceMapTree from './source-map-tree';
 import stripFilename from './strip-filename';
 
-import type { DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
+import type { SourceMapInput, SourceMapLoader } from './types';
 
 function asArray<T>(value: T | T[]): T[] {
   if (Array.isArray(value)) return value;
@@ -29,13 +29,6 @@ function asArray<T>(value: T | T[]): T[] {
 
 function id(relativeRoot: string, index: number): string {
   return `${relativeRoot}.${index}`;
-}
-
-function toDecodedMap(map: SourceMapInput): { isEdit: boolean; decoded: DecodedSourceMap } {
-  if (typeof map === 'string' || !('map' in map)) {
-    return { isEdit: false, decoded: decodeSourceMap(map) };
-  }
-  return { isEdit: !!map.edit, decoded: decodeSourceMap(map.map) };
 }
 
 /**
@@ -54,11 +47,11 @@ export default function buildSourceMapTree(
   loader: SourceMapLoader,
   relativeRoot: string
 ): SourceMapTree {
-  const maps = asArray(input).map(toDecodedMap);
+  const maps = asArray(input).map(decodeSourceMap);
   const map = maps.pop()!;
 
   for (let i = 0; i < maps.length; i++) {
-    if (maps[i].decoded.sources.length !== 1) {
+    if (maps[i].sources.length !== 1) {
       throw new Error(
         `Transformation map ${id(
           relativeRoot || 'input',
@@ -68,21 +61,8 @@ export default function buildSourceMapTree(
       );
     }
   }
-  if (map.isEdit) {
-    if (map.decoded.sources.length !== 1) {
-      throw new Error(
-        `Edit map ${id(relativeRoot || 'input', maps.length)} must have exactly one source file.`
-      );
-    }
-  } else {
-    if (map.decoded.sources.length === 0) {
-      throw new Error(
-        `Sourcemap ${id(relativeRoot || 'input', maps.length)} must have at least one source file.`
-      );
-    }
-  }
 
-  const { sourceRoot, sources, sourcesContent } = map.decoded;
+  const { sourceRoot, sources, sourcesContent } = map;
 
   const children = sources.map((sourceFile: string | null, i: number):
     | SourceMapTree
@@ -109,10 +89,9 @@ export default function buildSourceMapTree(
     return buildSourceMapTree(sourceMap, loader, uri);
   });
 
-  let tree = new SourceMapTree(map.decoded, map.isEdit, children);
+  let tree = new SourceMapTree(map, children);
   for (let i = maps.length - 1; i >= 0; i--) {
-    const { decoded, isEdit } = maps[i];
-    tree = new SourceMapTree(decoded, isEdit, [tree]);
+    tree = new SourceMapTree(maps[i], [tree]);
   }
   return tree;
 }

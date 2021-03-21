@@ -20,7 +20,6 @@ import SourceMap from './source-map';
 import type { SourceMapInput, SourceMapLoader, Options } from './types';
 export type {
   DecodedSourceMap,
-  EditMap,
   Options,
   RawSourceMap,
   SourceMapInput,

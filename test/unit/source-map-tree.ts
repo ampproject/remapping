@@ -20,7 +20,6 @@ import type { DecodedSourceMap } from '../../src/types';
 
 describe('SourceMapTree', () => {
   describe('traceMappings()', () => {
-    const isEdit = false;
     const sourceRoot = 'https://foobar.com';
     const baseMap: DecodedSourceMap = {
       mappings: [],
@@ -44,7 +43,6 @@ describe('SourceMapTree', () => {
         sources: ['original.js'],
         version: 3,
       },
-      isEdit,
       [new OriginalSource(`${sourceRoot}/original.js`, '')]
     );
 
@@ -54,7 +52,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0]]],
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced.mappings).toEqual([]);
     });
@@ -68,7 +66,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced.mappings).toEqual([]);
     });
@@ -85,7 +83,7 @@ describe('SourceMapTree', () => {
         names: [name],
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 0, 0, 0]]],
@@ -102,7 +100,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 1, 1]]],
@@ -118,7 +116,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 0, 0, 0]]],
@@ -137,7 +135,7 @@ describe('SourceMapTree', () => {
         ...extras,
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject(extras);
     });
@@ -150,7 +148,7 @@ describe('SourceMapTree', () => {
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         sources: ['child.js'],
@@ -160,14 +158,14 @@ describe('SourceMapTree', () => {
     test('truncates mappings to the last line with segment', () => {
       const map: DecodedSourceMap = {
         ...baseMap,
-        mappings: [[[0, 0, 0, 0]], [], []],
+        mappings: [[[1, 0, 0, 0]], [], []],
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
-        mappings: [[[0, 0, 0, 0]]],
+        mappings: [[[1, 0, 0, 0]]],
       });
     });
 
@@ -178,7 +176,7 @@ describe('SourceMapTree', () => {
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, isEdit, [child]);
+      const source = new SourceMapTree(map, [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [],
@@ -197,7 +195,7 @@ describe('SourceMapTree', () => {
           ],
         };
 
-        const source = new SourceMapTree(map, isEdit, [child]);
+        const source = new SourceMapTree(map, [child]);
         const traced = source.traceMappings();
         expect(traced).toMatchObject({
           mappings: [[[0, 0, 0, 0]]],
@@ -207,20 +205,19 @@ describe('SourceMapTree', () => {
       it('keeps redundant segments on another line', () => {
         const map: DecodedSourceMap = {
           ...baseMap,
-          mappings: [[[0, 0, 0, 0]], [[0, 0, 0, 0]]],
+          mappings: [[[1, 0, 0, 0]], [[1, 0, 0, 0]]],
         };
 
-        const source = new SourceMapTree(map, isEdit, [child]);
+        const source = new SourceMapTree(map, [child]);
         const traced = source.traceMappings();
         expect(traced).toMatchObject({
-          mappings: [[[0, 0, 0, 0]], [[0, 0, 0, 0]]],
+          mappings: [[[1, 0, 0, 0]], [[1, 0, 0, 0]]],
         });
       });
     });
   });
 
   describe('traceSegment()', () => {
-    const isEdit = false;
     const map: DecodedSourceMap = {
       mappings: [
         [
@@ -242,7 +239,7 @@ describe('SourceMapTree', () => {
       sources: ['child.js'],
       version: 3,
     };
-    const source = new SourceMapTree(map, isEdit, [new OriginalSource('child.js', '')]);
+    const source = new SourceMapTree(map, [new OriginalSource('child.js', '')]);
     const outputColumn = 0;
 
     test('traces LineSegments to the segment with matching generated column', () => {
