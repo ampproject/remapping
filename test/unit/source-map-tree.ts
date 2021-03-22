@@ -16,7 +16,7 @@
 
 import OriginalSource from '../../src/original-source';
 import SourceMapTree from '../../src/source-map-tree';
-import type { DecodedSourceMap } from '../../src/types';
+import type { SourceMapSegment, SourceMapSegmentObject, DecodedSourceMap } from '../../src/types';
 
 describe('SourceMapTree', () => {
   describe('traceMappings()', () => {
@@ -214,6 +214,100 @@ describe('SourceMapTree', () => {
           mappings: [[[1, 0, 0, 0]], [[1, 0, 0, 0]]],
         });
       });
+    });
+
+    describe('unedited line', () => {
+      it('inherits mappings from child map', () => {
+        const map: DecodedSourceMap = {
+          ...baseMap,
+          mappings: [[[0, 0, 0, 0]]],
+        };
+
+        const source = new SourceMapTree(map, [child]);
+        const traced = source.traceMappings();
+
+        expect(traced).toMatchObject({
+          mappings: [
+            [
+              [0, 0, 0, 0],
+              [4, 0, 1, 1],
+            ],
+          ],
+        });
+      });
+
+      it('inherits mappings from any child map', () => {
+        const map: DecodedSourceMap = {
+          ...baseMap,
+          mappings: [[[0, 1, 0, 0]]],
+        };
+
+        const source = new SourceMapTree(map, [new OriginalSource('foo.js', ''), child]);
+        const traced = source.traceMappings();
+
+        expect(traced).toMatchObject({
+          sources: [`${sourceRoot}/original.js`],
+          mappings: [
+            [
+              [0, 0, 0, 0],
+              [4, 0, 1, 1],
+            ],
+          ],
+        });
+      });
+    });
+  });
+
+  describe('traceLine()', () => {
+    const map: DecodedSourceMap = {
+      mappings: [
+        [[0, 0, 0, 0]],
+        [
+          [0, 0, 0, 0],
+          [1, 0, 1, 2],
+        ],
+      ],
+      names: [],
+      sources: ['middle.js'],
+      version: 3,
+    };
+    const middle: DecodedSourceMap = {
+      mappings: [
+        [
+          [0, 0, 0, 0],
+          [1, 0, 0, 0],
+          [2, 0, 0, 0],
+          [4, 0, 1, 1],
+        ], // line 0
+        [[2, 0, 1, 1]], // line 1 - maps to line 0 col 0
+      ],
+      names: ['name'],
+      sources: ['child.js'],
+      version: 3,
+    };
+    const source = new SourceMapTree(map, [
+      new SourceMapTree(middle, [new OriginalSource('child.js', '')]),
+    ]);
+    function into(s: SourceMapSegmentObject): SourceMapSegment {
+      return [s.outputColumn, 0, s.line, s.column];
+    }
+
+    it('inherits segments from unedited line', () => {
+      const traced = source.traceLine(0, into);
+
+      expect(traced).toEqual([
+        [0, 0, 0, 0],
+        [4, 0, 1, 1],
+      ]);
+    });
+
+    it('traces segments from an edited line', () => {
+      const traced = source.traceLine(1, into);
+
+      expect(traced).toEqual([
+        [0, 0, 0, 0],
+        [1, 0, 1, 1],
+      ]);
     });
   });
 
