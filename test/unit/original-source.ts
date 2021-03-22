@@ -16,11 +16,42 @@
 
 import OriginalSource from '../../src/original-source';
 
+import type { SourceMapSegmentObject } from '../../src/types';
+
 describe('OriginalSource', () => {
   let source: OriginalSource;
 
   beforeEach(() => {
     source = new OriginalSource('file.js', '1 + 1');
+  });
+
+  describe('traceLine()', () => {
+    test('calls into with a line marker SourceMapSegmentObject', () => {
+      const into = jest.fn<any, [SourceMapSegmentObject]>();
+      source.traceLine(1, into);
+
+      expect(into).toHaveBeenCalledTimes(1);
+      expect(into).toHaveBeenCalledWith(
+        expect.objectContaining({
+          outputColumn: 0,
+          line: 1,
+          column: 0,
+          name: '',
+          filename: source.filename,
+          content: source.content,
+        })
+      );
+    });
+
+    test("returns an array containing into's return value", () => {
+      const segment = [0, 10, 1, 0, 3] as [number, number, number, number, number];
+      const into = () => segment;
+
+      const traced = source.traceLine(segment[2], into);
+
+      expect(traced).toHaveLength(1);
+      expect(traced[0]).toBe(segment);
+    });
   });
 
   describe('traceSegment()', () => {

@@ -30,6 +30,7 @@ type Source = OriginalSource | SourceMapTree;
 export default class SourceMapTree {
   declare map: DecodedSourceMap;
   declare sources: Source[];
+  private declare lines: number;
   private declare lastLine: number;
   private declare lastColumn: number;
   private declare lastIndex: number;
@@ -37,6 +38,7 @@ export default class SourceMapTree {
   constructor(map: DecodedSourceMap, sources: Source[]) {
     this.map = map;
     this.sources = sources;
+    this.lines = map.mappings.length;
     this.lastLine = 0;
     this.lastColumn = 0;
     this.lastIndex = 0;
@@ -101,9 +103,13 @@ export default class SourceMapTree {
     line: number,
     into: (s: SourceMapSegmentObject) => SourceMapSegment
   ): SourceMapSegment[] {
-    const { mappings } = this.map;
-    if (line >= mappings.length) return [];
-    return traceLine(mappings[line], this.sources, this.map.names, into);
+    if (line >= this.lines) return [];
+
+    const { sources } = this;
+    const { mappings, names } = this.map;
+    const segments = mappings[line];
+    return traceUneditedLine(segments, sources, into) ||
+      traceLine(segments, sources, names, into);
   }
 
   /**
@@ -116,12 +122,11 @@ export default class SourceMapTree {
     column: number,
     name: string
   ): SourceMapSegmentObject | null {
-    const { mappings, names } = this.map;
-
     // It's common for parent sourcemaps to have pointers to lines that have no
     // mapping (like a "//# sourceMappingURL=") at the end of the child file.
-    if (line >= mappings.length) return null;
+    if (line >= this.lines) return null;
 
+    const { mappings, names } = this.map;
     const segments = mappings[line];
 
     if (segments.length === 0) return null;

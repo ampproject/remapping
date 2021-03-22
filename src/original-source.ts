@@ -29,8 +29,15 @@ export default class OriginalSource {
     this.content = content;
   }
 
+  /**
+   * Tracing a line happens when the parent map only recorded a line marker
+   * segment. Since we're in an `OriginalSource`, there is no additional
+   * information we can provide.
+   */
   traceLine(line: number, into: (s: SourceMapSegmentObject) => SourceMapSegment): SourceMapSegment[] {
-    return [into(this.traceSegment(line, line, 0, ''))];
+    // Generate a line marker segment for this line, so that it is retained in
+    // the output.
+    return [into(this.traceSegment(0, line, 0, ''))];
   }
 
   /**
