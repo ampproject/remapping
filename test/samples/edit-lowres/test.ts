@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import type { RawSourceMap } from 'source-map';
 import { SourceMapConsumer } from 'source-map';
 import remapping from '../../../src/remapping';
@@ -29,9 +29,6 @@ describe('lowres edit map', () => {
     const remapped = remapping(map, (file) => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
-
-    writeFileSync('remapped.js', read('bundle.js').replace('bundle.js.map', 'remapped.js.map'));
-    writeFileSync('remapped.js.map', remapped.toString());
 
     const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
 
