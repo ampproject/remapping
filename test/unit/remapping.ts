@@ -142,17 +142,49 @@ describe('remapping', () => {
     expect(map).toHaveProperty('sourcesContent', [null]);
   });
 
-  test('excludes sourcesContent if `excludeContent` is set', () => {
-    const map = remapping(
-      rawMap,
-      (name: string) => {
-        if (name === 'transpiled.js') {
-          return transpiledMap;
-        }
-      },
-      true
-    );
+  describe('boolean options', () => {
+    test('excludes sourcesContent if `excludeContent` is set', () => {
+      const map = remapping(
+        rawMap,
+        (name: string) => {
+          if (name === 'transpiled.js') {
+            return transpiledMap;
+          }
+        },
+        true
+      );
 
-    expect(map).not.toHaveProperty('sourcesContent');
+      expect(map).not.toHaveProperty('sourcesContent');
+    });
+  });
+
+  describe('options bag', () => {
+    test('excludes sourcesContent if `excludeContent` is set', () => {
+      const map = remapping(
+        rawMap,
+        (name: string) => {
+          if (name === 'transpiled.js') {
+            return transpiledMap;
+          }
+        },
+        { excludeContent: true }
+      );
+
+      expect(map).not.toHaveProperty('sourcesContent');
+    });
+
+    test('returns decoded sourcemap if `decodedMappings` is set', () => {
+      const map = remapping(
+        rawMap,
+        (name: string) => {
+          if (name === 'transpiled.js') {
+            return transpiledMap;
+          }
+        },
+        { decodedMappings: true }
+      );
+
+      expect(map).toHaveProperty('mappings', [[[0, 0, 2, 2, 0]]]);
+    });
   });
 });
