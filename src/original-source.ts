@@ -34,7 +34,10 @@ export default class OriginalSource {
    * segment. Since we're in an `OriginalSource`, there is no additional
    * information we can provide.
    */
-  traceLine(line: number, into: (s: SourceMapSegmentObject) => SourceMapSegment): SourceMapSegment[] {
+  traceLine(
+    line: number,
+    into: (s: SourceMapSegmentObject) => SourceMapSegment
+  ): SourceMapSegment[] {
     // Generate a line marker segment for this line, so that it is retained in
     // the output.
     return [into(this.traceSegment(0, line, 0, ''))];

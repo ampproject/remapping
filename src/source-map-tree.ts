@@ -108,8 +108,7 @@ export default class SourceMapTree {
     const { sources } = this;
     const { mappings, names } = this.map;
     const segments = mappings[line];
-    return traceUneditedLine(segments, sources, into) ||
-      traceLine(segments, sources, names, into);
+    return traceUneditedLine(segments, sources, into) || traceLine(segments, sources, names, into);
   }
 
   /**
