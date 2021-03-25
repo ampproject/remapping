@@ -11,8 +11,7 @@ they only need to generate an output sourcemap. This greatly simplifies building
 transformations (think a find-and-replace).
 
 Note that the remapped sourcemap depends on how precise the input sourcemaps are. The more segments
-are recorded, the more accurate the remapped positions become. If any sourcemap records only the
-minimal changes made, then the remapped sourcemap will not be able to trace through that map.
+are recorded, the more accurate the remapped positions become.
 
 ## Installation
 
