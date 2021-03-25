@@ -13,12 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+var bar = function bar() {
+  return 'bar';
+};
 
-/**
- * Removes the filename from a path.
- */
-export default function stripFilename(path: string): string {
-  if (!path) return '';
-  const index = path.lastIndexOf('/');
-  return path.slice(0, index + 1);
-}
+
+var bar = function bar() {
+  return 'bar';
+};
+
+
+var baz = function baz() {
+  return 'baz';
+};
+"a";
+"b"
+"c"
+"d"
+"e"
+
+
+var qux = function qux() {
+  return 'qux';
+};
+"f";
+"g"
+"i"
+"j"
+
+
+var quux = function quux() {
+  return 'quux';
+};
+//# sourceMappingURL=main.js.map

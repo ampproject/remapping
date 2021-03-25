@@ -26,21 +26,23 @@ function save(filename, contents) {
 }
 
 const main = load('main.js');
-const placeholder = load('placeholder.js');
 
-const search = '/* PLACEHOLDER */';
-const index = main.original.indexOf(search);
+function replaceAll(ms, substring, replacement) {
+  let index = -1;
+  while ((index = ms.original.indexOf(substring, index + 1)) > -1) {
+    ms.overwrite(index, index + substring.length, replacement);
+  }
+}
 
-const before = main.snip(0, index);
-const after = main.snip(index + search.length, main.length());
+replaceAll(main, 'foo', 'bar');
+replaceAll(main, '\n/* REMOVE START */', '')
+replaceAll(main, '/* REMOVE END */\n', '')
+replaceAll(main, '\n/* INSERT START */', '\n"a";\n"b"\n"c"\n"d"\n"e"');
+replaceAll(main, '/* INSERT END */\n', '"f";\n"g"\n"i"\n"j"\n');
 
-const bundle = new MagicString.Bundle();
-bundle.addSource(before);
-bundle.addSource(placeholder);
-bundle.addSource(after);
-
-save('bundle.js', bundle.toString());
-save('bundle.js.map', bundle.generateMap({
+save('bundle.js', main.toString());
+save('bundle.js.map', main.generateMap({
+  source: 'main.js',
   hires: false,
   includeContent: true,
 }).toString());

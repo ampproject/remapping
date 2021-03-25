@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { SourceMapSegmentObject } from './types';
+import type { SourceMapSegment, SourceMapSegmentObject } from './types';
 
 /**
  * A "leaf" node in the sourcemap tree, representing an original, unmodified
@@ -30,10 +30,36 @@ export default class OriginalSource {
   }
 
   /**
+   * Tracing a line happens when the parent map only recorded a line marker
+   * segment. Since we're in an `OriginalSource`, there is no additional
+   * information we can provide.
+   */
+  traceLine(
+    line: number,
+    into: (s: SourceMapSegmentObject) => SourceMapSegment
+  ): SourceMapSegment[] {
+    // Generate a line marker segment for this line, so that it is retained in
+    // the output.
+    return [into(this.traceSegment(0, line, 0, ''))];
+  }
+
+  /**
    * Tracing a `SourceMapSegment` ends when we get to an `OriginalSource`,
    * meaning this line/column location originated from this source file.
    */
-  traceSegment(line: number, column: number, name: string): SourceMapSegmentObject {
-    return { column, line, name, source: this };
+  traceSegment(
+    outputColumn: number,
+    line: number,
+    column: number,
+    name: string
+  ): SourceMapSegmentObject {
+    return {
+      outputColumn,
+      line,
+      column,
+      name,
+      filename: this.filename,
+      content: this.content,
+    };
   }
 }

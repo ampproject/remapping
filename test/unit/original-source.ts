@@ -16,6 +16,8 @@
 
 import OriginalSource from '../../src/original-source';
 
+import type { SourceMapSegmentObject } from '../../src/types';
+
 describe('OriginalSource', () => {
   let source: OriginalSource;
 
@@ -23,45 +25,52 @@ describe('OriginalSource', () => {
     source = new OriginalSource('file.js', '1 + 1');
   });
 
+  describe('traceLine()', () => {
+    test('calls into with a line marker SourceMapSegmentObject', () => {
+      const into = jest.fn<any, [SourceMapSegmentObject]>();
+      source.traceLine(1, into);
+
+      expect(into).toHaveBeenCalledTimes(1);
+      expect(into).toHaveBeenCalledWith(
+        expect.objectContaining({
+          outputColumn: 0,
+          line: 1,
+          column: 0,
+          name: '',
+          filename: source.filename,
+          content: source.content,
+        })
+      );
+    });
+
+    test("returns an array containing into's return value", () => {
+      const segment = [0, 10, 1, 0, 3] as [number, number, number, number, number];
+      const into = () => segment;
+
+      const traced = source.traceLine(segment[2], into);
+
+      expect(traced).toHaveLength(1);
+      expect(traced[0]).toBe(segment);
+    });
+  });
+
   describe('traceSegment()', () => {
-    test('returns the same line number', () => {
+    test('returns a SourceMapSegmentObject struct of input params', () => {
+      const outputColumn = Math.random();
       const line = Math.random();
       const column = Math.random();
       const name = String(Math.random());
 
-      const trace = source.traceSegment(line, column, name);
+      const traced = source.traceSegment(outputColumn, line, column, name);
 
-      expect(trace.line).toBe(line);
-    });
-
-    test('returns the same column number', () => {
-      const line = Math.random();
-      const column = Math.random();
-      const name = String(Math.random());
-
-      const trace = source.traceSegment(line, column, name);
-
-      expect(trace.column).toBe(column);
-    });
-
-    test('returns the same name', () => {
-      const line = Math.random();
-      const column = Math.random();
-      const name = String(Math.random());
-
-      const trace = source.traceSegment(line, column, name);
-
-      expect(trace.name).toBe(name);
-    });
-
-    test('returns the original source itself', () => {
-      const line = Math.random();
-      const column = Math.random();
-      const name = String(Math.random());
-
-      const trace = source.traceSegment(line, column, name);
-
-      expect(trace.source).toBe(source);
+      expect(traced).toMatchObject({
+        outputColumn,
+        line,
+        column,
+        name,
+        filename: source.filename,
+        content: source.content,
+      });
     });
   });
 });

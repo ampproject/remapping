@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-/**
- * Removes the filename from a path.
- */
-export default function stripFilename(path: string): string {
-  if (!path) return '';
-  const index = path.lastIndexOf('/');
-  return path.slice(0, index + 1);
-}
+module.exports = function(api) {
+  api.cache(false);
+
+  return {
+    presets: [['@babel/preset-env', { modules: false }]],
+  };
+};

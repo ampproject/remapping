@@ -13,12 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+var foo = function foo() {
+  return 'foo';
+};
+/* REMOVE START */
 
-/**
- * Removes the filename from a path.
- */
-export default function stripFilename(path: string): string {
-  if (!path) return '';
-  const index = path.lastIndexOf('/');
-  return path.slice(0, index + 1);
-}
+
+var bar = function bar() {
+  return 'bar';
+};
+/* REMOVE END */
+
+
+var baz = function baz() {
+  return 'baz';
+};
+/* INSERT START */
+
+
+var qux = function qux() {
+  return 'qux';
+};
+/* INSERT END */
+
+
+var quux = function quux() {
+  return 'quux';
+};
+//# sourceMappingURL=main.js.map

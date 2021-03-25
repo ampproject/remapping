@@ -27,6 +27,10 @@ function asArray<T>(value: T | T[]): T[] {
   return [value];
 }
 
+function id(relativeRoot: string, index: number): string {
+  return `${relativeRoot}.${index}`;
+}
+
 /**
  * Recursively builds a tree structure out of sourcemap files, with each node
  * being either an `OriginalSource` "leaf" or a `SourceMapTree` composed of
@@ -41,7 +45,7 @@ function asArray<T>(value: T | T[]): T[] {
 export default function buildSourceMapTree(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader,
-  relativeRoot?: string
+  relativeRoot: string
 ): SourceMapTree {
   const maps = asArray(input).map(decodeSourceMap);
   const map = maps.pop()!;
@@ -49,7 +53,10 @@ export default function buildSourceMapTree(
   for (let i = 0; i < maps.length; i++) {
     if (maps[i].sources.length !== 1) {
       throw new Error(
-        `Transformation map ${i} must have exactly one source file.\n` +
+        `Transformation map ${id(
+          relativeRoot || 'input',
+          i
+        )} must have exactly one source file.\n` +
           'Did you specify these with the most recent transformation maps first?'
       );
     }
@@ -79,7 +86,7 @@ export default function buildSourceMapTree(
 
     // Else, it's a real sourcemap, and we need to recurse into it to load its
     // source files.
-    return buildSourceMapTree(decodeSourceMap(sourceMap), loader, uri);
+    return buildSourceMapTree(sourceMap, loader, uri);
   });
 
   let tree = new SourceMapTree(map, children);

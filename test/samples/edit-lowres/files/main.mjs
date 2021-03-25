@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-/**
- * Removes the filename from a path.
- */
-export default function stripFilename(path: string): string {
-  if (!path) return '';
-  const index = path.lastIndexOf('/');
-  return path.slice(0, index + 1);
-}
+const foo = () => 'foo';
+/* REMOVE START */
+const bar = () => 'bar';
+/* REMOVE END */
+const baz = () => 'baz';
+/* INSERT START */
+const qux = () => 'qux';
+/* INSERT END */
+const quux = () => 'quux';

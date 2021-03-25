@@ -10,6 +10,9 @@ With remapping, none of your source code transformations need to be aware of the
 they only need to generate an output sourcemap. This greatly simplifies building custom
 transformations (think a find-and-replace).
 
+Note that the remapped sourcemap depends on how precise the input sourcemaps are. The more segments
+are recorded, the more accurate the remapped positions become.
+
 ## Installation
 
 ```sh
