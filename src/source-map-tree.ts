@@ -23,6 +23,10 @@ import type { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from 
 
 type Sources = OriginalSource | SourceMapTree;
 
+const INVALID_MAPPING = undefined;
+const SOURCELESS_MAPPING = null;
+type MappingSource = SourceMapSegmentObject | typeof INVALID_MAPPING | typeof SOURCELESS_MAPPING;
+
 /**
  * SourceMapTree represents a single sourcemap, with the ability to trace
  * mappings into its child nodes (which may themselves be SourceMapTrees).
@@ -63,7 +67,7 @@ export default class SourceMapTree {
       for (let j = 0; j < segments.length; j++) {
         const segment = segments[j];
 
-        let traced;
+        let traced: MappingSource = SOURCELESS_MAPPING;
         // 1-length segments only move the current generated column, there's no source information
         // to gather from it.
         if (segment.length !== 1) {
@@ -77,10 +81,16 @@ export default class SourceMapTree {
           // If the trace returned unefined, then there's no original source containing the mapping.
           // It may have returned null, in which case it's a source-less mapping that might need to
           // be preserved.
-          if (traced === undefined) continue;
+          if (traced === INVALID_MAPPING) continue;
         }
 
-        if (traced) {
+        if (traced === SOURCELESS_MAPPING) {
+          if (lastTraced.length === 1) {
+            // This is a consecutive source-less segment, which doesn't carry any new information.
+            continue;
+          }
+          lastTraced = [segment[0]];
+        } else {
           // So we traced a segment down into its original source file. Now push a
           // new segment pointing to this location.
           const { column, line, name } = traced;
@@ -111,12 +121,6 @@ export default class SourceMapTree {
           } else {
             lastTraced = [segment[0], sourceIndex, line, column];
           }
-        } else {
-          if (lastTraced.length === 1) {
-            // This is a consequtive source-less segment, which doesn't carry any new information.
-            continue;
-          }
-          lastTraced = [segment[0]];
         }
 
         tracedSegments.push(lastTraced);
@@ -147,20 +151,16 @@ export default class SourceMapTree {
    * traceSegment is only called on children SourceMapTrees. It recurses down
    * into its own child SourceMapTrees, until we find the original source map.
    */
-  traceSegment(
-    line: number,
-    column: number,
-    name: string
-  ): SourceMapSegmentObject | null | undefined {
+  traceSegment(line: number, column: number, name: string): MappingSource {
     const { mappings, names } = this.map;
 
     // It's common for parent sourcemaps to have pointers to lines that have no
     // mapping (like a "//# sourceMappingURL=") at the end of the child file.
-    if (line >= mappings.length) return undefined;
+    if (line >= mappings.length) return INVALID_MAPPING;
 
     const segments = mappings[line];
 
-    if (segments.length === 0) return undefined;
+    if (segments.length === 0) return INVALID_MAPPING;
 
     let low = 0;
     let high = segments.length - 1;
@@ -177,7 +177,7 @@ export default class SourceMapTree {
 
     if (index === -1) {
       this.lastIndex = index;
-      return undefined; // we come before any mapped segment
+      return INVALID_MAPPING; // we come before any mapped segment
     }
 
     // If we can't find a segment that lines up to this column, we use the
@@ -191,9 +191,7 @@ export default class SourceMapTree {
 
     // 1-length segments only move the current generated column, there's no
     // source information to gather from it.
-    if (segment.length === 1) {
-      return null;
-    }
+    if (segment.length === 1) return SOURCELESS_MAPPING;
 
     const source = this.sources[segment[1]];
 
