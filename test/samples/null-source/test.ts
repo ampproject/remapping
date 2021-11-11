@@ -35,7 +35,7 @@ describe('null-source segement', () => {
 
   test('minified code keeps null-source segment', () => {
     const remapped = remapping([minified, original], () => null);
-    const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
+    const consumer = new SourceMapConsumer(remapped as unknown as RawSourceMap);
 
     const console = consumer.originalPositionFor({
       column: 20,
@@ -70,7 +70,7 @@ describe('null-source segement', () => {
 
   test('null-source', () => {
     const remapped = remapping(original, () => null);
-    const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
+    const consumer = new SourceMapConsumer(remapped as unknown as RawSourceMap);
 
     const console = consumer.originalPositionFor({
       column: 20,

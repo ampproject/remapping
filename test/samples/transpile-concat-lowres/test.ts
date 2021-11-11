@@ -30,7 +30,7 @@ describe('transpile then concatenate', () => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
-    const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
+    const consumer = new SourceMapConsumer(remapped as unknown as RawSourceMap);
 
     const foo = consumer.originalPositionFor({
       column: 11,

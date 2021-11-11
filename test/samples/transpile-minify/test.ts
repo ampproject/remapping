@@ -30,7 +30,7 @@ describe('transpile then minify', () => {
       return file.endsWith('.mjs') ? null : read(`${file}.map`);
     });
 
-    const consumer = new SourceMapConsumer((remapped as unknown) as RawSourceMap);
+    const consumer = new SourceMapConsumer(remapped as unknown as RawSourceMap);
     const alert = consumer.originalPositionFor({
       column: 47,
       line: 16,

@@ -57,30 +57,30 @@ export default function buildSourceMapTree(
 
   const { sourceRoot, sources, sourcesContent } = map;
 
-  const children = sources.map((sourceFile: string | null, i: number):
-    | SourceMapTree
-    | OriginalSource => {
-    // Each source file is loaded relative to the sourcemap's own sourceRoot,
-    // which is itself relative to the sourcemap's parent.
-    const uri = resolve(sourceFile || '', resolve(sourceRoot || '', stripFilename(relativeRoot)));
+  const children = sources.map(
+    (sourceFile: string | null, i: number): SourceMapTree | OriginalSource => {
+      // Each source file is loaded relative to the sourcemap's own sourceRoot,
+      // which is itself relative to the sourcemap's parent.
+      const uri = resolve(sourceFile || '', resolve(sourceRoot || '', stripFilename(relativeRoot)));
 
-    // Use the provided loader callback to retrieve the file's sourcemap.
-    // TODO: We should eventually support async loading of sourcemap files.
-    const sourceMap = loader(uri);
+      // Use the provided loader callback to retrieve the file's sourcemap.
+      // TODO: We should eventually support async loading of sourcemap files.
+      const sourceMap = loader(uri);
 
-    // If there is no sourcemap, then it is an unmodified source file.
-    if (!sourceMap) {
-      // The source file's actual contents must be included in the sourcemap
-      // (done when generating the sourcemap) for it to be included as a
-      // sourceContent in the output sourcemap.
-      const sourceContent = sourcesContent ? sourcesContent[i] : null;
-      return new OriginalSource(uri, sourceContent);
+      // If there is no sourcemap, then it is an unmodified source file.
+      if (!sourceMap) {
+        // The source file's actual contents must be included in the sourcemap
+        // (done when generating the sourcemap) for it to be included as a
+        // sourceContent in the output sourcemap.
+        const sourceContent = sourcesContent ? sourcesContent[i] : null;
+        return new OriginalSource(uri, sourceContent);
+      }
+
+      // Else, it's a real sourcemap, and we need to recurse into it to load its
+      // source files.
+      return buildSourceMapTree(decodeSourceMap(sourceMap), loader, uri);
     }
-
-    // Else, it's a real sourcemap, and we need to recurse into it to load its
-    // source files.
-    return buildSourceMapTree(decodeSourceMap(sourceMap), loader, uri);
-  });
+  );
 
   let tree = new SourceMapTree(map, children);
   for (let i = maps.length - 1; i >= 0; i--) {
