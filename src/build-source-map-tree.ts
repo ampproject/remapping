@@ -31,7 +31,7 @@ export default function buildSourceMapTree(
   const map = maps.pop()!;
 
   for (let i = 0; i < maps.length; i++) {
-    if (maps[i].sources.length !== 1) {
+    if (maps[i].sources.length > 1) {
       throw new Error(
         `Transformation map ${i} must have exactly one source file.\n` +
           'Did you specify these with the most recent transformation maps first?'
