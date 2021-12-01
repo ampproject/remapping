@@ -1,6 +1,6 @@
 {
   "name": "@ampproject/remapping",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Remap sequential sourcemaps through transformations to point at the original source code",
   "keywords": [
     "source",
