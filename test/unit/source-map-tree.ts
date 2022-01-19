@@ -217,7 +217,7 @@ describe('SourceMapTree', () => {
     });
   });
 
-  describe('traceSegment()', () => {
+  describe('originalPositionFor()', () => {
     const map: DecodedSourceMap = {
       mappings: [
         [
@@ -242,14 +242,14 @@ describe('SourceMapTree', () => {
     const source = new SourceMapTree(map, [new OriginalSource('child.js', '')]);
 
     test('traces LineSegments to the segment with matching generated column', () => {
-      const trace = source.traceSegment(0, 4, '');
+      const trace = source.originalPositionFor(0, 4, '');
       expect(trace).toMatchObject({ line: 1, column: 1 });
     });
 
     test('traces all generated cols on a line back to their source when source had characters removed', () => {
       const expectedCols = [0, 0, 0, 0, 0, 6, 6, 6, 6];
       for (let genCol = 0; genCol < expectedCols.length; genCol++) {
-        const trace = source.traceSegment(4, genCol, '');
+        const trace = source.originalPositionFor(4, genCol, '');
         expect(trace).toMatchObject({ line: 4, column: expectedCols[genCol] });
       }
     });
@@ -257,7 +257,7 @@ describe('SourceMapTree', () => {
     test('traces all generated cols on a line back to their source when source had characters added', () => {
       const expectedCols = [0, 0, 0, 0, 0, null, 5, 5, 5, 5, 5];
       for (let genCol = 0; genCol < expectedCols.length; genCol++) {
-        const trace = source.traceSegment(5, genCol, '');
+        const trace = source.originalPositionFor(5, genCol, '');
         if (expectedCols[genCol] == null) {
           expect(trace).toBe(null);
         } else {
@@ -267,74 +267,74 @@ describe('SourceMapTree', () => {
     });
 
     test('returns undefined if line is longer than mapping lines', () => {
-      const trace = source.traceSegment(10, 0, '');
+      const trace = source.originalPositionFor(10, 0, '');
       expect(trace).toBe(undefined);
     });
 
     test('returns undefined if no matching segment column', () => {
       //line 1 col 0 of generated doesn't exist in the original source
-      const trace = source.traceSegment(1, 0, '');
+      const trace = source.originalPositionFor(1, 0, '');
       expect(trace).toBe(undefined);
     });
 
     test('returns null if segment is 1-length', () => {
-      const trace = source.traceSegment(2, 0, '');
+      const trace = source.originalPositionFor(2, 0, '');
       expect(trace).toBe(null);
     });
 
     test('passes in outer name to trace', () => {
-      const trace = source.traceSegment(0, 0, 'foo');
+      const trace = source.originalPositionFor(0, 0, 'foo');
       expect(trace).toMatchObject({ name: 'foo' });
     });
 
     test('overrides name if segment is 5-length', () => {
-      const trace = source.traceSegment(3, 0, 'foo');
+      const trace = source.originalPositionFor(3, 0, 'foo');
       expect(trace).toMatchObject({ name: 'name' });
     });
 
     describe('tracing same line multiple times', () => {
       describe('later column', () => {
         test('returns matching segment after match', () => {
-          expect(source.traceSegment(0, 1, '')).not.toBe(undefined);
-          const trace = source.traceSegment(0, 4, '');
+          expect(source.originalPositionFor(0, 1, '')).not.toBe(undefined);
+          const trace = source.originalPositionFor(0, 4, '');
           expect(trace).toMatchObject({ line: 1, column: 1 });
         });
 
         test('returns matching segment after undefined match', () => {
-          expect(source.traceSegment(1, 0, '')).toBe(undefined);
-          const trace = source.traceSegment(1, 2, '');
+          expect(source.originalPositionFor(1, 0, '')).toBe(undefined);
+          const trace = source.originalPositionFor(1, 2, '');
           expect(trace).toMatchObject({ line: 0, column: 0 });
         });
 
         test('returns undefined segment segment after undefined match', () => {
-          expect(source.traceSegment(1, 0, '')).toBe(undefined);
-          const trace = source.traceSegment(1, 1, '');
+          expect(source.originalPositionFor(1, 0, '')).toBe(undefined);
+          const trace = source.originalPositionFor(1, 1, '');
           expect(trace).toBe(undefined);
         });
 
         test('returns matching segment after almost match', () => {
-          expect(source.traceSegment(4, 2, '')).not.toBe(undefined);
-          const trace = source.traceSegment(4, 5, '');
+          expect(source.originalPositionFor(4, 2, '')).not.toBe(undefined);
+          const trace = source.originalPositionFor(4, 5, '');
           expect(trace).toMatchObject({ line: 4, column: 6 });
         });
       });
 
       describe('earlier column', () => {
         test('returns matching segment after match', () => {
-          expect(source.traceSegment(0, 4, '')).not.toBe(undefined);
-          const trace = source.traceSegment(0, 1, '');
+          expect(source.originalPositionFor(0, 4, '')).not.toBe(undefined);
+          const trace = source.originalPositionFor(0, 1, '');
           expect(trace).toMatchObject({ line: 0, column: 0 });
         });
 
         test('returns undefined segment segment after undefined match', () => {
-          expect(source.traceSegment(1, 1, '')).toBe(undefined);
-          const trace = source.traceSegment(1, 0, '');
+          expect(source.originalPositionFor(1, 1, '')).toBe(undefined);
+          const trace = source.originalPositionFor(1, 0, '');
           expect(trace).toBe(undefined);
         });
 
         test('returns matching segment after almost match', () => {
-          expect(source.traceSegment(4, 2, '')).not.toBe(undefined);
-          const trace = source.traceSegment(4, 0, '');
+          expect(source.originalPositionFor(4, 2, '')).not.toBe(undefined);
+          const trace = source.originalPositionFor(4, 0, '');
           expect(trace).toMatchObject({ line: 4, column: 0 });
         });
       });

@@ -9,32 +9,10 @@ describe('buildSourceMapTree', () => {
     sourcesContent: [null],
     version: 3,
   };
-  const jsonRawMap = JSON.stringify(rawMap);
   const decodedMap: DecodedSourceMap = {
     ...rawMap,
     mappings: [[[0, 0, 0, 0]]],
   };
-  const jsonDecodedMap = JSON.stringify(decodedMap);
-
-  test('parses and decodes a JSON sourcemap', () => {
-    const tree = buildSourceMapTree(jsonRawMap, () => null);
-    expect(tree.map).toEqual(decodedMap);
-  });
-
-  test('parses a Decoded JSON sourcemap', () => {
-    const tree = buildSourceMapTree(jsonDecodedMap, () => null);
-    expect(tree.map).toEqual(decodedMap);
-  });
-
-  test('parses a Raw sourcemap', () => {
-    const tree = buildSourceMapTree(rawMap, () => null);
-    expect(tree.map).toEqual(decodedMap);
-  });
-
-  test('parses a Decoded sourcemap', () => {
-    const tree = buildSourceMapTree(decodedMap, () => null);
-    expect(tree.map).toEqual(decodedMap);
-  });
 
   test('calls loader for any needed sourcemap', () => {
     const loader = jest.fn(() => null);

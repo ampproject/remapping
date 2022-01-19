@@ -7,13 +7,13 @@ describe('OriginalSource', () => {
     source = new OriginalSource('file.js', '1 + 1');
   });
 
-  describe('traceSegment()', () => {
+  describe('originalPositionFor()', () => {
     test('returns the same line number', () => {
       const line = Math.random();
       const column = Math.random();
       const name = String(Math.random());
 
-      const trace = source.traceSegment(line, column, name);
+      const trace = source.originalPositionFor(line, column, name);
 
       expect(trace.line).toBe(line);
     });
@@ -23,7 +23,7 @@ describe('OriginalSource', () => {
       const column = Math.random();
       const name = String(Math.random());
 
-      const trace = source.traceSegment(line, column, name);
+      const trace = source.originalPositionFor(line, column, name);
 
       expect(trace.column).toBe(column);
     });
@@ -33,7 +33,7 @@ describe('OriginalSource', () => {
       const column = Math.random();
       const name = String(Math.random());
 
-      const trace = source.traceSegment(line, column, name);
+      const trace = source.originalPositionFor(line, column, name);
 
       expect(trace.name).toBe(name);
     });
@@ -43,7 +43,7 @@ describe('OriginalSource', () => {
       const column = Math.random();
       const name = String(Math.random());
 
-      const trace = source.traceSegment(line, column, name);
+      const trace = source.originalPositionFor(line, column, name);
 
       expect(trace.source).toBe(source);
     });

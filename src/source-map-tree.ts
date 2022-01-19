@@ -1,9 +1,15 @@
-import binarySearch from './binary-search';
+import { TraceMap } from '@jridgewell/trace-mapping';
+
 import defaults from './defaults';
 import FastStringArray from './fast-string-array';
 
 import type OriginalSource from './original-source';
-import type { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
+import type {
+  DecodedSourceMap,
+  RawSourceMap,
+  SourceMapSegment,
+  SourceMapSegmentObject,
+} from './types';
 
 type Sources = OriginalSource | SourceMapTree;
 
@@ -16,18 +22,12 @@ type MappingSource = SourceMapSegmentObject | typeof INVALID_MAPPING | typeof SO
  * mappings into its child nodes (which may themselves be SourceMapTrees).
  */
 export default class SourceMapTree {
-  map: DecodedSourceMap;
+  map: TraceMap;
   sources: Sources[];
-  private lastLine: number;
-  private lastColumn: number;
-  private lastIndex: number;
 
-  constructor(map: DecodedSourceMap, sources: Sources[]) {
-    this.map = map;
+  constructor(map: RawSourceMap | DecodedSourceMap, sources: Sources[]) {
+    this.map = new TraceMap(map);
     this.sources = sources;
-    this.lastLine = 0;
-    this.lastColumn = 0;
-    this.lastIndex = 0;
   }
 
   /**
@@ -39,8 +39,9 @@ export default class SourceMapTree {
     const names = new FastStringArray();
     const sources = new FastStringArray();
     const sourcesContent: (string | null)[] = [];
-    const { sources: rootSources } = this;
-    const { mappings: rootMappings, names: rootNames } = this.map;
+    const { sources: rootSources, map } = this;
+    const rootNames = map.names;
+    const rootMappings = map.decodedMappings();
 
     let lastLineWithSegment = -1;
     for (let i = 0; i < rootMappings.length; i++) {
@@ -56,7 +57,7 @@ export default class SourceMapTree {
         // to gather from it.
         if (segment.length !== 1) {
           const source = rootSources[segment[1]];
-          traced = source.traceSegment(
+          traced = source.originalPositionFor(
             segment[2],
             segment[3],
             segment.length === 5 ? rootNames[segment[4]] : ''
@@ -135,61 +136,20 @@ export default class SourceMapTree {
    * traceSegment is only called on children SourceMapTrees. It recurses down
    * into its own child SourceMapTrees, until we find the original source map.
    */
-  traceSegment(line: number, column: number, name: string): MappingSource {
-    const { mappings, names } = this.map;
+  originalPositionFor(line: number, column: number, name: string): MappingSource {
+    const segment = this.map.traceSegment(line, column);
 
-    // It's common for parent sourcemaps to have pointers to lines that have no
-    // mapping (like a "//# sourceMappingURL=") at the end of the child file.
-    if (line >= mappings.length) return INVALID_MAPPING;
-
-    const segments = mappings[line];
-
-    if (segments.length === 0) return INVALID_MAPPING;
-
-    let low = 0;
-    let high = segments.length - 1;
-    if (line === this.lastLine) {
-      if (column >= this.lastColumn) {
-        low = this.lastIndex;
-      } else {
-        high = this.lastIndex;
-      }
-    }
-    let index = binarySearch(segments, column, segmentComparator, low, high);
-    this.lastLine = line;
-    this.lastColumn = column;
-
-    if (index === -1) {
-      this.lastIndex = index;
-      return INVALID_MAPPING; // we come before any mapped segment
-    }
-
-    // If we can't find a segment that lines up to this column, we use the
-    // segment before.
-    if (index < 0) {
-      index = ~index - 1;
-    }
-    this.lastIndex = index;
-
-    const segment = segments[index];
-
-    // 1-length segments only move the current generated column, there's no
-    // source information to gather from it.
+    // If we couldn't find a segment, then this doesn't exist in the sourcemap.
+    if (segment == null) return INVALID_MAPPING;
+    // 1-length segments only move the current generated column, there's no source information
+    // to gather from it.
     if (segment.length === 1) return SOURCELESS_MAPPING;
 
     const source = this.sources[segment[1]];
-
-    // So now we can recurse down, until we hit the original source file.
-    return source.traceSegment(
+    return source.originalPositionFor(
       segment[2],
       segment[3],
-      // A child map's recorded name for this segment takes precedence over the
-      // parent's mapped name. Imagine a mangler changing the name over, etc.
-      segment.length === 5 ? names[segment[4]] : name
+      segment.length === 5 ? this.map.names[segment[4]] : name
     );
   }
-}
-
-function segmentComparator(segment: SourceMapSegment, column: number): number {
-  return segment[0] - column;
 }

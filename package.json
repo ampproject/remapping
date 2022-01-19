@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "@jridgewell/resolve-uri": "2.0.0",
+    "@jridgewell/trace-mapping": "0.1.0",
     "sourcemap-codec": "1.4.8"
   }
 }

@@ -17,7 +17,7 @@ export default class OriginalSource {
    * Tracing a `SourceMapSegment` ends when we get to an `OriginalSource`,
    * meaning this line/column location originated from this source file.
    */
-  traceSegment(line: number, column: number, name: string): SourceMapSegmentObject {
+  originalPositionFor(line: number, column: number, name: string): SourceMapSegmentObject {
     return { column, line, name, source: this };
   }
 }

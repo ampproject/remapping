@@ -1,14 +1,18 @@
-import decodeSourceMap from './decode-source-map';
 import OriginalSource from './original-source';
 import resolve from './resolve';
 import SourceMapTree from './source-map-tree';
 import stripFilename from './strip-filename';
 
-import type { SourceMapInput, SourceMapLoader } from './types';
+import type { RawSourceMap, DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
 
 function asArray<T>(value: T | T[]): T[] {
   if (Array.isArray(value)) return value;
   return [value];
+}
+
+function parseMap(map: SourceMapInput): RawSourceMap | DecodedSourceMap {
+  if (typeof map === 'string') return JSON.parse(map);
+  return map;
 }
 
 /**
@@ -24,10 +28,9 @@ function asArray<T>(value: T | T[]): T[] {
  */
 export default function buildSourceMapTree(
   input: SourceMapInput | SourceMapInput[],
-  loader: SourceMapLoader,
-  relativeRoot?: string
+  loader: SourceMapLoader
 ): SourceMapTree {
-  const maps = asArray(input).map(decodeSourceMap);
+  const maps = asArray(input).map(parseMap);
   const map = maps.pop()!;
 
   for (let i = 0; i < maps.length; i++) {
@@ -39,6 +42,18 @@ export default function buildSourceMapTree(
     }
   }
 
+  let tree = build(map, loader, undefined);
+  for (let i = maps.length - 1; i >= 0; i--) {
+    tree = new SourceMapTree(maps[i], [tree]);
+  }
+  return tree;
+}
+
+function build(
+  map: RawSourceMap | DecodedSourceMap,
+  loader: SourceMapLoader,
+  relativeRoot?: string
+): SourceMapTree {
   const { sourceRoot, sources, sourcesContent } = map;
 
   const children = sources.map(
@@ -62,13 +77,9 @@ export default function buildSourceMapTree(
 
       // Else, it's a real sourcemap, and we need to recurse into it to load its
       // source files.
-      return buildSourceMapTree(decodeSourceMap(sourceMap), loader, uri);
+      return build(parseMap(sourceMap), loader, uri);
     }
   );
 
-  let tree = new SourceMapTree(map, children);
-  for (let i = maps.length - 1; i >= 0; i--) {
-    tree = new SourceMapTree(maps[i], [tree]);
-  }
-  return tree;
+  return new SourceMapTree(map, children);
 }
