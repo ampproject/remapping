@@ -1,4 +1,3 @@
-import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 
 function configure(esm) {
@@ -9,7 +8,6 @@ function configure(esm) {
       : { format: 'umd', name: 'remapping', dir: 'dist', entryFileNames: '[name].umd.js', sourcemap: true },
     plugins: [
       typescript({ tsconfig: './tsconfig.build.json' }),
-      resolve(),
     ],
     watch: {
       include: 'src/**',
