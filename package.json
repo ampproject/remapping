@@ -58,7 +58,7 @@
     "typescript": "4.4.4"
   },
   "dependencies": {
-    "@jridgewell/resolve-uri": "2.0.0",
+    "@jridgewell/resolve-uri": "3.0.0",
     "@jridgewell/trace-mapping": "0.1.0",
     "sourcemap-codec": "1.4.8"
   }
