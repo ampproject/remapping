@@ -1,4 +1,3 @@
-import defaults from './defaults';
 import FastStringArray from './fast-string-array';
 
 import type { TraceMap } from '@jridgewell/trace-mapping';
@@ -115,15 +114,12 @@ export default class SourceMapTree {
 
     // TODO: Make all sources relative to the sourceRoot.
 
-    return defaults(
-      {
-        mappings,
-        names: names.array,
-        sources: sources.array,
-        sourcesContent,
-      },
-      this.map
-    );
+    return Object.assign({}, this.map, {
+      mappings,
+      names: names.array,
+      sources: sources.array,
+      sourcesContent,
+    });
   }
 
   /**
