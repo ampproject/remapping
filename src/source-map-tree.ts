@@ -1,15 +1,9 @@
-import { TraceMap } from '@jridgewell/trace-mapping';
-
 import defaults from './defaults';
 import FastStringArray from './fast-string-array';
 
+import type { TraceMap } from '@jridgewell/trace-mapping';
 import type OriginalSource from './original-source';
-import type {
-  DecodedSourceMap,
-  RawSourceMap,
-  SourceMapSegment,
-  SourceMapSegmentObject,
-} from './types';
+import type { DecodedSourceMap, SourceMapSegment, SourceMapSegmentObject } from './types';
 
 type Sources = OriginalSource | SourceMapTree;
 
@@ -25,8 +19,8 @@ export default class SourceMapTree {
   map: TraceMap;
   sources: Sources[];
 
-  constructor(map: RawSourceMap | DecodedSourceMap, sources: Sources[]) {
-    this.map = new TraceMap(map);
+  constructor(map: TraceMap, sources: Sources[]) {
+    this.map = map;
     this.sources = sources;
   }
 

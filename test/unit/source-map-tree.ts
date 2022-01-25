@@ -1,3 +1,5 @@
+import { TraceMap } from '@jridgewell/trace-mapping';
+
 import OriginalSource from '../../src/original-source';
 import SourceMapTree from '../../src/source-map-tree';
 import type { DecodedSourceMap } from '../../src/types';
@@ -13,7 +15,7 @@ describe('SourceMapTree', () => {
       version: 3,
     };
     const child = new SourceMapTree(
-      {
+      new TraceMap({
         mappings: [
           [
             [0, 0, 0, 0],
@@ -26,7 +28,7 @@ describe('SourceMapTree', () => {
         names: ['child'],
         sources: ['original.js'],
         version: 3,
-      },
+      }),
       [new OriginalSource(`${sourceRoot}/original.js`, '')]
     );
 
@@ -36,7 +38,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, 0, 0, 4], [5]]],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced.mappings).toEqual([[[0, 0, 1, 1], [5]]]);
     });
@@ -52,7 +54,7 @@ describe('SourceMapTree', () => {
         ],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced.mappings).toEqual([[[0, 0, 1, 1], [5]]]);
     });
@@ -66,7 +68,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced.mappings).toEqual([]);
     });
@@ -83,7 +85,7 @@ describe('SourceMapTree', () => {
         names: [name],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 0, 0, 0]]],
@@ -100,7 +102,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 1, 1]]],
@@ -116,7 +118,7 @@ describe('SourceMapTree', () => {
         mappings: [[[0, sourceIndex, line, column]]],
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 0, 0, 0]]],
@@ -135,7 +137,7 @@ describe('SourceMapTree', () => {
         ...extras,
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject(extras);
     });
@@ -148,7 +150,7 @@ describe('SourceMapTree', () => {
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         sources: ['child.js'],
@@ -162,7 +164,7 @@ describe('SourceMapTree', () => {
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [[[0, 0, 0, 0]]],
@@ -176,7 +178,7 @@ describe('SourceMapTree', () => {
         sourceRoot,
       };
 
-      const source = new SourceMapTree(map, [child]);
+      const source = new SourceMapTree(new TraceMap(map), [child]);
       const traced = source.traceMappings();
       expect(traced).toMatchObject({
         mappings: [],
@@ -195,7 +197,7 @@ describe('SourceMapTree', () => {
           ],
         };
 
-        const source = new SourceMapTree(map, [child]);
+        const source = new SourceMapTree(new TraceMap(map), [child]);
         const traced = source.traceMappings();
         expect(traced).toMatchObject({
           mappings: [[[0, 0, 0, 0]]],
@@ -208,7 +210,7 @@ describe('SourceMapTree', () => {
           mappings: [[[0, 0, 0, 0]], [[0, 0, 0, 0]]],
         };
 
-        const source = new SourceMapTree(map, [child]);
+        const source = new SourceMapTree(new TraceMap(map), [child]);
         const traced = source.traceMappings();
         expect(traced).toMatchObject({
           mappings: [[[0, 0, 0, 0]], [[0, 0, 0, 0]]],
@@ -239,7 +241,7 @@ describe('SourceMapTree', () => {
       sources: ['child.js'],
       version: 3,
     };
-    const source = new SourceMapTree(map, [new OriginalSource('child.js', '')]);
+    const source = new SourceMapTree(new TraceMap(map), [new OriginalSource('child.js', '')]);
 
     test('traces LineSegments to the segment with matching generated column', () => {
       const trace = source.originalPositionFor(0, 4, '');

@@ -132,7 +132,7 @@ describe('buildSourceMapTree', () => {
         ...rawMap,
         file: 'two.js',
         // We need to support relative roots...
-        // sourceRoot: './deep/',
+        sourceRoot: './deep/',
         sources: ['three.js'],
       })
       .mockReturnValue(null);
@@ -146,7 +146,7 @@ describe('buildSourceMapTree', () => {
             // two.js's map
             sources: [
               {
-                filename: 'https://foo.com/assets/three.js',
+                filename: 'https://foo.com/assets/deep/three.js',
               },
             ],
           },
@@ -156,7 +156,7 @@ describe('buildSourceMapTree', () => {
 
     expect(loader).toHaveBeenCalledWith('helloworld.js');
     expect(loader).toHaveBeenCalledWith('https://foo.com/assets/two.js');
-    expect(loader).toHaveBeenCalledWith('https://foo.com/assets/three.js');
+    expect(loader).toHaveBeenCalledWith('https://foo.com/assets/deep/three.js');
     expect(loader.mock.calls.length).toBe(3);
   });
 

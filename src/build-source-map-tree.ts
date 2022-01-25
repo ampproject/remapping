@@ -1,18 +1,13 @@
-import OriginalSource from './original-source';
-import resolve from './resolve';
-import SourceMapTree from './source-map-tree';
-import stripFilename from './strip-filename';
+import TraceMap from '@jridgewell/trace-mapping';
 
-import type { RawSourceMap, DecodedSourceMap, SourceMapInput, SourceMapLoader } from './types';
+import OriginalSource from './original-source';
+import SourceMapTree from './source-map-tree';
+
+import type { SourceMapInput, SourceMapLoader } from './types';
 
 function asArray<T>(value: T | T[]): T[] {
   if (Array.isArray(value)) return value;
   return [value];
-}
-
-function parseMap(map: SourceMapInput): RawSourceMap | DecodedSourceMap {
-  if (typeof map === 'string') return JSON.parse(map);
-  return map;
 }
 
 /**
@@ -30,7 +25,7 @@ export default function buildSourceMapTree(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader
 ): SourceMapTree {
-  const maps = asArray(input).map(parseMap);
+  const maps = asArray(input).map((m) => new TraceMap(m));
   const map = maps.pop()!;
 
   for (let i = 0; i < maps.length; i++) {
@@ -42,29 +37,22 @@ export default function buildSourceMapTree(
     }
   }
 
-  let tree = build(map, loader, undefined);
+  let tree = build(map, loader);
   for (let i = maps.length - 1; i >= 0; i--) {
     tree = new SourceMapTree(maps[i], [tree]);
   }
   return tree;
 }
 
-function build(
-  map: RawSourceMap | DecodedSourceMap,
-  loader: SourceMapLoader,
-  relativeRoot?: string
-): SourceMapTree {
-  const { sourceRoot, sources, sourcesContent } = map;
+function build(map: TraceMap, loader: SourceMapLoader): SourceMapTree {
+  const { resolvedSources, sourcesContent } = map;
 
-  const children = sources.map(
+  const children = resolvedSources.map(
     (sourceFile: string | null, i: number): SourceMapTree | OriginalSource => {
-      // Each source file is loaded relative to the sourcemap's own sourceRoot,
-      // which is itself relative to the sourcemap's parent.
-      const uri = resolve(sourceFile || '', resolve(sourceRoot || '', stripFilename(relativeRoot)));
-
+      const source = sourceFile || '';
       // Use the provided loader callback to retrieve the file's sourcemap.
       // TODO: We should eventually support async loading of sourcemap files.
-      const sourceMap = loader(uri);
+      const sourceMap = loader(source);
 
       // If there is no sourcemap, then it is an unmodified source file.
       if (!sourceMap) {
@@ -72,12 +60,12 @@ function build(
         // (done when generating the sourcemap) for it to be included as a
         // sourceContent in the output sourcemap.
         const sourceContent = sourcesContent ? sourcesContent[i] : null;
-        return new OriginalSource(uri, sourceContent);
+        return new OriginalSource(source, sourceContent);
       }
 
       // Else, it's a real sourcemap, and we need to recurse into it to load its
       // source files.
-      return build(parseMap(sourceMap), loader, uri);
+      return build(new TraceMap(sourceMap, source), loader);
     }
   );
 
