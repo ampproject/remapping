@@ -13,6 +13,7 @@ function configure(esm) {
           sourcemap: true,
           globals: {
             '@jridgewell/resolve-uri': 'resolveURI',
+            '@jridgewell/trace-mapping': 'traceMapping',
             'sourcemap-codec': 'sourcemapCodec',
           },
         },
