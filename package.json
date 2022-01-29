@@ -32,7 +32,7 @@
     "prebuild": "rm -rf dist",
     "prepublishOnly": "npm run preversion",
     "preversion": "run-s test build",
-    "test": "run-s -n test:lint 'test:only -- --no-cache'",
+    "test": "run-s -n test:lint test:only",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:lint": "run-s -n test:lint:*",
     "test:lint:prettier": "prettier --check '{src,test}/**/*.ts'",
@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "@jridgewell/resolve-uri": "^3.0.3",
-    "@jridgewell/trace-mapping": "^0.2.0",
+    "@jridgewell/trace-mapping": "^0.2.2",
     "sourcemap-codec": "1.4.8"
   }
 }
