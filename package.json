@@ -57,7 +57,7 @@
     "typescript": "4.4.4"
   },
   "dependencies": {
-    "@jridgewell/trace-mapping": "^0.2.2",
-    "sourcemap-codec": "1.4.8"
+    "@jridgewell/sourcemap-codec": "^1.4.9",
+    "@jridgewell/trace-mapping": "^0.2.7"
   }
 }

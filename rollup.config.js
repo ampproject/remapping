@@ -13,7 +13,7 @@ function configure(esm) {
           sourcemap: true,
           globals: {
             '@jridgewell/trace-mapping': 'traceMapping',
-            'sourcemap-codec': 'sourcemapCodec',
+            '@jridgewell/sourcemap-codec': 'sourcemapCodec',
           },
         },
     plugins: [typescript({ tsconfig: './tsconfig.build.json' })],

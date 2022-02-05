@@ -1,4 +1,4 @@
-import { encode } from 'sourcemap-codec';
+import { encode } from '@jridgewell/sourcemap-codec';
 
 import type { DecodedSourceMap, RawSourceMap, Options } from './types';
 
@@ -6,7 +6,7 @@ import type { DecodedSourceMap, RawSourceMap, Options } from './types';
  * A SourceMap v3 compatible sourcemap, which only includes fields that were
  * provided to it.
  */
-export default class SourceMap implements SourceMap {
+export default class SourceMap {
   file?: string | null;
   mappings: RawSourceMap['mappings'] | DecodedSourceMap['mappings'];
   sourceRoot?: string;
