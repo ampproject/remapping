@@ -20,9 +20,7 @@ export default class SourceMap {
     this.mappings = options.decodedMappings ? decodedMappings(map) : encodedMappings(map);
     this.names = map.names;
 
-    // TODO: We first need to make all source URIs relative to the sourceRoot
-    // before we can support a sourceRoot.
-    // if ('sourceRoot' in map) this.sourceRoot = map.sourceRoot;
+    this.sourceRoot = map.sourceRoot;
 
     this.sources = map.sources;
     if (!options.excludeContent && 'sourcesContent' in map) {

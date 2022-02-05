@@ -6,7 +6,7 @@ import type { DecodedSourceMap } from '../../src/types';
 
 describe('SourceMapTree', () => {
   describe('traceMappings()', () => {
-    const sourceRoot = 'https://foobar.com';
+    const sourceRoot = 'foo';
     const baseMap: DecodedSourceMap = {
       mappings: [],
       names: ['name'],
@@ -127,7 +127,8 @@ describe('SourceMapTree', () => {
     test('defaults decoded return map with original data', () => {
       const extras = {
         file: 'foobar.js',
-        sourceRoot: 'https://foobar.com/',
+        // TODO: support sourceRoot
+        // sourceRoot: 'https://foobar.com/',
       };
       const map: DecodedSourceMap = {
         ...baseMap,
@@ -140,18 +141,18 @@ describe('SourceMapTree', () => {
       expect(traced).toMatchObject(extras);
     });
 
-    // TODO: support sourceRoot
-    test.skip('resolves source files realtive to sourceRoot', () => {
+    test('resolves source files realtive to sourceRoot', () => {
       const map: DecodedSourceMap = {
         ...baseMap,
         mappings: [[[0, 0, 0, 0]]],
-        sourceRoot,
       };
 
       const tree = new SourceMapTree(new TraceMap(map), [child]);
       const traced = traceMappings(tree);
       expect(traced).toMatchObject({
-        sources: ['child.js'],
+        // TODO: support sourceRoot
+        sourceRoot: undefined,
+        sources: ['foo/original.js'],
       });
     });
 

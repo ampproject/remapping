@@ -1,6 +1,11 @@
 import { FastStringArray, put } from './fast-string-array';
 
-import { TraceMap, traceSegment, decodedMappings } from '@jridgewell/trace-mapping';
+import {
+  type TraceMap,
+  presortedDecodedMap,
+  traceSegment,
+  decodedMappings,
+} from '@jridgewell/trace-mapping';
 import type OriginalSource from './original-source';
 import type { SourceMapSegment, SourceMapSegmentObject } from './types';
 
@@ -119,11 +124,11 @@ export class SourceMapTree {
         mappings.length = lastLineWithSegment + 1;
       }
 
-      // TODO: Make all sources relative to the sourceRoot.
-
-      return new TraceMap(
+      return presortedDecodedMap(
         Object.assign({}, tree.map, {
           mappings,
+          // TODO: Make all sources relative to the sourceRoot.
+          sourceRoot: undefined,
           names: names.array,
           sources: sources.array,
           sourcesContent,
