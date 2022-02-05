@@ -30,10 +30,8 @@ export interface SourceMapSegmentObject {
   column: number;
   line: number;
   name: string;
-  source: {
-    content: string | null;
-    filename: string;
-  };
+  source: string;
+  content: string | null;
 }
 
 export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;

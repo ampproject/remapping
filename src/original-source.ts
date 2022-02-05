@@ -5,11 +5,11 @@ import type { SourceMapSegmentObject } from './types';
  * source file. Recursive segment tracing ends at the `OriginalSource`.
  */
 export default class OriginalSource {
-  content: string | null;
-  filename: string;
+  declare content: string | null;
+  declare source: string;
 
-  constructor(filename: string, content: string | null) {
-    this.filename = filename;
+  constructor(source: string, content: string | null) {
+    this.source = source;
     this.content = content;
   }
 
@@ -18,6 +18,6 @@ export default class OriginalSource {
    * meaning this line/column location originated from this source file.
    */
   originalPositionFor(line: number, column: number, name: string): SourceMapSegmentObject {
-    return { column, line, name, source: this };
+    return { column, line, name, source: this.source, content: this.content };
   }
 }

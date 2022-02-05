@@ -1,4 +1,5 @@
 import buildSourceMapTree from './build-source-map-tree';
+import { traceMappings } from './source-map-tree';
 import SourceMap from './source-map';
 
 import type { SourceMapInput, SourceMapLoader, Options } from './types';
@@ -33,6 +34,6 @@ export default function remapping(
 ): SourceMap {
   const opts =
     typeof options === 'object' ? options : { excludeContent: !!options, decodedMappings: false };
-  const graph = buildSourceMapTree(input, loader);
-  return new SourceMap(graph.traceMappings(), opts);
+  const tree = buildSourceMapTree(input, loader);
+  return new SourceMap(traceMappings(tree), opts);
 }

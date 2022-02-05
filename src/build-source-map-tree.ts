@@ -1,7 +1,7 @@
-import TraceMap from '@jridgewell/trace-mapping';
+import { TraceMap } from '@jridgewell/trace-mapping';
 
 import OriginalSource from './original-source';
-import SourceMapTree from './source-map-tree';
+import { SourceMapTree } from './source-map-tree';
 
 import type { SourceMapInput, SourceMapLoader } from './types';
 

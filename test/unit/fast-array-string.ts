@@ -1,4 +1,4 @@
-import FastStringArray from '../../src/fast-string-array';
+import { FastStringArray, put } from '../../src/fast-string-array';
 
 describe('FastStringArray', () => {
   let array: FastStringArray;
@@ -9,41 +9,41 @@ describe('FastStringArray', () => {
 
   describe('put()', () => {
     test('puts string in if not present', () => {
-      array.put('test');
+      put(array, 'test');
       expect(array.array).toEqual(['test']);
-      array.put('test');
+      put(array, 'test');
       expect(array.array).toEqual(['test']);
 
-      array.put('foo');
+      put(array, 'foo');
       expect(array.array).toEqual(['test', 'foo']);
-      array.put('bar');
+      put(array, 'bar');
       expect(array.array).toEqual(['test', 'foo', 'bar']);
 
-      array.put('bar');
+      put(array, 'bar');
       expect(array.array).toEqual(['test', 'foo', 'bar']);
-      array.put('foo');
+      put(array, 'foo');
       expect(array.array).toEqual(['test', 'foo', 'bar']);
     });
 
     test('returns index of string in array', () => {
-      expect(array.put('test')).toBe(0);
-      expect(array.put('foo')).toBe(1);
-      expect(array.put('bar')).toBe(2);
+      expect(put(array, 'test')).toBe(0);
+      expect(put(array, 'foo')).toBe(1);
+      expect(put(array, 'bar')).toBe(2);
     });
 
     test('returns original index of string in array', () => {
-      array.put('test');
-      array.put('foo');
-      array.put('bar');
+      put(array, 'test');
+      put(array, 'foo');
+      put(array, 'bar');
 
-      expect(array.put('test')).toBe(0);
-      expect(array.put('foo')).toBe(1);
-      expect(array.put('bar')).toBe(2);
+      expect(put(array, 'test')).toBe(0);
+      expect(put(array, 'foo')).toBe(1);
+      expect(put(array, 'bar')).toBe(2);
     });
 
     test('handles empty string', () => {
-      expect(array.put('')).toBe(0);
-      expect(array.put('')).toBe(0);
+      expect(put(array, '')).toBe(0);
+      expect(put(array, '')).toBe(0);
       expect(array.array).toEqual(['']);
     });
   });

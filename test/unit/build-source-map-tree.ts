@@ -34,7 +34,7 @@ describe('buildSourceMapTree', () => {
     const tree = buildSourceMapTree(decodedMap, () => null);
     expect(tree.sources).toMatchObject([
       {
-        filename: 'helloworld.js',
+        source: 'helloworld.js',
       },
     ]);
   });
@@ -94,7 +94,7 @@ describe('buildSourceMapTree', () => {
       {
         sources: [
           {
-            filename: 'two.js',
+            source: 'two.js',
           },
         ],
       },
@@ -146,7 +146,7 @@ describe('buildSourceMapTree', () => {
             // two.js's map
             sources: [
               {
-                filename: 'https://foo.com/assets/deep/three.js',
+                source: 'https://foo.com/assets/deep/three.js',
               },
             ],
           },
@@ -194,7 +194,7 @@ describe('buildSourceMapTree', () => {
             // two.js's map
             sources: [
               {
-                filename: 'https://foo.com/assets/three.js',
+                source: 'https://foo.com/assets/three.js',
               },
             ],
           },
@@ -220,7 +220,7 @@ describe('buildSourceMapTree', () => {
         // helloworld.js's map
         sources: [
           {
-            filename: 'helloworld.js',
+            source: 'helloworld.js',
           },
         ],
       },
@@ -284,7 +284,7 @@ describe('buildSourceMapTree', () => {
       {
         sources: [
           {
-            filename: 'two.js',
+            source: 'two.js',
           },
         ],
       },
@@ -315,7 +315,7 @@ describe('buildSourceMapTree', () => {
       {
         sources: [
           {
-            filename: 'https://foo.com/two.js',
+            source: 'https://foo.com/two.js',
           },
         ],
       },

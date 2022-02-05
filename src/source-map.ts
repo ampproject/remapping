@@ -1,5 +1,4 @@
-import { encode } from '@jridgewell/sourcemap-codec';
-
+import { type TraceMap, encodedMappings, decodedMappings } from '@jridgewell/trace-mapping';
 import type { DecodedSourceMap, RawSourceMap, Options } from './types';
 
 /**
@@ -7,18 +6,18 @@ import type { DecodedSourceMap, RawSourceMap, Options } from './types';
  * provided to it.
  */
 export default class SourceMap {
-  file?: string | null;
-  mappings: RawSourceMap['mappings'] | DecodedSourceMap['mappings'];
-  sourceRoot?: string;
-  names: string[];
-  sources: (string | null)[];
-  sourcesContent?: (string | null)[];
-  version: 3;
+  declare file?: string | null;
+  declare mappings: RawSourceMap['mappings'] | DecodedSourceMap['mappings'];
+  declare sourceRoot?: string;
+  declare names: string[];
+  declare sources: (string | null)[];
+  declare sourcesContent?: (string | null)[];
+  declare version: 3;
 
-  constructor(map: DecodedSourceMap, options: Options) {
+  constructor(map: TraceMap, options: Options) {
     this.version = 3; // SourceMap spec says this should be first.
-    if ('file' in map) this.file = map.file;
-    this.mappings = options.decodedMappings ? map.mappings : encode(map.mappings);
+    this.file = map.file;
+    this.mappings = options.decodedMappings ? decodedMappings(map) : encodedMappings(map);
     this.names = map.names;
 
     // TODO: We first need to make all source URIs relative to the sourceRoot

@@ -38,14 +38,24 @@ describe('OriginalSource', () => {
       expect(trace.name).toBe(name);
     });
 
-    test('returns the original source itself', () => {
+    test("returns the original source's source", () => {
       const line = Math.random();
       const column = Math.random();
       const name = String(Math.random());
 
       const trace = source.originalPositionFor(line, column, name);
 
-      expect(trace.source).toBe(source);
+      expect(trace.source).toBe(source.source);
+    });
+
+    test("returns the original source's content", () => {
+      const line = Math.random();
+      const column = Math.random();
+      const name = String(Math.random());
+
+      const trace = source.originalPositionFor(line, column, name);
+
+      expect(trace.content).toBe(source.content);
     });
   });
 });
