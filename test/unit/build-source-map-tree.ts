@@ -18,8 +18,8 @@ describe('buildSourceMapTree', () => {
     const loader = jest.fn(() => null);
     buildSourceMapTree(decodedMap, loader);
 
+    expect(loader).toHaveBeenCalledTimes(1);
     expect(loader).toHaveBeenCalledWith('helloworld.js');
-    expect(loader.mock.calls.length).toBe(1);
   });
 
   test('loader cannot be async', () => {
@@ -100,9 +100,9 @@ describe('buildSourceMapTree', () => {
       },
     ]);
 
+    expect(loader).toHaveBeenCalledTimes(2);
     expect(loader).toHaveBeenCalledWith('helloworld.js');
     expect(loader).toHaveBeenCalledWith('two.js');
-    expect(loader.mock.calls.length).toBe(2);
   });
 
   test('calls loader with sourceRoot joined to source file', () => {
@@ -115,8 +115,8 @@ describe('buildSourceMapTree', () => {
       loader
     );
 
+    expect(loader).toHaveBeenCalledTimes(1);
     expect(loader).toHaveBeenCalledWith('https://foo.com/helloworld.js');
-    expect(loader.mock.calls.length).toBe(1);
   });
 
   test('original sources are relative to the tree path', () => {
@@ -154,10 +154,10 @@ describe('buildSourceMapTree', () => {
       },
     ]);
 
+    expect(loader).toHaveBeenCalledTimes(3);
     expect(loader).toHaveBeenCalledWith('helloworld.js');
     expect(loader).toHaveBeenCalledWith('https://foo.com/assets/two.js');
     expect(loader).toHaveBeenCalledWith('https://foo.com/assets/deep/three.js');
-    expect(loader.mock.calls.length).toBe(3);
   });
 
   test('original sources are relative to the tree path, edge cases', () => {
@@ -202,15 +202,37 @@ describe('buildSourceMapTree', () => {
       },
     ]);
 
+    expect(loader).toHaveBeenCalledTimes(3);
     expect(loader).toHaveBeenCalledWith('https://foo.com/deep/helloworld.js');
     expect(loader).toHaveBeenCalledWith('https://foo.com/two.js');
     expect(loader).toHaveBeenCalledWith('https://foo.com/assets/three.js');
-    expect(loader.mock.calls.length).toBe(3);
   });
 
   test('transformation maps of a sourcemap may be passed before the sourcemap', () => {
     const maps = [
       decodedMap, // "transformation map"
+      decodedMap,
+    ];
+    const tree = buildSourceMapTree(maps, () => null);
+
+    expect(tree.sources).toMatchObject([
+      {
+        // helloworld.js's map
+        sources: [
+          {
+            source: 'helloworld.js',
+          },
+        ],
+      },
+    ]);
+  });
+
+  test('transformation map does not influence map url', () => {
+    const maps = [
+      {
+        ...decodedMap,
+        sourceRoot: 'https://example.com/',
+      }, // "transformation map"
       decodedMap,
     ];
     const tree = buildSourceMapTree(maps, () => null);
@@ -239,6 +261,25 @@ describe('buildSourceMapTree', () => {
     expect(() => {
       buildSourceMapTree(maps, () => null);
     }).toThrow();
+  });
+
+  test('handles when transformation map has 0 sources', () => {
+    const maps = [
+      {
+        ...decodedMap,
+        mappings: [],
+        sources: [],
+      }, // "transformation map"
+      decodedMap,
+    ];
+    const loader = jest.fn();
+
+    const tree = buildSourceMapTree(maps, loader);
+    expect(tree.map).toMatchObject({
+      sources: [],
+    });
+    expect(loader).toHaveBeenCalledTimes(1);
+    expect(loader).toHaveBeenCalledWith('helloworld.js');
   });
 
   test('parses map with null source', () => {
