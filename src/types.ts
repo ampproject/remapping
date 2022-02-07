@@ -36,7 +36,16 @@ export interface SourceMapSegmentObject {
 
 export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;
 
-export type SourceMapLoader = (file: string) => SourceMapInput | null | undefined;
+export type LoaderContext = {
+  readonly importer: string;
+  source: string;
+  content: string | null | undefined;
+};
+
+export type SourceMapLoader = (
+  file: string,
+  ctx: LoaderContext
+) => SourceMapInput | null | undefined;
 
 export type Options = {
   excludeContent?: boolean;

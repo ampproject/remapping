@@ -21,9 +21,19 @@ npm install @ampproject/remapping
 ```typescript
 function remapping(
   map: SourceMap | SourceMap[],
-  loader: (file: string) => (SourceMap | null | undefined),
+  loader: (file: string, ctx: LoaderContext) => (SourceMap | null | undefined),
   options?: { excludeContent: boolean, decodedMappings: boolean }
 ): SourceMap;
+
+// LoaderContext gives the loader the importing sourcemap, and the ability to override the "source"
+// location (where nested sources are resolved relative to, and where an original source exists),
+// and the ability to override the "content" of an original sourcemap for inclusion in the output
+// sourcemap.
+type LoaderContext = {
+ readonly importer: string;
+ source: string;
+ content: string | null | undefined;
+}
 ```
 
 `remapping` takes the final output sourcemap, and a `loader` function. For every source file pointer
@@ -55,15 +65,20 @@ const minifiedTransformedMap = JSON.stringify({
 
 const remapped = remapping(
   minifiedTransformedMap,
-  (file) => {
+  (file, ctx) => {
 
     // The "transformed.js" file is an transformed file.
     if (file === 'transformed.js') {
+      // The root importer is empty.
+      console.assert(ctx.importer === '');
+
       return transformedMap;
     }
 
     // Loader will be called to load transformedMap's source file pointers as well.
     console.assert(file === 'helloworld.js');
+    // `transformed.js`'s sourcemap points into `helloworld.js`.
+    console.assert(ctx.importer === 'transformed.js');
     return null;
   }
 );
@@ -107,6 +122,76 @@ console.log(remapped);
 //   mappings: 'AAEE',
 //   sources: ['helloworld.js'],
 //   version: 3,
+// };
+```
+
+### Advanced control of the loading graph
+
+#### `source`
+
+The `source` property can overridden to any value to change the location of the current load. Eg,
+for an original source file, it allows us to change the filepath to the original source regardless
+of what the sourcemap source entry says. And for transformed files, it allows us to change the
+resolving location for nested sources files of the loaded sourcemap.
+
+```js
+const remapped = remapping(
+  minifiedTransformedMap,
+  (file, ctx) => {
+
+    if (file === 'transformed.js') {
+      // We pretend the transformed.js file actually exists in the 'src/' directory. When the nested
+      // source files are loaded, they will now be relative to `src/`.
+      ctx.source = 'src/transformed.js';
+      return transformedMap;
+    }
+
+    console.assert(file === 'src/helloworld.js');
+    // We could futher change the source of this original file, eg, to be inside a nested directory
+    // itself. This will be reflected in the remapped sourcemap.
+    ctx.source = 'src/nested/transformed.js';
+    return null;
+  }
+);
+
+console.log(remapped);
+// {
+//   …,
+//   sources: ['src/nested/helloworld.js'],
+// };
+```
+
+
+#### `content`
+
+The `content` property can be overridden when we encounter an original source file. Eg, this allows
+you to manually provide the source content of the file regardless of whether the `sourcesContent`
+field is present in the parent sourcemap. Or, it can be set to `null` to remove the source content.
+
+```js
+const remapped = remapping(
+  minifiedTransformedMap,
+  (file, ctx) => {
+
+    if (file === 'transformed.js') {
+      // transformedMap does not include a `sourcesContent` field, so usually the remapped sourcemap
+      // would not include any `sourcesContent` values.
+      return transformedMap;
+    }
+
+    console.assert(file === 'helloworld.js');
+    // We can read the file to provide the source content.
+    ctx.content = fs.readFileSync(file, 'utf8');
+    return null;
+  }
+);
+
+console.log(remapped);
+// {
+//   …,
+//   sourcesContent: [
+//     'console.log("Hello world!")',
+//   ],
 // };
 ```
 

@@ -30,7 +30,7 @@ describe('source-less transform', () => {
     const remapped = remapping([minified, original], loader);
 
     expect(loader).toHaveBeenCalledTimes(1);
-    expect(loader).toHaveBeenCalledWith('source.ts');
+    expect(loader).toHaveBeenCalledWith('source.ts', expect.anything());
     expect(remapped.sources).toHaveLength(0);
     expect(remapped.mappings).toBe('');
   });
