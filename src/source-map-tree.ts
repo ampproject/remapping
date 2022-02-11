@@ -1,11 +1,7 @@
 import { FastStringArray, put } from './fast-string-array';
+import { presortedDecodedMap, traceSegment, decodedMappings } from '@jridgewell/trace-mapping';
 
-import {
-  type TraceMap,
-  presortedDecodedMap,
-  traceSegment,
-  decodedMappings,
-} from '@jridgewell/trace-mapping';
+import type { TraceMap } from '@jridgewell/trace-mapping';
 import type OriginalSource from './original-source';
 import type { SourceMapSegment, SourceMapSegmentObject } from './types';
 

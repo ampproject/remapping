@@ -9,6 +9,7 @@ export type {
   DecodedSourceMap,
   SourceMapInput,
   SourceMapLoader,
+  LoaderContext,
   Options,
 } from './types';
 

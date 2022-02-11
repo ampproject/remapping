@@ -1,5 +1,6 @@
-import type { TraceMap } from '@jridgewell/trace-mapping';
 import { encodedMappings, decodedMappings } from '@jridgewell/trace-mapping';
+
+import type { TraceMap } from '@jridgewell/trace-mapping';
 import type { DecodedSourceMap, RawSourceMap, Options } from './types';
 
 /**
