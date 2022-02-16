@@ -199,6 +199,68 @@ describe('buildSourceMapTree', () => {
       });
     });
 
+    describe('depty', () => {
+      test('is 1 for sources loaded from the root', () => {
+        const loader = jest.fn();
+        buildSourceMapTree(
+          {
+            ...decodedMap,
+            sources: ['first.js', 'second.js'],
+          },
+          loader
+        );
+
+        expect(loader).toHaveBeenCalledTimes(2);
+        expect(loader).toHaveBeenCalledWith(
+          'first.js',
+          expect.objectContaining({
+            depth: 1,
+          })
+        );
+        expect(loader).toHaveBeenCalledWith(
+          'second.js',
+          expect.objectContaining({
+            depth: 1,
+          })
+        );
+      });
+
+      test('is increased for nested sources', () => {
+        const loader = jest.fn();
+        loader.mockReturnValueOnce({
+          ...rawMap,
+          sources: ['two.js'],
+        });
+        buildSourceMapTree(
+          {
+            ...decodedMap,
+            sources: ['first.js', 'second.js'],
+          },
+          loader
+        );
+
+        expect(loader).toHaveBeenCalledTimes(3);
+        expect(loader).toHaveBeenCalledWith(
+          'first.js',
+          expect.objectContaining({
+            depth: 1,
+          })
+        );
+        expect(loader).toHaveBeenCalledWith(
+          'two.js',
+          expect.objectContaining({
+            depth: 2,
+          })
+        );
+        expect(loader).toHaveBeenCalledWith(
+          'second.js',
+          expect.objectContaining({
+            depth: 1,
+          })
+        );
+      });
+    });
+
     describe('source', () => {
       test('matches the loader source param', () => {
         const loader = jest.fn();

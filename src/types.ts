@@ -38,6 +38,7 @@ export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;
 
 export type LoaderContext = {
   readonly importer: string;
+  readonly depth: number;
   source: string;
   content: string | null | undefined;
 };

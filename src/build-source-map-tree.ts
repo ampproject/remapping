@@ -37,16 +37,22 @@ export default function buildSourceMapTree(
     }
   }
 
-  let tree = build(map, '', loader);
+  let tree = build(map, loader, '', 0);
   for (let i = maps.length - 1; i >= 0; i--) {
     tree = new SourceMapTree(maps[i], [tree]);
   }
   return tree;
 }
 
-function build(map: TraceMap, importer: string, loader: SourceMapLoader): SourceMapTree {
+function build(
+  map: TraceMap,
+  loader: SourceMapLoader,
+  importer: string,
+  importerDepth: number
+): SourceMapTree {
   const { resolvedSources, sourcesContent } = map;
 
+  const depth = importerDepth + 1;
   const children = resolvedSources.map(
     (sourceFile: string | null, i: number): SourceMapTree | OriginalSource => {
       // The loading context gives the loader more information about why this file is being loaded
@@ -55,6 +61,7 @@ function build(map: TraceMap, importer: string, loader: SourceMapLoader): Source
       // an unmodified source file.
       const ctx: LoaderContext = {
         importer,
+        depth,
         source: sourceFile || '',
         content: undefined,
       };
@@ -77,7 +84,7 @@ function build(map: TraceMap, importer: string, loader: SourceMapLoader): Source
 
       // Else, it's a real sourcemap, and we need to recurse into it to load its
       // source files.
-      return build(new TraceMap(sourceMap, source), source, loader);
+      return build(new TraceMap(sourceMap, source), loader, source, depth);
     }
   );
 
