@@ -1,10 +1,4 @@
 /**
- * Puts `key` into the backing array, if it is not already present. Returns
- * the index of the `key` in the backing array.
- */
-export let put: (strarr: FastStringArray, key: string) => number;
-
-/**
  * FastStringArray acts like a `Set` (allowing only one occurrence of a string
  * `key`), but provides the index of the `key` in the backing array.
  *
@@ -15,21 +9,24 @@ export let put: (strarr: FastStringArray, key: string) => number;
 export class FastStringArray {
   indexes = Object.create(null) as { [key: string]: number };
   array = [] as ReadonlyArray<string>;
-
-  static {
-    put = (strarr, key) => {
-      const { array, indexes } = strarr;
-      // The key may or may not be present. If it is present, it's a number.
-      let index = indexes[key] as number | undefined;
-
-      // If it's not yet present, we need to insert it and track the index in the
-      // indexes.
-      if (index === undefined) {
-        index = indexes[key] = array.length;
-        (array as string[]).push(key);
-      }
-
-      return index;
-    };
-  }
 }
+
+/**
+ * Puts `key` into the backing array, if it is not already present. Returns
+ * the index of the `key` in the backing array.
+ */
+export function put(strarr: FastStringArray, key: string): number {
+  const { array, indexes } = strarr;
+  // The key may or may not be present. If it is present, it's a number.
+  let index = indexes[key] as number | undefined;
+
+  // If it's not yet present, we need to insert it and track the index in the
+  // indexes.
+  if (index === undefined) {
+    index = indexes[key] = array.length;
+    (array as string[]).push(key);
+  }
+
+  return index;
+}
+
