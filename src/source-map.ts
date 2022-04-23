@@ -1,7 +1,7 @@
 import { encodedMappings, decodedMappings } from '@jridgewell/trace-mapping';
 
 import type { TraceMap } from '@jridgewell/trace-mapping';
-import type { DecodedSourceMap, RawSourceMap, Options } from './types';
+import type { DecodedSourceMap, EncodedSourceMap, Options } from './types';
 
 /**
  * A SourceMap v3 compatible sourcemap, which only includes fields that were
@@ -9,7 +9,7 @@ import type { DecodedSourceMap, RawSourceMap, Options } from './types';
  */
 export default class SourceMap {
   declare file?: string | null;
-  declare mappings: RawSourceMap['mappings'] | DecodedSourceMap['mappings'];
+  declare mappings: EncodedSourceMap['mappings'] | DecodedSourceMap['mappings'];
   declare sourceRoot?: string;
   declare names: string[];
   declare sources: (string | null)[];
@@ -19,7 +19,9 @@ export default class SourceMap {
   constructor(map: TraceMap, options: Options) {
     this.version = 3; // SourceMap spec says this should be first.
     this.file = map.file;
-    this.mappings = options.decodedMappings ? decodedMappings(map) : encodedMappings(map);
+    this.mappings = options.decodedMappings
+      ? (decodedMappings(map) as DecodedSourceMap['mappings'])
+      : encodedMappings(map);
     this.names = map.names;
 
     this.sourceRoot = map.sourceRoot;

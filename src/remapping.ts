@@ -5,7 +5,8 @@ import SourceMap from './source-map';
 import type { SourceMapInput, SourceMapLoader, Options } from './types';
 export type {
   SourceMapSegment,
-  RawSourceMap,
+  EncodedSourceMap,
+  EncodedSourceMap as RawSourceMap,
   DecodedSourceMap,
   SourceMapInput,
   SourceMapLoader,

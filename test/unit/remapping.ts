@@ -1,8 +1,8 @@
 import remapping from '../../src/remapping';
-import type { RawSourceMap } from '../../src/types';
+import type { EncodedSourceMap } from '../../src/types';
 
 describe('remapping', () => {
-  const rawMap: RawSourceMap = {
+  const rawMap: EncodedSourceMap = {
     file: 'transpiled.min.js',
     // 0th column of 1st line of output file translates into the 1st source
     // file, line 2, column 1, using 1st name.
@@ -12,7 +12,7 @@ describe('remapping', () => {
     sourcesContent: ['1+1'],
     version: 3,
   };
-  const transpiledMap: RawSourceMap = {
+  const transpiledMap: EncodedSourceMap = {
     // 1st column of 2nd line of output file translates into the 1st source
     // file, line 3, column 2
     mappings: ';CAEE',
@@ -21,7 +21,7 @@ describe('remapping', () => {
     sourcesContent: ['\n\n  1 + 1;'],
     version: 3,
   };
-  const translatedMap: RawSourceMap = {
+  const translatedMap: EncodedSourceMap = {
     file: 'transpiled.min.js',
     // 0th column of 1st line of output file translates into the 1st source
     // file, line 3, column 2, using first name

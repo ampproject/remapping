@@ -1,30 +1,12 @@
-interface SourceMapV3 {
-  file?: string | null;
-  names: string[];
-  sourceRoot?: string;
-  sources: (string | null)[];
-  sourcesContent?: (string | null)[];
-  version: 3;
-}
+import type { SourceMapInput } from '@jridgewell/trace-mapping';
 
-type Column = number;
-type SourcesIndex = number;
-type SourceLine = number;
-type SourceColumn = number;
-type NamesIndex = number;
+export type {
+  SourceMapSegment,
+  DecodedSourceMap,
+  EncodedSourceMap,
+} from '@jridgewell/trace-mapping';
 
-export type SourceMapSegment =
-  | [Column]
-  | [Column, SourcesIndex, SourceLine, SourceColumn]
-  | [Column, SourcesIndex, SourceLine, SourceColumn, NamesIndex];
-
-export interface RawSourceMap extends SourceMapV3 {
-  mappings: string;
-}
-
-export interface DecodedSourceMap extends SourceMapV3 {
-  mappings: SourceMapSegment[][];
-}
+export type { SourceMapInput };
 
 export interface SourceMapSegmentObject {
   column: number;
@@ -33,8 +15,6 @@ export interface SourceMapSegmentObject {
   source: string;
   content: string | null;
 }
-
-export type SourceMapInput = string | RawSourceMap | DecodedSourceMap;
 
 export type LoaderContext = {
   readonly importer: string;
@@ -46,7 +26,7 @@ export type LoaderContext = {
 export type SourceMapLoader = (
   file: string,
   ctx: LoaderContext
-) => SourceMapInput | null | undefined;
+) => SourceMapInput | null | undefined | void;
 
 export type Options = {
   excludeContent?: boolean;

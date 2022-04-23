@@ -1,8 +1,8 @@
 import buildSourceMapTree from '../../src/build-source-map-tree';
-import type { DecodedSourceMap, RawSourceMap } from '../../src/types';
+import type { DecodedSourceMap, EncodedSourceMap } from '../../src/types';
 
 describe('buildSourceMapTree', () => {
-  const rawMap: RawSourceMap = {
+  const rawMap: EncodedSourceMap = {
     mappings: 'AAAA',
     names: [],
     sources: ['helloworld.js'],
