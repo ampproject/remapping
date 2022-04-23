@@ -17,8 +17,8 @@ type MappingSource = SourceMapSegmentObject | typeof INVALID_MAPPING | typeof SO
  */
 export function traceMappings(tree: SourceMapTree): TraceMap {
   const mappings: SourceMapSegment[][] = [];
-  const names = new FastStringArray();
-  const sources = new FastStringArray();
+  const names = FastStringArray();
+  const sources = FastStringArray();
   const sourcesContent: (string | null)[] = [];
   const { sources: rootSources, map } = tree;
   const rootNames = map.names;

@@ -1,3 +1,8 @@
+export interface FastStringArray {
+  indexes: { [key: string]: number };
+  array: readonly string[];
+}
+
 /**
  * FastStringArray acts like a `Set` (allowing only one occurrence of a string
  * `key`), but provides the index of the `key` in the backing array.
@@ -6,9 +11,11 @@
  * the backing array, like how `sourcesContent[i]` is the source content
  * associated with `source[i]`, and there are never duplicates.
  */
-export class FastStringArray {
-  indexes = Object.create(null) as { [key: string]: number };
-  array = [] as ReadonlyArray<string>;
+export function FastStringArray(): FastStringArray {
+  return {
+    indexes: { __proto__: null } as any,
+    array: [],
+  };
 }
 
 /**
@@ -29,4 +36,3 @@ export function put(strarr: FastStringArray, key: string): number {
 
   return index;
 }
-
