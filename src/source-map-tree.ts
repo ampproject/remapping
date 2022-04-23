@@ -1,4 +1,4 @@
-import { FastStringArray, put } from './fast-string-array';
+import { SetArray, put } from '@jridgewell/set-array';
 import { presortedDecodedMap, traceSegment, decodedMappings } from '@jridgewell/trace-mapping';
 
 import type { TraceMap } from '@jridgewell/trace-mapping';
@@ -62,8 +62,8 @@ export function OriginalSource(source: string, content: string | null): Original
  */
 export function traceMappings(tree: Sources): TraceMap {
   const mappings: SourceMapSegment[][] = [];
-  const names = FastStringArray();
-  const sources = FastStringArray();
+  const names = new SetArray();
+  const sources = new SetArray();
   const sourcesContent: (string | null)[] = [];
   const { sources: rootSources, map } = tree;
   const rootNames = map.names;
