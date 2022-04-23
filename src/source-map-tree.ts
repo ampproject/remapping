@@ -2,20 +2,65 @@ import { FastStringArray, put } from './fast-string-array';
 import { presortedDecodedMap, traceSegment, decodedMappings } from '@jridgewell/trace-mapping';
 
 import type { TraceMap } from '@jridgewell/trace-mapping';
-import type OriginalSource from './original-source';
 import type { SourceMapSegment, SourceMapSegmentObject } from './types';
-
-type Sources = OriginalSource | SourceMapTree;
 
 const INVALID_MAPPING = undefined;
 const SOURCELESS_MAPPING = null;
+const EMPTY_SOURCES: Sources[] = [];
+
 type MappingSource = SourceMapSegmentObject | typeof INVALID_MAPPING | typeof SOURCELESS_MAPPING;
+
+type OriginalSource = {
+  map: TraceMap;
+  sources: Sources[];
+  source: string;
+  content: string | null;
+};
+
+type MapSource = {
+  map: TraceMap;
+  sources: Sources[];
+  source: string;
+  content: string | null;
+};
+
+export type Sources = OriginalSource | MapSource;
+
+function Source<M extends TraceMap | null>(
+  map: TraceMap | null,
+  sources: Sources[],
+  source: string,
+  content: string | null
+): M extends null ? OriginalSource : MapSource {
+  return {
+    map,
+    sources,
+    source,
+    content,
+  } as any;
+}
+
+/**
+ * MapSource represents a single sourcemap, with the ability to trace mappings into its child nodes
+ * (which may themselves be SourceMapTrees).
+ */
+export function MapSource(map: TraceMap, sources: Sources[]): MapSource {
+  return Source(map, sources, '', null);
+}
+
+/**
+ * A "leaf" node in the sourcemap tree, representing an original, unmodified source file. Recursive
+ * segment tracing ends at the `OriginalSource`.
+ */
+export function OriginalSource(source: string, content: string | null): OriginalSource {
+  return Source(null, EMPTY_SOURCES, source, content);
+}
 
 /**
  * traceMappings is only called on the root level SourceMapTree, and begins the process of
  * resolving each mapping in terms of the original source files.
  */
-export function traceMappings(tree: SourceMapTree): TraceMap {
+export function traceMappings(tree: Sources): TraceMap {
   const mappings: SourceMapSegment[][] = [];
   const names = FastStringArray();
   const sources = FastStringArray();
@@ -41,7 +86,8 @@ export function traceMappings(tree: SourceMapTree): TraceMap {
       // to gather from it.
       if (segment.length !== 1) {
         const source = rootSources[segment[1]];
-        traced = source.originalPositionFor(
+        traced = originalPositionFor(
+          source,
           segment[2],
           segment[3],
           segment.length === 5 ? rootNames[segment[4]] : ''
@@ -117,36 +163,31 @@ export function traceMappings(tree: SourceMapTree): TraceMap {
 }
 
 /**
- * SourceMapTree represents a single sourcemap, with the ability to trace
- * mappings into its child nodes (which may themselves be SourceMapTrees).
+ * originalPositionFor is only called on children SourceMapTrees. It recurses down into its own
+ * child SourceMapTrees, until we find the original source map.
  */
-export class SourceMapTree {
-  declare map: TraceMap;
-  declare sources: Sources[];
-
-  constructor(map: TraceMap, sources: Sources[]) {
-    this.map = map;
-    this.sources = sources;
+export function originalPositionFor(
+  source: Sources,
+  line: number,
+  column: number,
+  name: string
+): MappingSource {
+  if (!source.map) {
+    return { column, line, name, source: source.source, content: source.content };
   }
 
-  /**
-   * originalPositionFor is only called on children SourceMapTrees. It recurses down
-   * into its own child SourceMapTrees, until we find the original source map.
-   */
-  originalPositionFor(line: number, column: number, name: string): MappingSource {
-    const segment = traceSegment(this.map, line, column);
+  const segment = traceSegment(source.map, line, column);
 
-    // If we couldn't find a segment, then this doesn't exist in the sourcemap.
-    if (segment == null) return INVALID_MAPPING;
-    // 1-length segments only move the current generated column, there's no source information
-    // to gather from it.
-    if (segment.length === 1) return SOURCELESS_MAPPING;
+  // If we couldn't find a segment, then this doesn't exist in the sourcemap.
+  if (segment == null) return INVALID_MAPPING;
+  // 1-length segments only move the current generated column, there's no source information
+  // to gather from it.
+  if (segment.length === 1) return SOURCELESS_MAPPING;
 
-    const source = this.sources[segment[1]];
-    return source.originalPositionFor(
-      segment[2],
-      segment[3],
-      segment.length === 5 ? this.map.names[segment[4]] : name
-    );
-  }
+  return originalPositionFor(
+    source.sources[segment[1]],
+    segment[2],
+    segment[3],
+    segment.length === 5 ? source.map.names[segment[4]] : name
+  );
 }

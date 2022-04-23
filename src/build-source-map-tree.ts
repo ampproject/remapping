@@ -1,8 +1,8 @@
 import { TraceMap } from '@jridgewell/trace-mapping';
 
-import OriginalSource from './original-source';
-import { SourceMapTree } from './source-map-tree';
+import { OriginalSource, MapSource } from './source-map-tree';
 
+import type { Sources } from './source-map-tree';
 import type { SourceMapInput, SourceMapLoader, LoaderContext } from './types';
 
 function asArray<T>(value: T | T[]): T[] {
@@ -24,7 +24,7 @@ function asArray<T>(value: T | T[]): T[] {
 export default function buildSourceMapTree(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader
-): SourceMapTree {
+): Sources {
   const maps = asArray(input).map((m) => new TraceMap(m, ''));
   const map = maps.pop()!;
 
@@ -39,7 +39,7 @@ export default function buildSourceMapTree(
 
   let tree = build(map, loader, '', 0);
   for (let i = maps.length - 1; i >= 0; i--) {
-    tree = new SourceMapTree(maps[i], [tree]);
+    tree = MapSource(maps[i], [tree]);
   }
   return tree;
 }
@@ -49,44 +49,42 @@ function build(
   loader: SourceMapLoader,
   importer: string,
   importerDepth: number
-): SourceMapTree {
+): Sources {
   const { resolvedSources, sourcesContent } = map;
 
   const depth = importerDepth + 1;
-  const children = resolvedSources.map(
-    (sourceFile: string | null, i: number): SourceMapTree | OriginalSource => {
-      // The loading context gives the loader more information about why this file is being loaded
-      // (eg, from which importer). It also allows the loader to override the location of the loaded
-      // sourcemap/original source, or to override the content in the sourcesContent field if it's
-      // an unmodified source file.
-      const ctx: LoaderContext = {
-        importer,
-        depth,
-        source: sourceFile || '',
-        content: undefined,
-      };
+  const children = resolvedSources.map((sourceFile: string | null, i: number): Sources => {
+    // The loading context gives the loader more information about why this file is being loaded
+    // (eg, from which importer). It also allows the loader to override the location of the loaded
+    // sourcemap/original source, or to override the content in the sourcesContent field if it's
+    // an unmodified source file.
+    const ctx: LoaderContext = {
+      importer,
+      depth,
+      source: sourceFile || '',
+      content: undefined,
+    };
 
-      // Use the provided loader callback to retrieve the file's sourcemap.
-      // TODO: We should eventually support async loading of sourcemap files.
-      const sourceMap = loader(ctx.source, ctx);
+    // Use the provided loader callback to retrieve the file's sourcemap.
+    // TODO: We should eventually support async loading of sourcemap files.
+    const sourceMap = loader(ctx.source, ctx);
 
-      const { source, content } = ctx;
+    const { source, content } = ctx;
 
-      // If there is no sourcemap, then it is an unmodified source file.
-      if (!sourceMap) {
-        // The contents of this unmodified source file can be overridden via the loader context,
-        // allowing it to be explicitly null or a string. If it remains undefined, we fall back to
-        // the importing sourcemap's `sourcesContent` field.
-        const sourceContent =
-          content !== undefined ? content : sourcesContent ? sourcesContent[i] : null;
-        return new OriginalSource(source, sourceContent);
-      }
-
-      // Else, it's a real sourcemap, and we need to recurse into it to load its
-      // source files.
-      return build(new TraceMap(sourceMap, source), loader, source, depth);
+    // If there is no sourcemap, then it is an unmodified source file.
+    if (!sourceMap) {
+      // The contents of this unmodified source file can be overridden via the loader context,
+      // allowing it to be explicitly null or a string. If it remains undefined, we fall back to
+      // the importing sourcemap's `sourcesContent` field.
+      const sourceContent =
+        content !== undefined ? content : sourcesContent ? sourcesContent[i] : null;
+      return OriginalSource(source, sourceContent);
     }
-  );
 
-  return new SourceMapTree(map, children);
+    // Else, it's a real sourcemap, and we need to recurse into it to load its
+    // source files.
+    return build(new TraceMap(sourceMap, source), loader, source, depth);
+  });
+
+  return MapSource(map, children);
 }
