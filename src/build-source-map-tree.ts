@@ -71,19 +71,16 @@ function build(
 
     const { source, content } = ctx;
 
-    // If there is no sourcemap, then it is an unmodified source file.
-    if (!sourceMap) {
-      // The contents of this unmodified source file can be overridden via the loader context,
-      // allowing it to be explicitly null or a string. If it remains undefined, we fall back to
-      // the importing sourcemap's `sourcesContent` field.
-      const sourceContent =
-        content !== undefined ? content : sourcesContent ? sourcesContent[i] : null;
-      return OriginalSource(source, sourceContent);
-    }
+    // If there is a sourcemap, then we need to recurse into it to load its source files.
+    if (sourceMap) return build(new TraceMap(sourceMap, source), loader, source, depth);
 
-    // Else, it's a real sourcemap, and we need to recurse into it to load its
-    // source files.
-    return build(new TraceMap(sourceMap, source), loader, source, depth);
+    // Else, it's an an unmodified source file.
+    // The contents of this unmodified source file can be overridden via the loader context,
+    // allowing it to be explicitly null or a string. If it remains undefined, we fall back to
+    // the importing sourcemap's `sourcesContent` field.
+    const sourceContent =
+      content !== undefined ? content : sourcesContent ? sourcesContent[i] : null;
+    return OriginalSource(source, sourceContent);
   });
 
   return MapSource(map, children);
