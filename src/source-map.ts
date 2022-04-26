@@ -1,6 +1,6 @@
-import { encodedMappings, decodedMappings } from '@jridgewell/trace-mapping';
+import { decodedMap, encodedMap } from '@jridgewell/gen-mapping';
 
-import type { TraceMap } from '@jridgewell/trace-mapping';
+import type { GenMapping } from '@jridgewell/gen-mapping';
 import type { DecodedSourceMap, EncodedSourceMap, Options } from './types';
 
 /**
@@ -16,20 +16,17 @@ export default class SourceMap {
   declare sourcesContent?: (string | null)[];
   declare version: 3;
 
-  constructor(map: TraceMap, options: Options) {
-    this.version = 3; // SourceMap spec says this should be first.
-    this.file = map.file;
-    this.mappings = options.decodedMappings
-      ? (decodedMappings(map) as DecodedSourceMap['mappings'])
-      : encodedMappings(map);
-    this.names = map.names;
+  constructor(map: GenMapping, options: Options) {
+    const out = options.decodedMappings ? decodedMap(map) : encodedMap(map);
+    this.version = out.version; // SourceMap spec says this should be first.
+    this.file = out.file;
+    this.mappings = out.mappings;
+    this.names = out.names;
 
-    this.sourceRoot = map.sourceRoot;
+    this.sourceRoot = out.sourceRoot;
 
-    this.sources = map.sources;
-    if (!options.excludeContent && 'sourcesContent' in map) {
-      this.sourcesContent = map.sourcesContent;
-    }
+    this.sources = out.sources;
+    if (!options.excludeContent) this.sourcesContent = out.sourcesContent;
   }
 
   toString(): string {
