@@ -28,14 +28,14 @@ const SOURCELESS_MAPPING = {
 };
 const EMPTY_SOURCES: Sources[] = [];
 
-type OriginalSource = {
+export type OriginalSource = {
   map: TraceMap;
   sources: Sources[];
   source: string;
   content: string | null;
 };
 
-type MapSource = {
+export type MapSource = {
   map: TraceMap;
   sources: Sources[];
   source: string;
@@ -78,8 +78,8 @@ export function OriginalSource(source: string, content: string | null): Original
  * traceMappings is only called on the root level SourceMapTree, and begins the process of
  * resolving each mapping in terms of the original source files.
  */
-export function traceMappings(tree: Sources): GenMapping {
-  const gen = new GenMapping(tree.map.file);
+export function traceMappings(tree: MapSource): GenMapping {
+  const gen = new GenMapping({ file: tree.map.file });
   const { sources: rootSources, map } = tree;
   const rootNames = map.names;
   const rootMappings = decodedMappings(map);

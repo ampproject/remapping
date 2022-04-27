@@ -20,13 +20,15 @@ export default class SourceMap {
     const out = options.decodedMappings ? decodedMap(map) : encodedMap(map);
     this.version = out.version; // SourceMap spec says this should be first.
     this.file = out.file;
-    this.mappings = out.mappings;
-    this.names = out.names;
+    this.mappings = out.mappings as SourceMap['mappings'];
+    this.names = out.names as SourceMap['names'];
 
     this.sourceRoot = out.sourceRoot;
 
-    this.sources = out.sources;
-    if (!options.excludeContent) this.sourcesContent = out.sourcesContent;
+    this.sources = out.sources as SourceMap['sources'];
+    if (!options.excludeContent) {
+      this.sourcesContent = out.sourcesContent as SourceMap['sourcesContent'];
+    }
   }
 
   toString(): string {

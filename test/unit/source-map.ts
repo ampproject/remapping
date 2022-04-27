@@ -20,7 +20,7 @@ describe('SourceMap', () => {
 
   test('it can include a file', () => {
     const file = 'foobar.js';
-    const traced = new GenMapping(file);
+    const traced = new GenMapping({ file });
     addSegment(traced, 0, 0, 'file.js', 0, 0, '');
 
     const map = new SourceMap(traced, opts);
@@ -30,7 +30,7 @@ describe('SourceMap', () => {
   // TODO: support sourceRoot
   test.skip('it can include a sourceRoot', () => {
     const sourceRoot = 'https://foo.com/';
-    const traced = new GenMapping(undefined, sourceRoot);
+    const traced = new GenMapping({ sourceRoot });
     addSegment(traced, 0, 0, 'file.js', 0, 0, '');
 
     const map = new SourceMap(traced, opts);
