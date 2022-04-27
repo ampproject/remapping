@@ -1,4 +1,4 @@
-import { decodedMap, encodedMap } from '@jridgewell/gen-mapping';
+import { toDecodedMap, toEncodedMap } from '@jridgewell/gen-mapping';
 
 import type { GenMapping } from '@jridgewell/gen-mapping';
 import type { DecodedSourceMap, EncodedSourceMap, Options } from './types';
@@ -17,7 +17,7 @@ export default class SourceMap {
   declare version: 3;
 
   constructor(map: GenMapping, options: Options) {
-    const out = options.decodedMappings ? decodedMap(map) : encodedMap(map);
+    const out = options.decodedMappings ? toDecodedMap(map) : toEncodedMap(map);
     this.version = out.version; // SourceMap spec says this should be first.
     this.file = out.file;
     this.mappings = out.mappings as SourceMap['mappings'];

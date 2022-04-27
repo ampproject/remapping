@@ -1,4 +1,4 @@
-import { decodedMap } from '@jridgewell/gen-mapping';
+import { toDecodedMap } from '@jridgewell/gen-mapping';
 import { TraceMap } from '@jridgewell/trace-mapping';
 
 import {
@@ -44,7 +44,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced.mappings).toEqual([[[0, 0, 1, 1], [5]]]);
     });
 
@@ -60,7 +60,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced.mappings).toEqual([[[0, 0, 1, 1], [5]]]);
     });
 
@@ -74,7 +74,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced.mappings).toEqual([]);
     });
 
@@ -91,7 +91,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced.mappings).toEqual([[[0, 0, 0, 0, 0]]]);
       expect(traced).toMatchObject({
         names: [name],
@@ -108,7 +108,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced.mappings).toEqual([[[0, 0, 1, 1]]]);
     });
 
@@ -122,7 +122,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced.mappings).toEqual([[[0, 0, 0, 0, 0]]]);
       expect(traced).toMatchObject({
         names: ['child'],
@@ -142,7 +142,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced).toMatchObject(extras);
     });
 
@@ -153,7 +153,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced).toMatchObject({
         // TODO: support sourceRoot
         sourceRoot: undefined,
@@ -169,7 +169,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced.mappings).toEqual([[[0, 0, 0, 0]]]);
     });
 
@@ -181,7 +181,7 @@ describe('MapSource', () => {
       };
 
       const tree = MapSource(new TraceMap(map), [child]);
-      const traced = decodedMap(traceMappings(tree));
+      const traced = toDecodedMap(traceMappings(tree));
       expect(traced.mappings).toEqual([]);
     });
 
@@ -198,7 +198,7 @@ describe('MapSource', () => {
         };
 
         const tree = MapSource(new TraceMap(map), [child]);
-        const traced = decodedMap(traceMappings(tree));
+        const traced = toDecodedMap(traceMappings(tree));
         expect(traced.mappings).toEqual([[[0, 0, 0, 0]]]);
       });
 
@@ -209,7 +209,7 @@ describe('MapSource', () => {
         };
 
         const tree = MapSource(new TraceMap(map), [child]);
-        const traced = decodedMap(traceMappings(tree));
+        const traced = toDecodedMap(traceMappings(tree));
         expect(traced.mappings).toEqual([[[0, 0, 0, 0]], [[0, 0, 0, 0]]]);
       });
     });
