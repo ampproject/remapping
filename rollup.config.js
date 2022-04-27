@@ -12,6 +12,7 @@ function configure(esm) {
           entryFileNames: '[name].umd.js',
           sourcemap: true,
           globals: {
+            '@jridgewell/gen-mapping': 'genMapping',
             '@jridgewell/trace-mapping': 'traceMapping',
           },
         },

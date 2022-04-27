@@ -2,7 +2,7 @@ import { TraceMap } from '@jridgewell/trace-mapping';
 
 import { OriginalSource, MapSource } from './source-map-tree';
 
-import type { Sources } from './source-map-tree';
+import type { Sources, MapSource as MapSourceType } from './source-map-tree';
 import type { SourceMapInput, SourceMapLoader, LoaderContext } from './types';
 
 function asArray<T>(value: T | T[]): T[] {
@@ -24,7 +24,7 @@ function asArray<T>(value: T | T[]): T[] {
 export default function buildSourceMapTree(
   input: SourceMapInput | SourceMapInput[],
   loader: SourceMapLoader
-): Sources {
+): MapSourceType {
   const maps = asArray(input).map((m) => new TraceMap(m, ''));
   const map = maps.pop()!;
 
@@ -49,7 +49,7 @@ function build(
   loader: SourceMapLoader,
   importer: string,
   importerDepth: number
-): Sources {
+): MapSourceType {
   const { resolvedSources, sourcesContent } = map;
 
   const depth = importerDepth + 1;
