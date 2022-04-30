@@ -1,4 +1,4 @@
-import { GenMapping, addSegment, setSourceContent } from '@jridgewell/gen-mapping';
+import { GenMapping, maybeAddSegment, setSourceContent } from '@jridgewell/gen-mapping';
 import { traceSegment, decodedMappings } from '@jridgewell/trace-mapping';
 
 import type { TraceMap } from '@jridgewell/trace-mapping';
@@ -79,6 +79,8 @@ export function OriginalSource(source: string, content: string | null): Original
  * resolving each mapping in terms of the original source files.
  */
 export function traceMappings(tree: MapSource): GenMapping {
+  // TODO: Eventually support sourceRoot, which has to be removed because the sources are already
+  // fully resolved. We'll need to make sources relative to the sourceRoot before adding them.
   const gen = new GenMapping({ file: tree.map.file });
   const { sources: rootSources, map } = tree;
   const rootNames = map.names;
@@ -86,10 +88,6 @@ export function traceMappings(tree: MapSource): GenMapping {
 
   for (let i = 0; i < rootMappings.length; i++) {
     const segments = rootMappings[i];
-
-    let lastSource = null;
-    let lastSourceLine = null;
-    let lastSourceColumn = null;
 
     for (let j = 0; j < segments.length; j++) {
       const segment = segments[j];
@@ -112,19 +110,11 @@ export function traceMappings(tree: MapSource): GenMapping {
         if (traced == null) continue;
       }
 
-      // So we traced a segment down into its original source file. Now push a
-      // new segment pointing to this location.
       const { column, line, name, content, source } = traced;
-      if (line === lastSourceLine && column === lastSourceColumn && source === lastSource) {
-        continue;
-      }
-      lastSourceLine = line;
-      lastSourceColumn = column;
-      lastSource = source;
 
       // Sigh, TypeScript can't figure out source/line/column are either all null, or all non-null...
-      (addSegment as any)(gen, i, genCol, source, line, column, name);
-      if (content != null) setSourceContent(gen, source, content);
+      (maybeAddSegment as any)(gen, i, genCol, source, line, column, name);
+      if (source && content != null) setSourceContent(gen, source, content);
     }
   }
 
