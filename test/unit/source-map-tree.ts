@@ -257,7 +257,7 @@ describe('MapSource', () => {
       for (let genCol = 0; genCol < expectedCols.length; genCol++) {
         const trace = originalPositionFor(tree, 5, genCol, '');
         if (expectedCols[genCol] == null) {
-          expect(trace).toMatchObject({ source: null });
+          expect(trace).toMatchObject({ source: '' });
         } else {
           expect(trace).toMatchObject({ line: 5, column: expectedCols[genCol] });
         }
@@ -277,7 +277,7 @@ describe('MapSource', () => {
 
     test('returns sourceless segment object if segment is 1-length', () => {
       const trace = originalPositionFor(tree, 2, 0, '');
-      expect(trace).toMatchObject({ source: null });
+      expect(trace).toMatchObject({ source: '' });
     });
 
     test('passes in outer name to trace', () => {

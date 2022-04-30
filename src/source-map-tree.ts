@@ -3,33 +3,16 @@ import { traceSegment, decodedMappings } from '@jridgewell/trace-mapping';
 
 import type { TraceMap } from '@jridgewell/trace-mapping';
 
-export type SourceMapSegmentObject =
-  | {
-      column: number;
-      line: number;
-      name: string;
-      source: string;
-      content: string | null;
-    }
-  | {
-      column: null;
-      line: null;
-      name: null;
-      source: null;
-      content: null;
-    };
-
-const SOURCELESS_MAPPING = {
-  source: null,
-  column: null,
-  line: null,
-  name: null,
-  content: null,
+export type SourceMapSegmentObject = {
+  column: number;
+  line: number;
+  name: string;
+  source: string;
+  content: string | null;
 };
-const EMPTY_SOURCES: Sources[] = [];
 
 export type OriginalSource = {
-  map: TraceMap;
+  map: null;
   sources: Sources[];
   source: string;
   content: string | null;
@@ -39,17 +22,37 @@ export type MapSource = {
   map: TraceMap;
   sources: Sources[];
   source: string;
-  content: string | null;
+  content: null;
 };
 
 export type Sources = OriginalSource | MapSource;
 
-function Source<M extends TraceMap | null>(
-  map: TraceMap | null,
+const SOURCELESS_MAPPING = /* #__PURE__ */ SegmentObject('', -1, -1, '', null);
+const EMPTY_SOURCES: Sources[] = [];
+
+function SegmentObject(
+  source: string,
+  line: number,
+  column: number,
+  name: string,
+  content: string | null
+): SourceMapSegmentObject {
+  return { source, line, column, name, content };
+}
+
+function Source(map: TraceMap, sources: Sources[], source: '', content: null): MapSource;
+function Source(
+  map: null,
   sources: Sources[],
   source: string,
   content: string | null
-): M extends null ? OriginalSource : MapSource {
+): OriginalSource;
+function Source(
+  map: TraceMap | null,
+  sources: Sources[],
+  source: string | '',
+  content: string | null
+): Sources {
   return {
     map,
     sources,
@@ -112,8 +115,7 @@ export function traceMappings(tree: MapSource): GenMapping {
 
       const { column, line, name, content, source } = traced;
 
-      // Sigh, TypeScript can't figure out source/line/column are either all null, or all non-null...
-      (maybeAddSegment as any)(gen, i, genCol, source, line, column, name);
+      maybeAddSegment(gen, i, genCol, source, line, column, name);
       if (source && content != null) setSourceContent(gen, source, content);
     }
   }
@@ -132,7 +134,7 @@ export function originalPositionFor(
   name: string
 ): SourceMapSegmentObject | null {
   if (!source.map) {
-    return { column, line, name, source: source.source, content: source.content };
+    return SegmentObject(source.source, line, column, name, source.content);
   }
 
   const segment = traceSegment(source.map, line, column);
