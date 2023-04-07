@@ -9,7 +9,7 @@
   ],
   "main": "dist/remapping.umd.js",
   "module": "dist/remapping.mjs",
-  "typings": "dist/types/remapping.d.ts",
+  "types": "dist/types/remapping.d.ts",
   "exports": {
     ".": [
       {
