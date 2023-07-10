@@ -55,8 +55,8 @@
   "devDependencies": {
     "@rollup/plugin-typescript": "8.3.2",
     "@types/jest": "27.4.1",
-    "@typescript-eslint/eslint-plugin": "5.20.0",
-    "@typescript-eslint/parser": "5.20.0",
+    "@typescript-eslint/eslint-plugin": "5.62.0",
+    "@typescript-eslint/parser": "5.62.0",
     "eslint": "8.14.0",
     "eslint-config-prettier": "8.5.0",
     "jest": "27.5.1",
