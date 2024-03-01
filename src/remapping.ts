@@ -13,6 +13,7 @@ export type {
   LoaderContext,
   Options,
 } from './types';
+export type { SourceMap };
 
 /**
  * Traces through all the mappings in the root sourcemap, through the sources
