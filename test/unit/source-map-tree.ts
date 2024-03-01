@@ -34,7 +34,7 @@ describe('MapSource', () => {
         sources: ['original.js'],
         version: 3,
       }),
-      [OriginalSource(`${sourceRoot}/original.js`, '')]
+      [OriginalSource(`${sourceRoot}/original.js`, '', false)]
     );
 
     test('records segment if segment is 1-length', () => {
@@ -237,7 +237,7 @@ describe('MapSource', () => {
       sources: ['child.js'],
       version: 3,
     };
-    const tree = MapSource(new TraceMap(map), [OriginalSource('child.js', '')]);
+    const tree = MapSource(new TraceMap(map), [OriginalSource('child.js', '', false)]);
 
     test('traces LineSegments to the segment with matching generated column', () => {
       const trace = originalPositionFor(tree, 0, 4, '');

@@ -50,7 +50,7 @@ function build(
   importer: string,
   importerDepth: number
 ): MapSourceType {
-  const { resolvedSources, sourcesContent } = map;
+  const { resolvedSources, sourcesContent, ignoreList } = map;
 
   const depth = importerDepth + 1;
   const children = resolvedSources.map((sourceFile: string | null, i: number): Sources => {
@@ -63,24 +63,26 @@ function build(
       depth,
       source: sourceFile || '',
       content: undefined,
+      ignore: undefined,
     };
 
     // Use the provided loader callback to retrieve the file's sourcemap.
     // TODO: We should eventually support async loading of sourcemap files.
     const sourceMap = loader(ctx.source, ctx);
 
-    const { source, content } = ctx;
+    const { source, content, ignore } = ctx;
 
     // If there is a sourcemap, then we need to recurse into it to load its source files.
     if (sourceMap) return build(new TraceMap(sourceMap, source), loader, source, depth);
 
-    // Else, it's an an unmodified source file.
+    // Else, it's an unmodified source file.
     // The contents of this unmodified source file can be overridden via the loader context,
     // allowing it to be explicitly null or a string. If it remains undefined, we fall back to
     // the importing sourcemap's `sourcesContent` field.
     const sourceContent =
       content !== undefined ? content : sourcesContent ? sourcesContent[i] : null;
-    return OriginalSource(source, sourceContent);
+    const ignored = ignore !== undefined ? ignore : ignoreList ? ignoreList.includes(i) : false;
+    return OriginalSource(source, sourceContent, ignored);
   });
 
   return MapSource(map, children);

@@ -1,4 +1,4 @@
-import { GenMapping, maybeAddSegment, setSourceContent } from '@jridgewell/gen-mapping';
+import { GenMapping, maybeAddSegment, setIgnore, setSourceContent } from '@jridgewell/gen-mapping';
 import { traceSegment, decodedMappings } from '@jridgewell/trace-mapping';
 
 import type { TraceMap } from '@jridgewell/trace-mapping';
@@ -9,6 +9,7 @@ export type SourceMapSegmentObject = {
   name: string;
   source: string;
   content: string | null;
+  ignore: boolean;
 };
 
 export type OriginalSource = {
@@ -16,6 +17,7 @@ export type OriginalSource = {
   sources: Sources[];
   source: string;
   content: string | null;
+  ignore: boolean;
 };
 
 export type MapSource = {
@@ -23,11 +25,12 @@ export type MapSource = {
   sources: Sources[];
   source: string;
   content: null;
+  ignore: false;
 };
 
 export type Sources = OriginalSource | MapSource;
 
-const SOURCELESS_MAPPING = /* #__PURE__ */ SegmentObject('', -1, -1, '', null);
+const SOURCELESS_MAPPING = /* #__PURE__ */ SegmentObject('', -1, -1, '', null, false);
 const EMPTY_SOURCES: Sources[] = [];
 
 function SegmentObject(
@@ -35,29 +38,39 @@ function SegmentObject(
   line: number,
   column: number,
   name: string,
-  content: string | null
+  content: string | null,
+  ignore: boolean
 ): SourceMapSegmentObject {
-  return { source, line, column, name, content };
+  return { source, line, column, name, content, ignore };
 }
 
-function Source(map: TraceMap, sources: Sources[], source: '', content: null): MapSource;
+function Source(
+  map: TraceMap,
+  sources: Sources[],
+  source: '',
+  content: null,
+  ignore: false
+): MapSource;
 function Source(
   map: null,
   sources: Sources[],
   source: string,
-  content: string | null
+  content: string | null,
+  ignore: boolean
 ): OriginalSource;
 function Source(
   map: TraceMap | null,
   sources: Sources[],
   source: string | '',
-  content: string | null
+  content: string | null,
+  ignore: boolean
 ): Sources {
   return {
     map,
     sources,
     source,
     content,
+    ignore,
   } as any;
 }
 
@@ -66,15 +79,19 @@ function Source(
  * (which may themselves be SourceMapTrees).
  */
 export function MapSource(map: TraceMap, sources: Sources[]): MapSource {
-  return Source(map, sources, '', null);
+  return Source(map, sources, '', null, false);
 }
 
 /**
  * A "leaf" node in the sourcemap tree, representing an original, unmodified source file. Recursive
  * segment tracing ends at the `OriginalSource`.
  */
-export function OriginalSource(source: string, content: string | null): OriginalSource {
-  return Source(null, EMPTY_SOURCES, source, content);
+export function OriginalSource(
+  source: string,
+  content: string | null,
+  ignore: boolean
+): OriginalSource {
+  return Source(null, EMPTY_SOURCES, source, content, ignore);
 }
 
 /**
@@ -113,10 +130,11 @@ export function traceMappings(tree: MapSource): GenMapping {
         if (traced == null) continue;
       }
 
-      const { column, line, name, content, source } = traced;
+      const { column, line, name, content, source, ignore } = traced;
 
       maybeAddSegment(gen, i, genCol, source, line, column, name);
       if (source && content != null) setSourceContent(gen, source, content);
+      if (ignore) setIgnore(gen, source, true);
     }
   }
 
@@ -134,7 +152,7 @@ export function originalPositionFor(
   name: string
 ): SourceMapSegmentObject | null {
   if (!source.map) {
-    return SegmentObject(source.source, line, column, name, source.content);
+    return SegmentObject(source.source, line, column, name, source.content, source.ignore);
   }
 
   const segment = traceSegment(source.map, line, column);

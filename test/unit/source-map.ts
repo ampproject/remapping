@@ -1,4 +1,4 @@
-import { GenMapping, addSegment, setSourceContent } from '@jridgewell/gen-mapping';
+import { GenMapping, addSegment, setIgnore, setSourceContent } from '@jridgewell/gen-mapping';
 import SourceMap from '../../src/source-map';
 
 describe('SourceMap', () => {
@@ -55,6 +55,15 @@ describe('SourceMap', () => {
 
     const map = new SourceMap(traced, { ...opts, excludeContent: true });
     expect(map).not.toHaveProperty('sourcesContent');
+  });
+
+  test('it can include ignoreList', () => {
+    const traced = new GenMapping();
+    addSegment(traced, 0, 0, 'file.js', 0, 0, '');
+    setIgnore(traced, 'file.js');
+
+    const map = new SourceMap(traced, opts);
+    expect(map).toHaveProperty('ignoreList', [0]);
   });
 
   test('mappings can be decoded', () => {

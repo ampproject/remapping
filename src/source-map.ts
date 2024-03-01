@@ -15,6 +15,7 @@ export default class SourceMap {
   declare sources: (string | null)[];
   declare sourcesContent?: (string | null)[];
   declare version: 3;
+  declare ignoreList: number[] | undefined;
 
   constructor(map: GenMapping, options: Options) {
     const out = options.decodedMappings ? toDecodedMap(map) : toEncodedMap(map);
@@ -22,7 +23,7 @@ export default class SourceMap {
     this.file = out.file;
     this.mappings = out.mappings as SourceMap['mappings'];
     this.names = out.names as SourceMap['names'];
-
+    this.ignoreList = out.ignoreList as SourceMap['ignoreList'];
     this.sourceRoot = out.sourceRoot;
 
     this.sources = out.sources as SourceMap['sources'];

@@ -11,6 +11,7 @@ describe('remapping', () => {
     sources: ['transpiled.js'],
     sourcesContent: ['1+1'],
     version: 3,
+    ignoreList: [],
   };
   const transpiledMap: EncodedSourceMap = {
     // 1st column of 2nd line of output file translates into the 1st source
@@ -20,6 +21,7 @@ describe('remapping', () => {
     sources: ['helloworld.js'],
     sourcesContent: ['\n\n  1 + 1;'],
     version: 3,
+    ignoreList: [],
   };
   const translatedMap: EncodedSourceMap = {
     file: 'transpiled.min.js',
@@ -32,6 +34,7 @@ describe('remapping', () => {
     sources: ['helloworld.js'],
     sourcesContent: ['\n\n  1 + 1;'],
     version: 3,
+    ignoreList: [],
   };
 
   test('does not alter a lone sourcemap', () => {
@@ -124,6 +127,45 @@ describe('remapping', () => {
     });
 
     expect(map).toHaveProperty('sourcesContent', [null]);
+  });
+
+  test('ignores if original source is ignored', () => {
+    const map = remapping(rawMap, (name: string) => {
+      if (name === 'transpiled.js') {
+        return {
+          ...transpiledMap,
+          ignoreList: [0],
+        };
+      }
+    });
+
+    expect(map).toHaveProperty('ignoreList', [0]);
+  });
+
+  test('unignores if sourcemap has no ignoreList', () => {
+    const map = remapping(rawMap, (name: string) => {
+      if (name === 'transpiled.js') {
+        return {
+          ...transpiledMap,
+          ignoreList: undefined,
+        };
+      }
+    });
+
+    expect(map).toHaveProperty('ignoreList', []);
+  });
+
+  test('unignores if sourcemap unignores original source', () => {
+    const map = remapping(rawMap, (name: string) => {
+      if (name === 'transpiled.js') {
+        return {
+          ...transpiledMap,
+          ignoreList: [],
+        };
+      }
+    });
+
+    expect(map).toHaveProperty('ignoreList', []);
   });
 
   describe('boolean options', () => {

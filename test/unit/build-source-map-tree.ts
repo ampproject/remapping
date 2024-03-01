@@ -80,6 +80,47 @@ describe('buildSourceMapTree', () => {
     ]);
   });
 
+  test('creates ignored OriginalSource with ignoreList', () => {
+    const tree = buildSourceMapTree(
+      {
+        ...decodedMap,
+        ignoreList: [0],
+      },
+      () => null
+    );
+
+    expect(tree.sources).toMatchObject([
+      {
+        ignore: true,
+      },
+    ]);
+  });
+
+  test('creates unignored OriginalSource if no ignoreList', () => {
+    const tree = buildSourceMapTree(decodedMap, () => null);
+    expect(tree.sources).toMatchObject([
+      {
+        ignore: false,
+      },
+    ]);
+  });
+
+  test('creates unignored OriginalSource with if no ignoreList', () => {
+    const tree = buildSourceMapTree(
+      {
+        ...decodedMap,
+        ignoreList: undefined,
+      },
+      () => null
+    );
+
+    expect(tree.sources).toMatchObject([
+      {
+        ignore: false,
+      },
+    ]);
+  });
+
   test('recursively loads sourcemaps', () => {
     const loader = jest.fn();
     loader
@@ -351,6 +392,46 @@ describe('buildSourceMapTree', () => {
         expect(tree.sources).toMatchObject([
           {
             content: null,
+          },
+        ]);
+      });
+    });
+
+    describe('ignore', () => {
+      test('can override the ignore of parent map', () => {
+        const loader = jest.fn();
+        loader.mockImplementationOnce((s, ctx) => {
+          expect(s).toBe('helloworld.js');
+          ctx.ignore = true;
+        });
+
+        const tree = buildSourceMapTree(decodedMap, loader);
+
+        expect(tree.sources).toMatchObject([
+          {
+            ignore: true,
+          },
+        ]);
+      });
+
+      test('can override the sourcesContent of parent map', () => {
+        const loader = jest.fn();
+        loader.mockImplementationOnce((s, ctx) => {
+          expect(s).toBe('helloworld.js');
+          ctx.ignore = false;
+        });
+
+        const tree = buildSourceMapTree(
+          {
+            ...decodedMap,
+            ignoreList: [0],
+          },
+          loader
+        );
+
+        expect(tree.sources).toMatchObject([
+          {
+            ignore: false,
           },
         ]);
       });
