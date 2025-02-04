@@ -151,6 +151,8 @@ export function originalPositionFor(
   column: number,
   name: string
 ): SourceMapSegmentObject | null {
+  if (!source) return null;
+
   if (!source.map) {
     return SegmentObject(source.source, line, column, name, source.content, source.ignore);
   }
