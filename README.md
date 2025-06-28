@@ -1,3 +1,9 @@
+# Development moved to [monorepo](https://github.com/jridgewell/sourcemaps)
+
+See https://github.com/jridgewell/sourcemaps/tree/main/packages/remapping for latest code.
+
+- - -
+
 # @ampproject/remapping
 
 > Remap sequential sourcemaps through transformations to point at the original source code
